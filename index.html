@@ -3,28 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>사주로또 v2 - 천기누설 사주 운명 넘버 연구소</title>
-  <meta name="description" content="정통 명리학의 오행 상생 이론과 최신 통계를 결합한 인생 행운 번호 및 로또 추천 큐레이션 서비스">
+  <title>사주로또 v2 - 모바일 1화면 핏</title>
   <link rel="stylesheet" href="v2_style.css">
 </head>
 <body>
 
-  <!-- 1. 최상단 네비게이션 & v1 클래식 스위처 -->
+  <!-- 최상단 바 -->
   <header class="top-bar">
     <div class="brand-title">🔮 사주로또 v2 연구소</div>
-    <a href="index_v1.html" class="v1-btn" title="기존 v1 버전으로 전환">v1 클래식 보기</a>
+    <a href="index_v1.html" class="v1-btn">v1 클래식</a>
   </header>
 
   <div class="container">
     
-    <!-- 2. [핵심 개선] 100만 앱 스타일 대형 최신 당첨결과 전면 대시보드 -->
+    <!-- 1. 대형 최신 1243회 당첨 대시보드 (슬림 핏) -->
     <section class="latest-lotto-dashboard">
       <div class="round-header">
-        <h2 class="round-title">1243회차 당첨결과</h2>
-        <span class="round-date">(2026.09.26 추첨)</span>
+        <h2 class="round-title">1243회 당첨결과</h2>
+        <span class="round-date">09.26 추첨</span>
       </div>
 
-      <!-- 큼직한 대형 로또 볼 7개 -->
       <div class="big-ball-row">
         <div class="big-ball col-1">9</div>
         <div class="big-ball col-11">18</div>
@@ -36,188 +34,123 @@
         <div class="big-ball col-31">35</div>
       </div>
 
-      <!-- 당첨금 및 인원 현황 -->
-      <div class="prize-grid">
-        <div class="prize-box">
-          <span class="label">1등 당첨자</span>
-          <span class="val highlight">12 명</span>
-        </div>
-        <div class="prize-box">
-          <span class="label">1등 당첨금 (1인당)</span>
-          <span class="val highlight">2,592,525,282 원</span>
-        </div>
-      </div>
-
-      <!-- 다음 회차 진행 현황 -->
-      <div class="next-draw-bar">
-        <span>다음 회차 예상 1등 당첨금</span>
-        <strong>약 50억 5,963만 원</strong>
+      <div class="prize-bar">
+        <span>1등 (12명) <strong>25.9억</strong></span>
+        <span>다음 회차 예상 <strong>약 50.5억</strong></span>
       </div>
     </section>
 
-    <!-- 3. 2대 핵심 줄기 탭 스위처 -->
+    <!-- 2. 2대 줄기 탭 스위처 -->
     <nav class="track-tabs">
       <button id="tab-lotto" class="tab-btn active" type="button">
-        <span style="font-size: 1.3rem;">🎰</span>
-        <span>사주 로또 추출</span>
+        <span>🎰 사주 로또 추출</span>
       </button>
       <button id="tab-destiny" class="tab-btn" type="button">
-        <span style="font-size: 1.3rem;">📜</span>
-        <span>사주 & 나만의 운명수</span>
+        <span>📜 사주 & 운명수</span>
       </button>
     </nav>
 
-    <!-- 재방문 회원용 자동 패스 배너 (저장된 정보가 있을 때 노출) -->
-    <div id="profile-quick-banner" style="display: none; justify-content: space-between; align-items: center; background: #1e293b; border: 1px solid var(--border-gold); padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 16px;">
-      <div>
-        <span style="color: #fbbf24; font-weight: 700;">기존 사주 정보 불러옴:</span>
-        <span id="saved-profile-desc" style="color: #cbd5e1; font-size: 0.9rem; margin-left: 6px;"></span>
-      </div>
-      <button id="btn-re-enter" type="button" style="background: transparent; border: 1px solid #64748b; color: #cbd5e1; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer;">
-        사주 변경
-      </button>
+    <!-- 3. 사주 정보 1줄 요약 바 (분석 완료 시 자동 노출 & 폼 접기) -->
+    <div id="saju-summary-bar" class="saju-summary-bar" style="display: none;">
+      <span class="info" id="summary-text">사주 분석 완료</span>
+      <button id="btn-toggle-saju" class="btn-toggle" type="button">사주 변경 ✏️</button>
     </div>
 
-    <!-- 4. 공통 사주 입력 폼 (성명 필드 완전 삭제! 개인정보 보호) -->
-    <section class="card" id="saju-form-card">
-      <div class="card-title">
-        <span>✨ 생년월일시 입력 (경도 시차 자동 보정)</span>
-      </div>
+    <!-- 4. 사주 입력 폼 (모바일 핏) -->
+    <section class="card-slim" id="saju-form-card">
       <form id="saju-form">
-        <div class="form-grid">
-          <div class="form-group full">
-            <label for="birth-date">생년월일 (양력 기준)</label>
+        <div class="form-grid-slim">
+          <div class="form-group-slim">
+            <label for="birth-date">생년월일 (양력)</label>
             <input type="date" id="birth-date" value="1988-08-18" required>
           </div>
-          <div class="form-group">
-            <label for="birth-hour">태어난 시간</label>
+          <div class="form-group-slim">
+            <label for="birth-hour">출생 시간</label>
             <select id="birth-hour">
-              <option value="0">자시 (23:30 ~ 01:29)</option>
-              <option value="2">축시 (01:30 ~ 03:29)</option>
-              <option value="4">인시 (03:30 ~ 05:29)</option>
-              <option value="6">묘시 (05:30 ~ 07:29)</option>
-              <option value="8">진시 (07:30 ~ 09:29)</option>
-              <option value="10">사시 (09:30 ~ 11:29)</option>
-              <option value="12" selected>오시 (11:30 ~ 13:29)</option>
-              <option value="14">미시 (13:30 ~ 15:29)</option>
-              <option value="16">신시 (15:30 ~ 17:29)</option>
-              <option value="18">유시 (17:30 ~ 19:29)</option>
-              <option value="20">술시 (19:30 ~ 21:29)</option>
-              <option value="22">해시 (21:30 ~ 23:29)</option>
-              <option value="-1">시간 모름</option>
+              <option value="12" selected>오시 (11:30~13:29)</option>
+              <option value="0">자시 (23:30~01:29)</option>
+              <option value="2">축시 (01:30~03:29)</option>
+              <option value="4">인시 (03:30~05:29)</option>
+              <option value="6">묘시 (05:30~07:29)</option>
+              <option value="8">진시 (07:30~09:29)</option>
+              <option value="10">사시 (09:30~11:29)</option>
+              <option value="14">미시 (13:30~15:29)</option>
+              <option value="16">신시 (15:30~17:29)</option>
+              <option value="18">유시 (17:30~19:29)</option>
+              <option value="20">술시 (19:30~21:29)</option>
+              <option value="22">해시 (21:30~23:29)</option>
+              <option value="-1">모름</option>
             </select>
           </div>
-          <div class="form-group">
+          <div class="form-group-slim">
+            <label for="birth-city">출생 지역 (시차보정)</label>
+            <select id="birth-city">
+              <option value="seoul" selected>서울·경기 (-32분)</option>
+              <option value="busan">부산·경남 (-24분)</option>
+              <option value="daegu">대구·경북 (-26분)</option>
+              <option value="incheon">인천 (-33분)</option>
+              <option value="gwangju">광주·전남 (-33분)</option>
+              <option value="daejeon">대전·충청 (-31분)</option>
+            </select>
+          </div>
+          <div class="form-group-slim">
             <label for="gender">성별</label>
             <select id="gender">
               <option value="male">남성</option>
               <option value="female">여성</option>
             </select>
           </div>
-          <div class="form-group full">
-            <label for="birth-city">출생 지역 (진태양시 경도 시차 보정)</label>
-            <select id="birth-city">
-              <option value="seoul" selected>서울·경기 (동경 127도 기준 -32분 보정)</option>
-              <option value="busan">부산·경남 (-24분 보정)</option>
-              <option value="daegu">대구·경북 (-26분 보정)</option>
-              <option value="incheon">인천 (-33분 보정)</option>
-              <option value="gwangju">광주·전남 (-33분 보정)</option>
-              <option value="daejeon">대전·충청 (-31분 보정)</option>
-              <option value="ulsan">울산 (-23분 보정)</option>
-              <option value="gangwon">강원 (-29분 보정)</option>
-              <option value="jeju">제주 (-34분 보정)</option>
-            </select>
-          </div>
         </div>
 
-        <button type="submit" class="btn-large-primary">
-          <span>🔮 천기누설 번호 분석 & 5게임 발행</span>
+        <button type="submit" class="btn-slim-primary">
+          <span>🔮 사주 맞춤 번호 5게임 추출하기</span>
         </button>
       </form>
     </section>
 
-    <!-- ================= [제1줄기: 로또 번호 추출 뷰] ================= -->
+    <!-- ================= [제1줄기: 로또 번호 5게임 추출 뷰] ================= -->
     <main id="view-lotto">
       <section id="lotto-result-section" style="display: none;">
         
-        <!-- 오행 도넛 차트 카드 -->
-        <div class="card">
-          <div class="card-title">
-            <span>☯️ 내 사주 오행(五行) 에너지 밸런스</span>
-          </div>
-          <div class="ohaeng-chart-wrap">
-            <svg id="ohaeng-svg" class="chart-svg" viewBox="0 0 140 140"></svg>
-            <div class="ohaeng-legend">
-              <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> 목(木): 성장·창의</div>
-              <div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span> 화(火): 열정·확장</div>
-              <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> 토(土): 신뢰·포용</div>
-              <div class="legend-item"><span class="legend-dot" style="background:#64748b;"></span> 금(金): 결단·정의</div>
-              <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span> 수(水): 지혜·유연</div>
-            </div>
-          </div>
-          <p id="ohaeng-analysis-text" style="font-size: 0.95rem; color: #cbd5e1; margin-top: 14px; line-height: 1.7;"></p>
-        </div>
-
-        <!-- 황금 영수증 부적 티켓 (게임별 상세 이유 해설 장착!) -->
-        <div class="receipt-ticket">
-          <div class="receipt-header">
+        <!-- [핵심] 한 화면 쏙 들어오는 컴팩트 티켓 -->
+        <div class="compact-ticket">
+          <div class="ticket-top-summary">
             <h3>사주 조화 맞춤 행운 티켓</h3>
-            <div class="receipt-stamp">대길(大吉) 상생 인장</div>
-            <div style="font-size: 0.85rem; color: #4b5563; margin-top: 8px;">
-              발행일시: <span id="ticket-date"></span> | 제 1244 회차 대비 5게임
-            </div>
+            <span class="stamp-badge">1244회 대비</span>
           </div>
 
-          <!-- A~E 5개 게임 (동일 번호 겹침 완전 방지 & 각각의 선정 이유 포함) -->
+          <!-- A자선 대신 의미 있는 제목이 달린 5개 게임 -->
           <div id="ticket-games">
             <!-- JS로 동적 렌더링 -->
           </div>
 
-          <div class="receipt-footer">
-            <div class="receipt-footer-row">
-              <span>추천 명당 방위:</span>
-              <strong id="ticket-direction">-</strong>
-            </div>
-            <div class="receipt-footer-row">
-              <span>최적 구매 시간대:</span>
-              <strong id="ticket-time">-</strong>
-            </div>
-            <div style="text-align: center; margin-top: 12px; font-size: 0.8rem; color: #6b7280;">
-              ★ 5개 게임 번호가 서로 겹치지 않게 오행과 빅데이터를 다채롭게 분산 결합하였습니다 ★
-            </div>
+          <div class="ticket-bottom-bar">
+            <span>추천 방위: <strong id="ticket-direction">-</strong></span>
+            <span>최적 시간: <strong id="ticket-time">-</strong></span>
           </div>
         </div>
 
         <!-- 번호 보관 버튼 -->
-        <button id="btn-save-numbers" class="btn-large-primary" style="background: #1e293b; color: #fbbf24; border: 1px solid var(--border-gold); margin-top: 16px;" type="button">
-          <span>💾 이번 5게임 번호 내 폰에 보관하기 (저장됨: <span id="saved-count-badge">0</span>개)</span>
+        <button id="btn-save-numbers" class="btn-save-compact" type="button">
+          💾 이번 5게임 내 폰에 보관하기 (저장됨: <span id="saved-count-badge">0</span>개)
         </button>
       </section>
     </main>
 
-    <!-- ================= [제2줄기: 사주 & 나만의 운명수 뷰] ================= -->
+    <!-- ================= [제2줄기: 사주 & 운명수 뷰] ================= -->
     <main id="view-destiny" style="display: none;">
       <section id="destiny-content">
-        <div class="card" style="text-align: center; padding: 40px 20px;">
-          <div style="font-size: 3rem; margin-bottom: 12px;">📜</div>
-          <h3 style="color: #fff; font-size: 1.25rem; font-weight: 800; margin-bottom: 10px;">사주를 입력하시면 운명수가 열립니다</h3>
-          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.7;">
-            위의 생년월일시를 입력하시고 <strong>[천기누설 번호 분석]</strong>을 누르시면,<br>
-            선천수·후천수 해설과 나만의 행운 전화번호·비밀번호 큐레이션이 자동으로 펼쳐집니다.
+        <div class="card-slim" style="text-align: center; padding: 24px 14px;">
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            사주를 입력하시면 선천수·후천수 및 전화번호 추천이 열립니다.
           </p>
         </div>
       </section>
     </main>
 
-    <!-- 5. 건전 구매 안내 헌장 & 법적 면책 문구 -->
-    <footer class="disclaimer-box">
-      <p style="margin-bottom: 8px;">
-        <strong>[건전 구매 안내]</strong> 로또는 소소한 일상의 설렘이자 나눔의 기쁨입니다. 한 주 5천 원 이하의 건전한 여가로 즐겨주세요.
-      </p>
-      <p>
-        본 서비스에서 제공하는 번호는 정통 명리학의 오행 상생 이론과 통계 데이터를 기반으로 한 <strong>'상징적 추천 및 긍정 기원 콘텐츠'</strong>이며, 
-        실제 복권 당첨이나 특정 결과를 확정·보장하지 않습니다.
-      </p>
+    <!-- 면책 문구 -->
+    <footer class="disclaimer-compact">
+      본 서비스는 정통 명리학의 상생 원리와 통계 데이터를 바탕으로 한 '상징적 행운 큐레이션'이며 당첨을 확정·보장하지 않습니다.
     </footer>
 
   </div>

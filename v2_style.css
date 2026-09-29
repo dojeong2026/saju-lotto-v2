@@ -1,6 +1,6 @@
 /* ==========================================================================
-   사주로또 v2 - 시원시원한 대형 가독성 & 프리미엄 다크 골드 디자인 시스템
-   대표님 지침: 큼직한 볼, 큰 글씨, 시원한 당첨 대시보드 전면 배치
+   사주로또 v2 - 모바일 한 화면 핏(Fit) & 고밀도 콤팩트 럭셔리 스타일
+   불필요한 공백 제거, 1게임당 1블록 컴팩트 정렬, 모바일 화면 최적화
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800;900&display=swap');
@@ -8,23 +8,15 @@
 :root {
   --bg-deep: #090d16;
   --bg-card: #131b2e;
-  --bg-subcard: #1e293b;
   --border-gold: rgba(245, 158, 11, 0.35);
   --border-gold-bright: #f59e0b;
   --text-main: #ffffff;
   --text-muted: #94a3b8;
   --text-gold: #fbbf24;
   
-  /* 오행 색상 토큰 */
-  --wood-color: #10b981;   /* 木: 초록 */
-  --fire-color: #ef4444;   /* 火: 빨강 */
-  --earth-color: #f59e0b;  /* 土: 노랑/골드 */
-  --metal-color: #64748b;  /* 金: 회색/실버 */
-  --water-color: #3b82f6;  /* 水: 파랑/네이비 */
-  
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
 }
 
 * {
@@ -38,362 +30,81 @@
 body {
   background-color: var(--bg-deep);
   color: var(--text-main);
-  line-height: 1.6;
+  line-height: 1.4;
   min-height: 100vh;
 }
 
 .container {
-  max-width: 680px;
+  max-width: 580px;
   margin: 0 auto;
-  padding: 0 16px 80px;
+  padding: 0 10px 40px;
 }
 
-/* ================= 1. 최상단 네비 & v1 링크 ================= */
+/* ================= 1. 최상단 바 ================= */
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+  padding: 8px 12px;
   background: #0f172a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .brand-title {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 900;
   color: #fff;
-  letter-spacing: -0.02em;
 }
 
 .v1-btn {
   background: rgba(255, 255, 255, 0.08);
   color: #cbd5e1;
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* ================= 2. [핵심] 대형 최신 당첨결과 전면 대시보드 ================= */
+/* ================= 2. 대형 당첨결과 대시보드 (슬림 핏) ================= */
 .latest-lotto-dashboard {
   background: #111827;
-  border: 2px solid rgba(245, 158, 11, 0.4);
-  border-radius: var(--radius-lg);
-  padding: 22px 18px;
-  margin: 16px 0 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin: 10px 0 12px;
 }
 
 .round-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
 }
 
 .round-title {
-  font-size: 1.45rem;
+  font-size: 1.15rem;
   font-weight: 900;
   color: #fff;
-  letter-spacing: -0.03em;
 }
 
 .round-date {
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
-/* 100만 앱 스타일 대형 로또 볼 */
 .big-ball-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin: 16px 0 20px;
-  flex-wrap: nowrap;
+  gap: 6px;
+  margin: 8px 0 10px;
 }
 
 .big-ball {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: #ffffff;
-  box-shadow: inset -3px -3px 6px rgba(0,0,0,0.6), inset 2px 2px 5px rgba(255,255,255,0.4), 0 4px 10px rgba(0,0,0,0.4);
-  text-shadow: 0 2px 3px rgba(0,0,0,0.7);
-}
-
-.ball-plus {
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: var(--text-muted);
-  margin: 0 2px;
-}
-
-/* 당첨금 현황 그리드 */
-.prize-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  background: #1f2937;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  margin-bottom: 10px;
-}
-
-.prize-box {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.prize-box .label {
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-.prize-box .val {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #f3f4f6;
-}
-
-.prize-box .val.highlight {
-  color: #fbbf24;
-}
-
-/* 다음 회차 진행 현황 */
-.next-draw-bar {
-  display: flex;
-  justify-content: space-between;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 0.88rem;
-  color: #cbd5e1;
-}
-
-.next-draw-bar strong {
-  color: #38bdf8;
-}
-
-/* ================= 3. 2대 줄기 탭 스위처 ================= */
-.track-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 16px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: var(--bg-card);
-  color: var(--text-muted);
-  font-size: 1.05rem;
-  font-weight: 700;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-btn.active {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.4));
-  color: #fff;
-  border-color: var(--border-gold-bright);
-  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.2);
-}
-
-/* ================= 4. 사주 입력 폼 (성명 삭제, 큰 글씨) ================= */
-.card {
-  background: var(--bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  padding: 22px 20px;
-  margin-bottom: 20px;
-}
-
-.card-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 16px;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-group.full {
-  grid-column: span 2;
-}
-
-label {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #cbd5e1;
-}
-
-input, select {
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  padding: 13px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 1.05rem;
-  font-weight: 600;
-  outline: none;
-}
-
-input:focus, select:focus {
-  border-color: var(--text-gold);
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
-}
-
-.btn-large-primary {
-  width: 100%;
-  padding: 18px;
-  margin-top: 16px;
-  border: none;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #000;
-  font-size: 1.2rem;
-  font-weight: 900;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 6px 25px rgba(245, 158, 11, 0.4);
-}
-
-.btn-large-primary:hover {
-  filter: brightness(1.1);
-}
-
-/* ================= 5. 오행 도넛 차트 ================= */
-.ohaeng-chart-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 12px 0;
-  gap: 20px;
-}
-
-.chart-svg {
-  width: 140px;
-  height: 140px;
-  transform: rotate(-90deg);
-}
-
-.ohaeng-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-/* ================= 6. 황금 영수증 티켓 (큼직한 볼 & 상세 이유 해설) ================= */
-.receipt-ticket {
-  background: #ffffff;
-  color: #111827;
-  padding: 26px 20px;
-  border-radius: var(--radius-md);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-  position: relative;
-  overflow: hidden;
-  margin-top: 10px;
-}
-
-.receipt-header {
-  text-align: center;
-  border-bottom: 2px dashed #9ca3af;
-  padding-bottom: 16px;
-  margin-bottom: 16px;
-}
-
-.receipt-header h3 {
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: #111827;
-  letter-spacing: -0.02em;
-}
-
-.receipt-stamp {
-  display: inline-block;
-  border: 2px solid #dc2626;
-  color: #dc2626;
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 900;
-  margin-top: 8px;
-  transform: rotate(-2deg);
-}
-
-/* 티켓 게임 행 */
-.ticket-game-card {
-  padding: 12px 0;
-  border-bottom: 1px dashed #e5e7eb;
-}
-
-.ticket-game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.ticket-game-label {
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: #1f2937;
-}
-
-.ticket-balls-wrap {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.ticket-ball-item {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -401,126 +112,276 @@ input:focus, select:focus {
   font-size: 1.15rem;
   font-weight: 900;
   color: #ffffff;
-  box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5), inset 1px 1px 4px rgba(255,255,255,0.4), 0 3px 6px rgba(0,0,0,0.2);
+  box-shadow: inset -2px -2px 4px rgba(0,0,0,0.6), inset 1px 1px 3px rgba(255,255,255,0.4), 0 3px 6px rgba(0,0,0,0.4);
 }
 
-/* 즉석 번호 이유 설명 캡션 (창 안 넘어가도 바로 이해) */
-.ticket-game-reason {
-  background: #f8fafc;
-  border-left: 3px solid #f59e0b;
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  color: #475569;
-  line-height: 1.5;
-  border-radius: 0 4px 4px 0;
+.ball-plus {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text-muted);
 }
 
-.ticket-game-reason strong {
-  color: #1e293b;
-}
-
-.receipt-footer {
-  border-top: 2px dashed #9ca3af;
-  padding-top: 16px;
-  margin-top: 16px;
-  font-size: 0.95rem;
-  color: #4b5563;
-}
-
-.receipt-footer-row {
+.prize-bar {
   display: flex;
   justify-content: space-between;
+  background: #1f2937;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: #d1d5db;
+}
+
+.prize-bar strong {
+  color: #fbbf24;
+}
+
+/* ================= 3. 2대 줄기 탭 스위처 ================= */
+.track-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.4));
+  color: #fff;
+  border-color: var(--border-gold-bright);
+}
+
+/* ================= 4. 사주 정보 1줄 요약 바 (접기 기능) ================= */
+.saju-summary-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e293b;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+}
+
+.saju-summary-bar .info {
+  color: #fde68a;
+  font-weight: 700;
+}
+
+.saju-summary-bar .btn-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #64748b;
+  color: #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+/* 사주 입력 폼 (슬림) */
+.card-slim {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.form-grid-slim {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.form-group-slim {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group-slim.full {
+  grid-column: span 2;
+}
+
+.form-group-slim label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.form-group-slim input, .form-group-slim select {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.btn-slim-primary {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #000;
+  font-size: 1.05rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* ================= 5. [핵심] 한 화면 쏙 들어가는 컴팩트 황금 티켓 ================= */
+.compact-ticket {
+  background: #ffffff;
+  color: #111827;
+  padding: 16px 14px 12px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  margin-top: 6px;
+}
+
+.ticket-top-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px dashed #9ca3af;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.ticket-top-summary h3 {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #111827;
+}
+
+.ticket-top-summary .stamp-badge {
+  background: #dc2626;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* 게임 1줄 행 (타이틀 + 볼 + 요약이 압축된 구조) */
+.game-compact-row {
+  padding: 8px 0;
+  border-bottom: 1px dotted #e5e7eb;
+}
+
+.game-title-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 6px;
 }
 
-.receipt-footer-row strong {
-  color: #111827;
-  font-size: 1.05rem;
+.game-meaning-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #1e3a8a; /* 딥 네이비 */
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* ================= 7. 공통 로또볼 색상 ================= */
-.ball-wood  { background: radial-gradient(circle at 35% 35%, #10b981, #047857); } /* 1~10 (노랑/초록) */
-.ball-fire  { background: radial-gradient(circle at 35% 35%, #3b82f6, #1d4ed8); } /* 11~20 (파랑) */
-.ball-earth { background: radial-gradient(circle at 35% 35%, #ef4444, #b91c1c); } /* 21~30 (빨강) */
-.ball-metal { background: radial-gradient(circle at 35% 35%, #64748b, #334155); } /* 31~40 (회색) */
-.ball-water { background: radial-gradient(circle at 35% 35%, #10b981, #065f46); } /* 41~45 (초록) */
+.game-meaning-desc {
+  font-size: 0.75rem;
+  color: #4b5563;
+  font-weight: 600;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
 
-/* 100만 앱 실제 볼 색상 (1~10 황금, 11~20 파랑, 21~30 빨강, 31~40 회색, 41~45 초록) */
+.game-balls-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compact-ball-group {
+  display: flex;
+  gap: 5px;
+}
+
+.compact-ball {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #ffffff;
+  box-shadow: inset -1.5px -1.5px 3px rgba(0,0,0,0.5), inset 1px 1px 2px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.ticket-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1.5px dashed #9ca3af;
+  padding-top: 8px;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
+.ticket-bottom-bar strong {
+  color: #111827;
+}
+
+/* ================= 6. 볼 색상 ================= */
 .col-1  { background: radial-gradient(circle at 35% 35%, #f59e0b, #d97706); } /* 황금 */
 .col-11 { background: radial-gradient(circle at 35% 35%, #3b82f6, #1d4ed8); } /* 파랑 */
 .col-21 { background: radial-gradient(circle at 35% 35%, #ef4444, #b91c1c); } /* 빨강 */
 .col-31 { background: radial-gradient(circle at 35% 35%, #94a3b8, #475569); } /* 회색 */
 .col-41 { background: radial-gradient(circle at 35% 35%, #10b981, #047857); } /* 초록 */
 
-/* ================= 8. 제2줄기 (사주와 운명수) 전용 ================= */
-.saju-intro-box {
-  background: rgba(245, 158, 11, 0.08);
+/* ================= 7. 버튼 및 푸터 ================= */
+.btn-save-compact {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
   border: 1px solid var(--border-gold);
-  border-radius: var(--radius-md);
-  padding: 20px;
-  margin-bottom: 20px;
-  font-size: 1rem;
-  line-height: 1.7;
-}
-
-.lucky-num-card {
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-md);
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.lucky-info h4 {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 4px;
-}
-
-.lucky-info p {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-}
-
-.lucky-digit-badge {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.5));
-  border: 1px solid var(--border-gold-bright);
-  color: #fde68a;
-  padding: 10px 18px;
   border-radius: var(--radius-sm);
-  font-size: 1.45rem;
-  font-weight: 900;
-  letter-spacing: 2px;
+  background: #1e293b;
+  color: #fbbf24;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
 }
 
-/* ================= 9. 건전 구매 & 면책 문구 ================= */
-.disclaimer-box {
+.disclaimer-compact {
   text-align: center;
-  padding: 26px 16px;
-  color: #94a3b8;
-  font-size: 0.85rem;
-  line-height: 1.8;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 40px;
-}
-
-/* 반응형 */
-@media (max-width: 480px) {
-  .big-ball {
-    width: 40px;
-    height: 40px;
-    font-size: 1.15rem;
-  }
-  .ticket-ball-item {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
-  }
-  .round-title {
-    font-size: 1.25rem;
-  }
+  padding: 16px 8px;
+  color: #64748b;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 20px;
 }
