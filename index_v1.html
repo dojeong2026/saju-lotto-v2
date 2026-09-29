@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>명리행운 - 5단계 사주 맞춤형 로또 비서</title>
+    <meta name="description" content="사주 명리학의 오행 수리학과 고정수/제외수 결합 엔진을 결합하여, 당신만을 위한 횡재수 맞춤형 로또 번호를 조합해 드립니다.">
+    <!-- Google Fonts: Noto Serif KR & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=2.1">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-top-nav">
+                <div class="logo">
+                    <i class="fa-solid fa-yin-yang logo-icon"></i>
+                    <span class="logo-text">명리행운</span>
+                </div>
+                <a href="guide.html" class="btn-guide-link"><i class="fa-solid fa-circle-info"></i> 원리 가이드</a>
+            </div>
+            <h1>명리학 행운 번호 여정</h1>
+            <!-- Progress Tracker -->
+            <div class="step-indicator">
+                <div class="indicator-bar" id="indicator-bar" style="width: 0%;"></div>
+                <div class="step-dot active" data-step="1" title="기원 선택">1</div>
+                <div class="step-dot" data-step="2" title="사주 입력">2</div>
+                <div class="step-dot" data-step="3" title="오행 분석">3</div>
+                <div class="step-dot" data-step="4" title="수리 융합">4</div>
+                <div class="step-dot" data-step="5" title="최종 결과">5</div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- STEP 1: 기원 및 테마 선택 -->
+            <section id="step-1-section" class="card active">
+                <h2 class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> 1단계: 오늘 바라는 행운의 기원</h2>
+                <p class="section-desc">수석님의 마음이 닿는 행운의 테마를 선택해 주십시오. 사주 분석 문맥이 튜닝됩니다.</p>
+                <div class="guide-nudge-box">
+                    <span><i class="fa-solid fa-lightbulb text-accent"></i> 내 번호에 숨겨진 오행 수리의 원리가 궁금하신가요?</span>
+                    <a href="guide.html" class="guide-text-link">3분 만에 배우는 명리 로또 원리 보기 <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                <div class="wish-buttons">
+                    <button class="wish-card" onclick="selectWish('wealth')">
+                        <div class="wish-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <div class="wish-text-wrapper">
+                            <h3>재물운</h3>
+                            <p>막힌 재물의 물꼬를 터주는 횡재 기운</p>
+                        </div>
+                    </button>
+                    <button class="wish-card" onclick="selectWish('business')">
+                        <div class="wish-icon"><i class="fa-solid fa-building-user"></i></div>
+                        <div class="wish-text-wrapper">
+                            <h3>사업운</h3>
+                            <p>성공과 귀인의 조력을 불러오는 기운</p>
+                        </div>
+                    </button>
+                    <button class="wish-card" onclick="selectWish('investment')">
+                        <div class="wish-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="wish-text-wrapper">
+                            <h3>투자운</h3>
+                            <p>재테크 및 횡재성 자산을 자극하는 기운</p>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 2: 기본 사주 정보 입력 -->
+            <section id="step-2-section" class="card">
+                <h2 class="section-title"><i class="fa-solid fa-user-gear"></i> 2단계: 생년월일시 입력</h2>
+                <p class="section-desc">간지 팔자를 산출하여 용신(용사) 오행을 분석하기 위한 기본 정보입니다.</p>
+                <form id="saju-form" onsubmit="event.preventDefault(); goToStep3();">
+
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="birth-date">태어난 날짜</label>
+                            <input type="date" id="birth-date" required>
+                        </div>
+                        <div class="form-group">
+                            <div class="time-label-wrapper">
+                                <label for="birth-time-slider">태어난 시간</label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="time-unknown" onchange="toggleTimeUnknown(this)">
+                                    <span>시간 모름</span>
+                                </label>
+                            </div>
+                            <div class="time-select-container">
+                                <select id="birth-hour-select" onchange="updateTimeDropdown(this.value)">
+                                    <option value="0">오전 00시 (자정)</option>
+                                    <option value="1">오전 01시</option>
+                                    <option value="2">오전 02시</option>
+                                    <option value="3">오전 03시</option>
+                                    <option value="4">오전 04시</option>
+                                    <option value="5">오전 05시</option>
+                                    <option value="6">오전 06시</option>
+                                    <option value="7">오전 07시</option>
+                                    <option value="8">오전 08시</option>
+                                    <option value="9">오전 09시</option>
+                                    <option value="10">오전 10시</option>
+                                    <option value="11">오전 11시</option>
+                                    <option value="12" selected>오후 12시 (정오)</option>
+                                    <option value="13">오후 01시 (13시)</option>
+                                    <option value="14">오후 02시 (14시)</option>
+                                    <option value="15">오후 03시 (15시)</option>
+                                    <option value="16">오후 04시 (16시)</option>
+                                    <option value="17">오후 05시 (17시)</option>
+                                    <option value="18">오후 06시 (18시)</option>
+                                    <option value="19">오후 07시 (19시)</option>
+                                    <option value="20">오후 08시 (20시)</option>
+                                    <option value="21">오후 09시 (21시)</option>
+                                    <option value="22">오후 10시 (22시)</option>
+                                    <option value="23">오후 11시 (23시)</option>
+                                </select>
+                                <div class="time-preview-box" id="time-preview">
+                                    <span class="preview-saji">午시 (11:30 ~ 13:30)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>양력/음력 구분</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="calendar-type" value="solar" checked>
+                                    <span>양력</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="calendar-type" value="lunar">
+                                    <span>음력 평달</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>성별</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="male" checked>
+                                    <span>남성</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="female">
+                                    <span>여성</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="fa-solid fa-arrow-left"></i> 이전</button>
+                        <button type="submit" class="btn btn-primary">다음 단계로 <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- LOADING SCREEN (로딩 중 전용 애니메이션) -->
+            <section id="loading-section" class="card">
+                <div class="loader-content">
+                    <div class="compass-wrapper">
+                        <i class="fa-solid fa-compass-drafting spinner-icon"></i>
+                        <div class="compass-ring"></div>
+                    </div>
+                    <h3>천기누설 분석 중...</h3>
+                    <p id="loading-text">생년월일을 바탕으로 만세력 간지를 산출하고 있습니다.</p>
+                </div>
+            </section>
+
+            <!-- STEP 3: 오행 카드 분석 및 만세력 해설 -->
+            <section id="step-3-section" class="card">
+                <h2 class="section-title"><i class="fa-solid fa-chart-pie"></i> 3단계: 사주팔자 및 오행 진단</h2>
+                <p class="section-desc">수석님의 타고난 팔자 기운입니다. <strong>아래 각 오행 카드를 터치</strong>하시면 명리 해석을 볼 수 있습니다.</p>
+
+                <!-- Saju Quad (사주팔자 판) -->
+                <div class="saju-pillar-container">
+                    <div class="saju-pillar">
+                        <div class="pillar-label">시주 (時柱)</div>
+                        <div class="kanji hour" id="pillar-hour">
+                            <div class="stem" id="stem-hour">庚</div>
+                            <div class="branch" id="branch-hour">子</div>
+                        </div>
+                    </div>
+                    <div class="saju-pillar">
+                        <div class="pillar-label">일주 (日柱)</div>
+                        <div class="kanji day focus" id="pillar-day">
+                            <div class="stem" id="stem-day">甲</div>
+                            <div class="branch" id="branch-day">寅</div>
+                        </div>
+                    </div>
+                    <div class="saju-pillar">
+                        <div class="pillar-label">월주 (月柱)</div>
+                        <div class="kanji month" id="pillar-month">
+                            <div class="stem" id="stem-month">戊</div>
+                            <div class="branch" id="branch-month">辰</div>
+                        </div>
+                    </div>
+                    <div class="saju-pillar">
+                        <div class="pillar-label">연주 (年柱)</div>
+                        <div class="kanji year" id="pillar-year">
+                            <div class="stem" id="stem-year">壬</div>
+                            <div class="branch" id="branch-year">戌</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Elements Graph -->
+                <div class="elements-interactive-grid" id="elements-interactive-list">
+                    <!-- Elements generated by JS -->
+                </div>
+
+                <div class="analysis-box">
+                    <h3><i class="fa-solid fa-feather-pointed"></i> 총평 및 행운 오행 처방</h3>
+                    <p class="analysis-desc" id="saju-analysis-text">사주를 분석 중입니다...</p>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="fa-solid fa-arrow-left"></i> 이전</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">수리 융합하러 가기 <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </section>
+
+            <!-- STEP 4: 수리 융합 (고정수/제외수 커스텀 필터) -->
+            <section id="step-4-section" class="card">
+                <div class="step-header">
+                    <span class="step-num">4</span>
+                    <h2>4단계: 염원이 담긴 고정수와 기피하는 제외수 설정</h2>
+                </div>
+                
+                <div class="nums-input-area">
+                    <div class="form-group">
+                        <label for="fixed-nums">고정수 지정 (최대 2개 - 콤마로 구분, 생략 가능)</label>
+                        <input type="text" id="fixed-nums" placeholder="예: 7, 24" autocomplete="off">
+                        <small class="helper-text">수석님이 반드시 포함시키고 싶은 행운의 숫자를 입력해 주십시오.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exclude-nums">제외수 지정 (최대 3개 - 콤마로 구분, 생략 가능)</label>
+                        <input type="text" id="exclude-nums" placeholder="예: 4, 13, 44" autocomplete="off">
+                        <small class="helper-text">나와 영적으로 맞지 않다고 느끼거나 제외할 번호를 입력하세요.</small>
+                    </div>
+                </div>
+
+                <div class="info-alert">
+                    <i class="fa-solid fa-circle-exclamation info-icon"></i>
+                    <p>입력하신 숫자는 3단계에서 도출된 수석님의 용신/희신 오행 수리 데이터에 밀결합되어 최적의 홀짝/총합 통계 필터를 통과하게 됩니다.</p>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="fa-solid fa-arrow-left"></i> 이전</button>
+                    <button type="button" class="btn btn-primary" onclick="generateLottoFinal()">최종 수리 융합 번호 추출 <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                </div>
+            </section>
+
+            <!-- Step 5 Section: Final Results -->
+            <section id="step-5-section" class="card">
+                <div class="step-header">
+                    <span class="step-num">5</span>
+                    <h2>5단계: 수석님만을 위한 최종 명리 행운 번호 브리핑</h2>
+                </div>
+
+                <!-- 횡재 지수 게이지 -->
+                <div class="luck-gauge-container">
+                    <div class="luck-gauge-header">
+                        <span>종합 횡재수 지수</span>
+                        <strong class="font-accent" id="gauge-score">75%</strong>
+                    </div>
+                    <div class="luck-gauge-bar-bg">
+                        <div class="luck-gauge-bar-fill" id="gauge-fill" style="width: 75%;"></div>
+                    </div>
+                    <p class="luck-gauge-desc" id="gauge-desc">수석님의 사주 오행 맞춤형 횡재수 조합이 생성되었습니다.</p>
+                </div>
+
+                <!-- 멤버십 등급 표시 -->
+                <div class="membership-status">
+                    <span>현재 멤버십:</span>
+                    <span class="membership-badge" id="membership-badge">회원 등급</span>
+                </div>
+
+                <!-- Lotto Combinations wrapper (통합형 5대 격국 추천 조합) -->
+                <div class="lotto-combinations-wrapper">
+                    <div class="integrated-combination-header" style="margin-bottom: 20px; border-bottom: 1px dashed rgba(229, 193, 88, 0.15); padding-bottom: 15px;">
+                        <span class="theme-name font-accent" style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; display: block; margin-bottom: 5px;"><i class="fa-solid fa-wand-magic-sparkles"></i> 수석님 사주 맞춤형 5대 격국 추천 조합</span>
+                        <span class="theme-desc" style="font-size: 0.85rem; color: var(--text-muted);">수석님의 사주 오행과 현대 통계 수리학을 융합한 핵심 5대 추천 조합입니다.</span>
+                    </div>
+                    
+                    <div class="lotto-integrated-list-container" style="position: relative;">
+                        <!-- 조합 A: 무상 조합 리스트 -->
+                        <div class="lotto-combinations" id="lotto-combinations-free-list">
+                            <!-- JS가 조합 A 렌더링 -->
+                        </div>
+                        
+                        <!-- 조합 B ~ 조합 E: 프리미엄 조합 영역 (자물쇠 덮개 대상) -->
+                        <div class="lotto-combinations-premium-wrapper" style="position: relative; margin-top: 12px;">
+                            <div class="lotto-combinations" id="lotto-combinations-premium-list">
+                                <!-- JS가 조합 B, C, D, E 렌더링 -->
+                            </div>
+                            
+                            <!-- Lock overlay (조합 B ~ E 를 철저히 가림) -->
+                            <div class="lock-overlay" id="combinations-lock" onclick="openPaymentModal()">
+                                <div class="lock-box">
+                                    <i class="fa-solid fa-lock lock-icon"></i>
+                                    <h4>격국 특수 조합 4종 비활성화</h4>
+                                    <p>단건 결제 또는 프리미엄 구독 시 즉시 오픈됩니다.</p>
+                                    <button class="btn btn-primary btn-sm"><i class="fa-solid fa-credit-card"></i> 4대 격국 융합 번호 해제</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reroll controls area -->
+                <div class="reroll-control-wrapper" id="reroll-control-wrapper-element">
+                    <div class="reroll-counter" id="reroll-counter-text">재배치 남은 횟수: 3회</div>
+                    <button class="btn btn-primary btn-block" id="btn-reroll" onclick="reRollLottoNumbers()"><i class="fa-solid fa-arrows-rotate"></i> 이 조건으로 번호 재배치</button>
+                </div>
+
+                <!-- Guideline Cards (also locked for free users) -->
+                <div class="prescription-wrapper">
+                    <div class="prescription-grid" id="prescription-grid-element">
+                        <div class="prescription-card">
+                            <div class="presc-icon"><i class="fa-solid fa-location-arrow"></i></div>
+                            <div class="presc-info">
+                                <h4>오늘의 행운 방위</h4>
+                                <p id="presc-direction">서북쪽</p>
+                            </div>
+                        </div>
+                        <div class="prescription-card">
+                            <div class="presc-icon"><i class="fa-solid fa-clock"></i></div>
+                            <div class="presc-info">
+                                <h4>구매 최적 시간</h4>
+                                <p id="presc-time">오전 09:30 ~ 11:30 (사시)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lock-overlay-small" id="presc-lock" onclick="openPaymentModal()">
+                        <div class="lock-box-small">
+                            <i class="fa-solid fa-lock"></i>
+                            <span>상세 행운 가이드(방위/시각) 잠금 해제</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="fa-solid fa-arrow-left"></i> 이전 단계로</button>
+                    <button type="button" class="btn btn-primary" onclick="goToStep(1)"><i class="fa-solid fa-house"></i> 처음으로</button>
+                </div>
+            </section>
+            </main>
+
+        <!-- Dynamic Element Description Modal (오행 터치 팝업) -->
+        <div class="modal" id="element-modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+                <div class="modal-header">
+                    <div class="modal-element-icon" id="modal-el-icon">木</div>
+                    <h3 id="modal-el-title">오행 분석</h3>
+                </div>
+                <div class="modal-body">
+                    <p id="modal-el-count">내 사주에 포함된 개수: 0개</p>
+                    <p class="modal-el-desc" id="modal-el-desc">오행 상세 설명이 들어가는 곳입니다.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary btn-sm" onclick="closeModal()">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tiered Payment Demo Modal (가상 결제창) -->
+        <div class="modal" id="payment-modal">
+            <div class="modal-content payment-modal-content">
+                <span class="close-modal" onclick="closePaymentModal()">&times;</span>
+                <div class="modal-header">
+                    <div class="modal-element-icon symbol-metal"><i class="fa-solid fa-gem"></i></div>
+                    <h3>명리행운 멤버십 및 결제</h3>
+                </div>
+                <div class="modal-body">
+                    <p class="payment-intro">원하시는 결제 옵션을 선택해 보십시오. (데모 결제 테스트가 적용되어 즉시 혜택이 활성화됩니다.)</p>
+                    
+                    <div class="payment-cards">
+                        <!-- Option A: Basic Package -->
+                        <div class="payment-card-option" onclick="buyDemoMembership('basic')">
+                            <div class="option-header">
+                                <span class="option-badge">이번 주 일회성</span>
+                                <h4>기본 패키지</h4>
+                            </div>
+                            <div class="option-price">₩ 990 <span class="price-sub">/ 1회</span></div>
+                            <ul class="option-benefits">
+                                <li><i class="fa-solid fa-check"></i> 5대 격국 조합(5개) 전면 해제</li>
+                                <li><i class="fa-solid fa-check"></i> 행운의 방위/시간 가이드 제공</li>
+                                <li class="disabled-benefit"><i class="fa-solid fa-xmark"></i> 사주 맞춤 번호 재배치 불가 (0회)</li>
+                            </ul>
+                            <button class="btn btn-secondary btn-sm btn-block">일회성 데모 결제하기</button>
+                        </div>
+
+                        <!-- Option B: Premium Subscription -->
+                        <div class="payment-card-option premium" onclick="buyDemoMembership('premium')">
+                            <div class="option-header">
+                                <span class="option-badge badge-premium">강력 추천 구독</span>
+                                <h4>프리미엄 멤버십</h4>
+                            </div>
+                            <div class="option-price">₩ 4,900 <span class="price-sub">/ 월</span></div>
+                            <ul class="option-benefits">
+                                <li><i class="fa-solid fa-check"></i> 5대 격국 조합(5개) 전면 해제</li>
+                                <li><i class="fa-solid fa-check"></i> 행운의 방위/시간 가이드 제공</li>
+                                <li><i class="fa-solid fa-check"></i> <strong>매주 재배치 3회 제공 (총 15조합)</strong></li>
+                                <li><i class="fa-solid fa-check"></i> 횡재수 알림 푸시/알림톡 발송</li>
+                            </ul>
+                            <button class="btn btn-primary btn-sm btn-block">프리미엄 데모 구독하기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="app-footer">
+            <p>© 2026 명리행운. All rights reserved. 코다리부장 기술 개발 및 배포.</p>
+        </footer>
+    </div>
+
+    <script src="app.js?v=2.1"></script>
+</body>
+</html>

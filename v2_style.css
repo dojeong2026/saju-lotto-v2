@@ -1,0 +1,545 @@
+/* ==========================================================================
+   사주로또 v2 (천기누설 넘버 연구소) - High-End Fintech Luxe Design System
+   비용 0원 / 온디바이스 브라우저 완벽 구동
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg-deep: #070a12;
+  --bg-card: rgba(17, 24, 39, 0.75);
+  --bg-card-hover: rgba(30, 41, 59, 0.85);
+  --border-gold: rgba(245, 158, 11, 0.25);
+  --border-gold-bright: rgba(245, 158, 11, 0.6);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-gold: #fbbf24;
+  --gold-glow: 0 0 25px rgba(245, 158, 11, 0.25);
+  
+  /* 오행 색상 토큰 */
+  --wood-color: #10b981;   /* 木: 청/녹 */
+  --fire-color: #ef4444;   /* 火: 적/주홍 */
+  --earth-color: #f59e0b;  /* 土: 황/골드 */
+  --metal-color: #64748b;  /* 金: 백/실버 */
+  --water-color: #3b82f6;  /* 水: 흑/딥블루 */
+  
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+  
+  --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 16px 80px;
+}
+
+/* ================= 1. 최상단 실시간 티커 & 버전 스위처 ================= */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(10, 15, 26, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.82rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.ticker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.ticker-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--text-gold);
+  border: 1px solid var(--border-gold);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.ticker-text {
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.v1-switch-btn {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.75rem;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.v1-switch-btn:hover {
+  color: var(--text-gold);
+  border-color: var(--border-gold);
+}
+
+/* ================= 2. 헤더 & 타이틀 ================= */
+.header {
+  text-align: center;
+  padding: 28px 0 20px;
+}
+
+.logo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-gold);
+  margin-bottom: 12px;
+}
+
+.main-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 40%, #fde68a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+.sub-title {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  word-break: keep-all;
+}
+
+/* ================= 3. 2대 핵심 줄기 탭 스위처 ================= */
+.track-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 5px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.3));
+  color: #fff;
+  border: 1px solid var(--border-gold-bright);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+}
+
+.tab-btn span.tab-icon {
+  font-size: 1.15rem;
+}
+
+/* ================= 4. 공통 카드 스타일 ================= */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.card-title .icon {
+  color: var(--text-gold);
+}
+
+/* ================= 5. 사주 입력 폼 (초간결 Zero-Friction) ================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full {
+  grid-column: span 2;
+}
+
+label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+input, select {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+  border-color: var(--text-gold);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 15px;
+  margin-top: 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #000;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+/* ================= 6. 오행 도넛 차트 & 분석 ================= */
+.ohaeng-chart-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 0;
+  gap: 16px;
+}
+
+.chart-svg {
+  width: 130px;
+  height: 130px;
+  transform: rotate(-90deg);
+}
+
+.ohaeng-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ================= 7. 로또 번호 공 (3D 프리미엄 볼) ================= */
+.ball-group {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+
+.lotto-ball {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #fff;
+  box-shadow: inset -3px -3px 6px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.4), 0 4px 10px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.ball-wood  { background: radial-gradient(circle at 35% 35%, #34d399, #059669); }
+.ball-fire  { background: radial-gradient(circle at 35% 35%, #f87171, #dc2626); }
+.ball-earth { background: radial-gradient(circle at 35% 35%, #fbbf24, #d97706); }
+.ball-metal { background: radial-gradient(circle at 35% 35%, #94a3b8, #475569); }
+.ball-water { background: radial-gradient(circle at 35% 35%, #60a5fa, #2563eb); }
+
+/* ================= 8. 황금 영수증 부적 티켓 ================= */
+.receipt-ticket {
+  background: #ffffff;
+  color: #111827;
+  padding: 24px 20px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Pretendard', sans-serif;
+  margin-top: 10px;
+}
+
+.receipt-ticket::before, .receipt-ticket::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: var(--bg-deep);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.receipt-ticket::before { left: -10px; }
+.receipt-ticket::after  { right: -10px; }
+
+.receipt-header {
+  text-align: center;
+  border-bottom: 2px dashed #d1d5db;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+
+.receipt-header h3 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.receipt-stamp {
+  display: inline-block;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  margin-top: 6px;
+  transform: rotate(-3deg);
+}
+
+.game-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dotted #e5e7eb;
+}
+
+.game-label {
+  font-weight: 800;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.game-balls {
+  display: flex;
+  gap: 6px;
+}
+
+.game-ball-mini {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.receipt-footer {
+  border-top: 2px dashed #d1d5db;
+  padding-top: 14px;
+  margin-top: 14px;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.receipt-footer-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.receipt-footer-row strong {
+  color: #111827;
+}
+
+/* ================= 9. 제2줄기 (사주와 운명수) 전용 스타일 ================= */
+.saju-intro-box {
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.number-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.lucky-num-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.lucky-num-card:hover {
+  border-color: var(--border-gold-bright);
+  transform: translateY(-2px);
+}
+
+.lucky-info h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.lucky-info p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.lucky-digit-badge {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
+  border: 1px solid var(--border-gold-bright);
+  color: #fde68a;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  font-family: monospace;
+}
+
+/* ================= 10. 건전성 헌장 & 면책 안내 (공익 가치) ================= */
+.disclaimer-box {
+  text-align: center;
+  padding: 24px 16px;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 40px;
+}
+
+.disclaimer-box strong {
+  color: #94a3b8;
+}
+
+/* 반응형 모바일 최적화 */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px 60px;
+  }
+  .main-title {
+    font-size: 1.55rem;
+  }
+  .ball-group {
+    gap: 6px;
+  }
+  .lotto-ball {
+    width: 38px;
+    height: 38px;
+    font-size: 0.95rem;
+  }
+  .game-balls {
+    gap: 4px;
+  }
+  .game-ball-mini {
+    width: 24px;
+    height: 24px;
+    font-size: 0.72rem;
+  }
+}
