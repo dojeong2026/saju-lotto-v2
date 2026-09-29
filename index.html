@@ -8,18 +8,30 @@
 </head>
 <body>
 
-  <!-- 최상단 바 -->
+  <!-- 최상단 프리미엄 브랜딩 헤더 -->
   <header class="top-bar">
-    <div class="brand-title">🔮 사주로또 v2 연구소</div>
-    <a href="index_v1.html" class="v1-btn">v1 클래식</a>
+    <div class="brand-group">
+      <div class="brand-title">🔮 사주로또 명운(命運) <span class="ver-badge">v2</span></div>
+      <div class="curator-badge">
+        <span class="avatar-icon">👩‍💼</span>
+        <span class="curator-name">영자 실장 AI 큐레이션</span>
+      </div>
+    </div>
+    <a href="index_v1.html" class="v1-btn" title="이전 v1 버전으로 전환">v1 클래식</a>
   </header>
 
   <div class="container">
     
-    <!-- 1. 대형 최신 1243회 당첨 대시보드 (슬림 핏) -->
+    <!-- 영자 실장의 한 줄 인사이트 배너 -->
+    <aside class="youngja-briefing" id="youngja-briefing">
+      <span class="youngja-sparkle">✨</span>
+      <p id="youngja-text">타고난 생년월일시의 <strong>선천수(1~10)</strong>와 결핍된 <strong>오행 기운</strong>을 보강해 드립니다.</p>
+    </aside>
+
+    <!-- 1. 최신 1243회 당첨 대시보드 (슬림 럭셔리 핏) -->
     <section class="latest-lotto-dashboard">
       <div class="round-header">
-        <h2 class="round-title">1243회 당첨결과</h2>
+        <h2 class="round-title"><span class="badge-gold">제1243회</span> 당첨결과</h2>
         <span class="round-date">09.26 추첨</span>
       </div>
 
@@ -35,8 +47,8 @@
       </div>
 
       <div class="prize-bar">
-        <span>1등 (12명) <strong>25.9억</strong></span>
-        <span>다음 회차 예상 <strong>약 50.5억</strong></span>
+        <span>1등 당첨 (12명) <strong class="prize-gold">25.9억</strong></span>
+        <span>다음 회차 누적 <strong class="prize-sky">약 50.5억</strong></span>
       </div>
     </section>
 
@@ -46,13 +58,16 @@
         <span>🎰 사주 로또 추출</span>
       </button>
       <button id="tab-destiny" class="tab-btn" type="button">
-        <span>📜 사주 & 운명수</span>
+        <span>📜 사주 & 평생 운명수</span>
       </button>
     </nav>
 
     <!-- 3. 사주 정보 1줄 요약 바 (분석 완료 시 자동 노출 & 폼 접기) -->
     <div id="saju-summary-bar" class="saju-summary-bar" style="display: none;">
-      <span class="info" id="summary-text">사주 분석 완료</span>
+      <div class="summary-left">
+        <span class="summary-icon">👤</span>
+        <span class="info" id="summary-text">사주 분석 완료</span>
+      </div>
       <button id="btn-toggle-saju" class="btn-toggle" type="button">사주 변경 ✏️</button>
     </div>
 

@@ -120,8 +120,15 @@ function runAnalysis(profile) {
   const summaryBar = document.getElementById('saju-summary-bar');
   if (summaryBar) {
     summaryBar.style.display = 'flex';
+    const cityName = profile.birthCity === 'seoul' ? '서울' : (profile.birthCity === 'busan' ? '부산' : '지역');
     document.getElementById('summary-text').innerText = 
-      `생년월일: ${profile.birthDate} | ${profile.birthCity === 'seoul' ? '서울' : '지방'}`;
+      `생년월일: ${profile.birthDate} | ${cityName} | ${sajuData.primaryElement.name} 기운 중심`;
+  }
+
+  // 영자 실장의 한 줄 품격 브리핑 동적 갱신
+  const briefingElem = document.getElementById('youngja-text');
+  if (briefingElem) {
+    briefingElem.innerHTML = `<strong>영자 실장 분석:</strong> 사주에 <strong>${sajuData.lackingElement.name}</strong> 기운이 부족하여, 이를 채워주는 행운수와 선천수·후천수를 황금 배합했습니다.`;
   }
 
   renderLottoView(sajuData);
