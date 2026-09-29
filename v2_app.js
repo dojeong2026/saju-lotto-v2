@@ -37,9 +37,15 @@ function initApp() {
   setupForm();
   renderSavedCount();
 
-  if (state.savedProfile) {
-    autoLoadProfile(state.savedProfile);
-  }
+  // 기본 프로필 또는 저장된 프로필로 즉시 5게임 번호 계산 및 렌더링 (빈 화면 방지)
+  const defaultProfile = state.savedProfile || {
+    birthDate: '1988-08-18',
+    birthHour: 12,
+    birthCity: 'seoul',
+    gender: 'male'
+  };
+
+  autoLoadProfile(defaultProfile);
 }
 
 function setupTabs() {
