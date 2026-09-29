@@ -37,15 +37,15 @@ function initApp() {
   setupForm();
   renderSavedCount();
 
-  // 저장된 프로필이 이미 있는 경우에만 기존 정보로 복원
+  // 초기 상태: 요약바와 결과는 닫고, 입력 폼만 깨끗하게 노출
+  const summaryBar = document.getElementById('saju-summary-bar');
+  if (summaryBar) summaryBar.style.display = 'none';
+
+  document.getElementById('saju-form-card').style.display = 'block';
+  document.getElementById('lotto-result-section').style.display = 'none';
+
   if (state.savedProfile) {
     autoLoadProfile(state.savedProfile);
-  } else {
-    // 신규 방문자는 입력 폼을 깨끗하게 보여줌
-    document.getElementById('saju-form-card').style.display = 'block';
-    document.getElementById('lotto-result-section').style.display = 'none';
-    const summaryBar = document.getElementById('saju-summary-bar');
-    if (summaryBar) summaryBar.style.display = 'none';
   }
 }
 
@@ -91,16 +91,14 @@ function setupForm() {
     runAnalysis(profile);
   });
 
-  // 사주 변경 버튼 리스너
+  // 사주 변경 버튼 클릭 시: 요약바 숨기고, 입력 폼만 열고, 결과 티켓은 숨김
   const toggleBtn = document.getElementById('btn-toggle-saju');
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
-      const formCard = document.getElementById('saju-form-card');
-      const summaryBar = document.getElementById('saju-summary-bar');
-      formCard.style.display = formCard.style.display === 'none' ? 'block' : 'none';
-      if (formCard.style.display === 'block') {
-        formCard.scrollIntoView({ behavior: 'smooth' });
-      }
+      document.getElementById('saju-form-card').style.display = 'block';
+      document.getElementById('saju-summary-bar').style.display = 'none';
+      document.getElementById('lotto-result-section').style.display = 'none';
+      document.getElementById('saju-form-card').scrollIntoView({ behavior: 'smooth' });
     });
   }
 }
@@ -110,7 +108,7 @@ function autoLoadProfile(profile) {
   document.getElementById('birth-hour').value = profile.birthHour;
   document.getElementById('birth-city').value = profile.birthCity;
   document.getElementById('gender').value = profile.gender;
-  runAnalysis(profile);
+  // 첫 방문 시에는 자동 실행하지 않고 폼을 보여줌
 }
 
 function runAnalysis(profile) {
