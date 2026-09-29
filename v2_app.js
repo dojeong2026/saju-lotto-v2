@@ -37,15 +37,16 @@ function initApp() {
   setupForm();
   renderSavedCount();
 
-  // 기본 프로필 또는 저장된 프로필로 즉시 5게임 번호 계산 및 렌더링 (빈 화면 방지)
-  const defaultProfile = state.savedProfile || {
-    birthDate: '1988-08-18',
-    birthHour: 12,
-    birthCity: 'seoul',
-    gender: 'male'
-  };
-
-  autoLoadProfile(defaultProfile);
+  // 저장된 프로필이 이미 있는 경우에만 기존 정보로 복원
+  if (state.savedProfile) {
+    autoLoadProfile(state.savedProfile);
+  } else {
+    // 신규 방문자는 입력 폼을 깨끗하게 보여줌
+    document.getElementById('saju-form-card').style.display = 'block';
+    document.getElementById('lotto-result-section').style.display = 'none';
+    const summaryBar = document.getElementById('saju-summary-bar');
+    if (summaryBar) summaryBar.style.display = 'none';
+  }
 }
 
 function setupTabs() {
