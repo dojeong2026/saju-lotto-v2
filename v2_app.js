@@ -234,11 +234,11 @@ function generateLuckyDigits(seed, variant) {
  */
 function renderLottoView(data) {
   const resultSec = document.getElementById('lotto-result-section');
-  resultSec.style.display = 'block';
-
-  document.getElementById('ticket-date').innerText = new Date().toLocaleDateString('ko-KR');
+  const dateEl = document.getElementById('ticket-date');
+  if (dateEl) dateEl.innerText = new Date().toLocaleDateString('ko-KR');
 
   const gamesContainer = document.getElementById('ticket-games');
+  if (!gamesContainer) return;
   gamesContainer.innerHTML = '';
 
   data.games.forEach((g, idx) => {
