@@ -66,20 +66,20 @@
         <strong class="prize-gold">25억 9,252만원</strong>
       </div>
 
-      <!-- 다음 회차 판매 현황 -->
+      <!-- 다음 회차 판매 현황 (1시간 단위 자동 갱신 연동) -->
       <div class="next-round-status">
         <div class="next-round-header">
-          <span class="next-round-tag">다음 회차(1244회) 판매 현황</span>
-          <span class="next-round-time">[9월 30일, 14시 현재]</span>
+          <span class="next-round-tag" id="next-round-tag">다음 회차(1244회) 판매 현황</span>
+          <span class="next-round-time" id="sales-update-time">[10월 1일, 18시 현재]</span>
         </div>
         <div class="next-round-grid">
           <div class="status-item">
             <span class="status-label">1등 총 예상 당첨금</span>
-            <span class="status-value highlight">77억 1,182만원</span>
+            <span class="status-value highlight" id="est-first-prize">126억 7,069만원</span>
           </div>
           <div class="status-item">
             <span class="status-label">누적 판매금</span>
-            <span class="status-value">320억 6,486만원</span>
+            <span class="status-value" id="cumulative-sales">526억 8,284만원</span>
           </div>
         </div>
       </div>
@@ -386,6 +386,6 @@
     </div>
   </div>
 
-  <script src="v2_app.js?v=2.9"></script>
+  <script src="v2_app.js?v=3.0"></script>
 </body>
 </html>

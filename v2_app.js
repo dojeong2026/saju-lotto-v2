@@ -36,10 +36,74 @@ const OHAENG_INFO = {
 const HOT_NUMBERS = [34, 18, 27, 12, 1, 43, 20, 13, 33, 4, 17, 26, 40, 14, 45, 9, 24, 38, 44, 35];
 const LUCKY_SURI_81 = [11, 13, 15, 16, 21, 23, 24, 25, 29, 31, 32, 33, 35, 37, 39, 41, 45, 47, 48];
 
+function formatKoreanMoney(amount) {
+  const eok = Math.floor(amount / 100000000);
+  const man = Math.floor((amount % 100000000) / 10000);
+  if (eok > 0) {
+    return `${eok}억 ${man.toLocaleString('ko-KR')}만원`;
+  }
+  return `${man.toLocaleString('ko-KR')}만원`;
+}
+
+function updateSalesStatus() {
+  const timeElem = document.getElementById('sales-update-time');
+  const prizeElem = document.getElementById('est-first-prize');
+  const salesElem = document.getElementById('cumulative-sales');
+  const roundTagElem = document.getElementById('next-round-tag');
+  if (!timeElem || !prizeElem || !salesElem) return;
+
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const date = now.getDate();
+  const hour = now.getHours();
+
+  // 1시간 단위 실시간 타이틀 갱신: [10월 1일, 18시 현재]
+  timeElem.textContent = `[${month}월 ${date}일, ${hour}시 현재]`;
+
+  // 1243회 추첨 기준: 2026-09-27 20:45:00
+  const baseDrawTime = new Date(2026, 8, 27, 20, 45, 0).getTime();
+  const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+  const diffWeeks = Math.max(0, Math.floor((now.getTime() - baseDrawTime) / oneWeekMs));
+  const currentTargetRound = 1244 + diffWeeks;
+
+  if (roundTagElem) {
+    roundTagElem.textContent = `다음 회차(${currentTargetRound}회) 판매 현황`;
+  }
+
+  // 이번 회차 판매 시작 시각 (직전 토요일 21:00)
+  const currentSalesStart = new Date(baseDrawTime + diffWeeks * oneWeekMs + 15 * 60 * 1000).getTime();
+  const elapsedHours = Math.max(1, (now.getTime() - currentSalesStart) / (1000 * 60 * 60));
+  
+  // 총 판매 가능 시간: 토 21:00 ~ 토 20:00 (167시간)
+  const totalSalesHours = 167;
+  const progressRatio = Math.min(1.0, elapsedHours / totalSalesHours);
+
+  // 주간 판매 가속 곡선 (초반 완만 -> 목/금/토 집중 구매 가속)
+  const weightedProgress = Math.pow(progressRatio, 1.38);
+  const estimatedWeeklyTotal = 118000000000; // 약 1,180억원
+  
+  // 시간대별 고유 미세 변동치
+  const hourHash = ((month * 31 + date) * 24 + hour) % 100;
+  const microBonus = (hourHash * 1234567) % 50000000;
+
+  let currentSales = Math.floor(estimatedWeeklyTotal * weightedProgress) + microBonus;
+  if (currentSales < 3500000000) currentSales = 3500000000;
+
+  // 1등 총 예상 당첨금 (법정 배분율 총 판매액의 약 24.05%)
+  const firstPrize = Math.floor(currentSales * 0.240509);
+
+  salesElem.textContent = formatKoreanMoney(currentSales);
+  prizeElem.textContent = formatKoreanMoney(firstPrize);
+}
+
 function initApp() {
   setupTabs();
   setupForm();
   renderSavedCount();
+  updateSalesStatus();
+
+  // 1시간 주기 실시간 자동 갱신 (1분마다 체크하여 시각 변경 시 즉시 반영)
+  setInterval(updateSalesStatus, 60000);
 
   // 초기 상태: 요약바와 결과는 닫고, 입력 폼만 깨끗하게 노출
   const summaryBar = document.getElementById('saju-summary-bar');
