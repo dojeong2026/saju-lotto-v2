@@ -171,8 +171,12 @@ function setupTabs() {
     tabLotto.classList.remove('active');
     state.currentTrack = 'destiny';
 
-    // 2. [사주 & 평생 운명수 탭]: 로또 전광판 전면 숨김!
+    const sajuSummaryBar = document.getElementById('saju-summary-bar');
+    const formCard = document.getElementById('saju-form-card');
+
+    // 1. [사주 & 평생 운명수 탭]: 로또 전광판 전면 숨김
     if (lottoBoard) lottoBoard.style.display = 'none';
+    if (destinyBoard) destinyBoard.style.display = 'none'; // 6대 순차 카드 내부로 완전 통합
 
     // 폼 버튼 및 안내 문구 전환
     const submitText = document.getElementById('btn-submit-text');
@@ -186,26 +190,19 @@ function setupTabs() {
     }
 
     if (state.sajuResult) {
-      // 분석 완료 상태: 천부명반과 운명수 뷰 전면 노출
-      if (destinyBoard) destinyBoard.style.display = 'block';
+      // 분석 완료 상태: 6대 주제 순차 스크롤 뷰 전면 노출
       viewLotto.style.display = 'none';
       viewDestiny.style.display = 'block';
+      if (sajuSummaryBar) sajuSummaryBar.style.display = 'none'; // 1주제 카드에 통합되었으므로 중복 숨김
+      if (formCard) formCard.style.display = 'none';
 
-      if (diagTitle) diagTitle.innerText = '평생 본원 수리 인증서';
-      if (diagBadge) {
-        diagBadge.style.display = 'inline-flex';
-        diagBadge.innerText = '📜 평생 불변';
-        diagBadge.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
-      }
-
-      updateDestinyDashboard(state.sajuResult);
       renderDestinyView(state.sajuResult);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // 아직 사주 입력 전: 임의의 결과를 띄우지 않고 폼 입력으로 집중 유도
-      if (destinyBoard) destinyBoard.style.display = 'none';
+      // 아직 사주 입력 전: 폼으로 집중
       viewLotto.style.display = 'none';
       viewDestiny.style.display = 'none';
-      const formCard = document.getElementById('saju-form-card');
+      if (sajuSummaryBar) sajuSummaryBar.style.display = 'none';
       if (formCard) formCard.style.display = 'block';
     }
   });
@@ -334,20 +331,16 @@ function runAnalysis(profile) {
 
     if (state.currentTrack === 'destiny') {
       if (lottoBoard) lottoBoard.style.display = 'none';
-      if (destinyBoard) destinyBoard.style.display = 'block';
+      if (destinyBoard) destinyBoard.style.display = 'none';
       if (viewLotto) viewLotto.style.display = 'none';
       if (viewDestiny) viewDestiny.style.display = 'block';
 
-      const diagTitle = document.getElementById('diagnosis-title');
-      if (diagTitle) diagTitle.innerText = '평생 본원 수리 인증서';
-      const amountBadge = document.getElementById('diagnosis-amount-badge');
-      if (amountBadge) {
-        amountBadge.innerText = '📜 평생 불변';
-        amountBadge.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
-      }
+      const sajuSummaryBar = document.getElementById('saju-summary-bar');
+      if (sajuSummaryBar) sajuSummaryBar.style.display = 'none';
 
-      if (destinyBoard && typeof destinyBoard.scrollIntoView === 'function') {
-        destinyBoard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const firstCard = document.getElementById('destiny-card-1');
+      if (firstCard && typeof firstCard.scrollIntoView === 'function') {
+        firstCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     } else {
       if (lottoBoard) lottoBoard.style.display = 'block';
@@ -842,128 +835,318 @@ function renderDestinyView(data) {
   const compass = data.destinyCompass || { dir: '남쪽(南)', color: '적색·자색 (화기운)', season: '여름' };
   const lacking = data.lackingElement || { name: '화(火)', symbol: '열정·활력' };
   const primary = data.primaryElement || { name: '수(水)', symbol: '지혜·유연' };
+  const birthStr = state.savedProfile ? state.savedProfile.birthDate : '1984.10.04';
+  const certId = 'SJ-' + (state.savedProfile ? state.savedProfile.birthDate.replace(/-/g, '') : '19841004') + '-VIP';
+
+  // 오행 5대 바 HTML 생성
+  const ohaengList = [
+    { key: 'wood',  name: '목(木)', fill: 'fill-wood' },
+    { key: 'fire',  name: '화(火)', fill: 'fill-fire' },
+    { key: 'earth', name: '토(土)', fill: 'fill-earth' },
+    { key: 'metal', name: '금(金)', fill: 'fill-metal' },
+    { key: 'water', name: '수(水)', fill: 'fill-water' }
+  ];
+  const ohaengBarsHtml = ohaengList.map(item => {
+    const pct = (data.ohaengPercent && data.ohaengPercent[item.key]) || 20;
+    return `
+      <div class="ohaeng-bar-row">
+        <span class="ohaeng-bar-name">${item.name}</span>
+        <div class="ohaeng-bar-track">
+          <div class="ohaeng-bar-fill ${item.fill}" style="width: ${pct}%;"></div>
+        </div>
+        <span class="ohaeng-bar-pct">${pct}%</span>
+      </div>
+    `;
+  }).join('');
 
   destinyBox.innerHTML = `
-    <!-- 제1장: 나의 타고난 천명과 일간 본원 -->
-    <div class="destiny-chapter-card">
-      <span class="chapter-badge">제1장 · 천명(天命) 본원</span>
-      <h3 class="chapter-title">🔮 나의 본원 기운: ${dm.name} (${dm.title})</h3>
-      <p class="chapter-desc">
-        대표님은 우주의 순환 속에서 <strong>${dm.name}</strong>의 영명한 기운을 부여받고 태어났습니다.
-        ${dm.desc}을 품고 있어, 조직과 가정에서 깊은 신뢰를 얻으며 큰 결실을 맺을 천부적 그릇입니다.
-      </p>
-      <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; font-size: 0.82rem; line-height: 1.6;">
-        <span style="color: #fbbf24; font-weight: 700;">💡 오행 조화 분석:</span> 
-        현재 사주는 <strong>${primary.name}</strong> 기운이 든든하게 자리 잡고 있으나, 
-        상대적으로 <strong>${lacking.name}</strong> 기운이 결핍되어 있어 삶의 추진력과 재물 결실을 위해선 
-        <strong>${lacking.name}의 수리(數理)와 방위</strong>를 적극 취해야 합니다.
+    <!-- [제1주제 화면]: 사주 평가 (나의 본원 기운 노출) -->
+    <div class="destiny-screen-card" id="destiny-card-1">
+      <div class="card-header-row">
+        <span class="card-step-badge">🔮 제1주제 · 사주 평가</span>
+        <span class="card-progress-counter">1 / 6</span>
       </div>
-    </div>
-
-    <!-- 제2장: 하도 선천수와 낙서 후천수 주역 비책 -->
-    <div class="destiny-chapter-card">
-      <span class="chapter-badge">제2장 · 하도(河圖)·낙서(洛書)</span>
-      <h3 class="chapter-title">☯️ 우주 수리의 비밀과 선천·후천수</h3>
-      <p class="chapter-desc">
-        동양 철학에서 <strong>하도(河圖)</strong>는 태어날 때 하늘이 내린 설계도이며, 
-        <strong>낙서(洛書)</strong>는 후천적으로 운을 바꾸는 변화의 열쇠입니다.
-      </p>
-      
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-        <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); padding: 12px; border-radius: 8px; text-align: center;">
-          <span style="color: #94a3b8; font-size: 0.76rem;">하도 선천수 (하늘의 뿌리)</span>
-          <div style="color: #fbbf24; font-size: 1.6rem; font-weight: 900; margin: 4px 0;">${data.seoncheon.join(', ')}</div>
-          <span style="color: #cbd5e1; font-size: 0.72rem;">${lacking.name}의 원초적 발현수</span>
-        </div>
-        <div style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); padding: 12px; border-radius: 8px; text-align: center;">
-          <span style="color: #94a3b8; font-size: 0.76rem;">낙서 후천수 (개운의 열쇠)</span>
-          <div style="color: #38bdf8; font-size: 1.6rem; font-weight: 900; margin: 4px 0;">${data.hucheon.join(', ')}</div>
-          <span style="color: #cbd5e1; font-size: 0.72rem;">운을 열어주는 변용수</span>
-        </div>
+      <div>
+        <h3 class="card-main-title">나의 본원(日干) 기운 노출</h3>
+        <p class="card-subtitle">우주 순환 속에서 부여받은 타고난 기질과 영명한 그릇</p>
       </div>
       
-      <div style="color: #94a3b8; font-size: 0.78rem; line-height: 1.5; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px;">
-        ※ 선천수 <strong>${data.seoncheon.join(', ')}</strong>와 후천수 <strong>${data.hucheon.join(', ')}</strong>는 
-        대표님의 부족한 기운을 채워주어 <strong>재물 손실을 막고 귀인의 조력을 끌어당기는 절대 불변의 수리</strong>입니다.
+      <div class="card-body-content">
+        <div class="day-master-showcase">
+          <div class="day-master-emblem">🌊</div>
+          <div class="day-master-title-kor">${dm.name}</div>
+          <div class="day-master-nick">${dm.title}</div>
+          <div class="day-master-desc-box">
+            "대표님은 <strong>${dm.name}</strong>의 영명한 기운을 타고났습니다. 
+            ${dm.desc}을 품고 있어, 주변 사람들에게 깊은 신뢰를 얻으며 큰 결실을 맺을 천부적 인물입니다."
+          </div>
+        </div>
+
+        <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; font-size: 0.82rem; line-height: 1.6;">
+          <div style="color: #fbbf24; font-weight: 800; margin-bottom: 4px;">⚖️ 오행 균형 조화 진단</div>
+          현재 사주는 <strong>${primary.name}</strong> 기운이 든든하게 받쳐주고 있으나, 
+          상대적으로 <strong>${lacking.name}</strong> 기운이 부족하여 보강이 필요합니다. 
+          따라서 <strong>${lacking.name}의 수리(數理)와 방위</strong>를 취하면 재물과 결실운이 비약적으로 열립니다.
+        </div>
+      </div>
+
+      <div class="card-next-scroll-indicator">
+        <span>스크롤을 내리면 <strong>[천부명반]</strong>이 나타납니다</span>
+        <span class="scroll-arrow-bounce">⬇️</span>
       </div>
     </div>
 
-    <!-- 제3장: 실생활 4대 평생 운명수 맞춤 가이드 -->
-    <div class="destiny-chapter-card">
-      <span class="chapter-badge">제3장 · 실생활 개운 처방</span>
-      <h3 class="chapter-title">💎 실생활 4대 평생 운명수 가이드</h3>
-      <p class="chapter-desc">
-        이 숫자들을 일상 속 중요 번호로 각인하여 나만의 긍정 에너지 주파수를 형성하십시오.
-      </p>
+    <!-- [제2주제 화면]: 천부명반 (5대 오행 기운 & 수호 나침반) -->
+    <div class="destiny-screen-card" id="destiny-card-2">
+      <div class="card-header-row">
+        <span class="card-step-badge">🧭 제2주제 · 천부명반(天府命盤)</span>
+        <span class="card-progress-counter">2 / 6</span>
+      </div>
+      <div>
+        <h3 class="card-main-title">5대 오행 분포 &amp; 수호 나침반</h3>
+        <p class="card-subtitle">나를 지켜주는 우주 방위와 상생 에너지 지형도</p>
+      </div>
 
-      <div class="lifetime-number-grid">
-        <!-- 1. 통장/도어락 비밀번호 -->
-        <div class="lifetime-number-card">
-          <div class="lifetime-card-header">
-            <span>💳</span>
-            <span>평생 금전 비밀번호</span>
+      <div class="card-body-content">
+        <div class="ohaeng-bars-wrapper">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 0.78rem; font-weight: 800; color: #94a3b8;">5대 오행(五行) 에너지 비율</span>
+            <span style="font-size: 0.76rem; color: #fbbf24; font-weight: 700;">${primary.name} 중심 · ${lacking.name} 보강</span>
           </div>
-          <div class="lifetime-big-val">${data.bankPass}</div>
-          <div class="lifetime-sub-principle">통장·카드·도어락 4자리<br>(선천·후천 결실 조합)</div>
+          ${ohaengBarsHtml}
         </div>
 
-        <!-- 2. 성공 차량 번호 -->
-        <div class="lifetime-number-card">
-          <div class="lifetime-card-header">
-            <span>🚗</span>
-            <span>안전·성공 차량번호</span>
+        <div class="compass-summary-card">
+          <div class="compass-sub-box">
+            <span class="compass-sub-label">수호 방위 (吉方)</span>
+            <span class="compass-sub-val">${compass.dir}</span>
           </div>
-          <div class="lifetime-big-val">${data.carNum}</div>
-          <div class="lifetime-sub-principle">자동차 번호판 4자리<br>(사고 예방 &amp; 사업 번창)</div>
+          <div class="compass-sub-box">
+            <span class="compass-sub-label">행운의 컬러</span>
+            <span class="compass-sub-val" style="color: #38bdf8;">${compass.color}</span>
+          </div>
         </div>
 
-        <!-- 3. 대박 전화번호 뒷자리 -->
-        <div class="lifetime-number-card" style="grid-column: span 2;">
-          <div class="lifetime-card-header">
-            <span>📱</span>
-            <span>인생 성공 골드 전화번호 (뒷자리 3선)</span>
-          </div>
-          <div style="display: flex; justify-content: space-around; margin: 6px 0;">
-            ${data.phoneNumbers.map(p => `
-              <span style="font-size: 1.25rem; font-weight: 900; color: #fbbf24; background: rgba(255,255,255,0.06); padding: 4px 12px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3);">${p}</span>
-            `).join('')}
-          </div>
-          <div class="lifetime-sub-principle">수리 81 영위격(榮華格) 기반 · 인복과 부귀를 부르는 조합</div>
+        <div style="background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px; font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; text-align: center;">
+          💡 중요 미팅이나 계약 시 <strong>${compass.dir}</strong>을 등지거나 마주하면 귀인의 조력을 얻기 유리합니다.
         </div>
+      </div>
 
-        <!-- 4. 주거 층수 및 동호수 -->
-        <div class="lifetime-number-card" style="grid-column: span 2;">
-          <div class="lifetime-card-header">
-            <span>🏢</span>
-            <span>재물이 쌓이는 주거 층수 &amp; 동호수</span>
-          </div>
-          <div style="font-size: 1.05rem; font-weight: 800; color: #38bdf8; margin: 4px 0;">
-            길한 층수: ${data.floorList && data.floorList.length ? data.floorList.join('층, ') + '층' : '2층, 7층, 12층, 17층, 22층'}
-          </div>
-          <div class="lifetime-sub-principle">
-            추천 호수: ${data.roomList && data.roomList.length ? data.roomList.join(', ') : '702호, 1202호, 1702호'} (오행 상생 길운 라인)
-          </div>
-        </div>
+      <div class="card-next-scroll-indicator">
+        <span>스크롤을 내리면 <strong>[평생본원 수리 인증]</strong>이 나타납니다</span>
+        <span class="scroll-arrow-bounce">⬇️</span>
       </div>
     </div>
 
-    <!-- 제4장: 영자 실장의 인생 수호 비책 가이드 -->
-    <div class="destiny-chapter-card" style="border-color: rgba(245, 158, 11, 0.4); background: linear-gradient(145deg, #131b2e 0%, #1c1a36 100%);">
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-        <span style="font-size: 1.3rem;">🌸</span>
-        <h3 class="chapter-title" style="margin-bottom: 0; color: #fbbf24;">영자 실장의 인생 수호 비책 가이드</h3>
+    <!-- [제3주제 화면]: 평생본원 수리 인증 (공식 인증서) -->
+    <div class="destiny-screen-card" id="destiny-card-3">
+      <div class="card-header-row">
+        <span class="card-step-badge">📜 제3주제 · 평생본원 수리 인증</span>
+        <span class="card-progress-counter">3 / 6</span>
       </div>
-      <p style="color: #cbd5e1; font-size: 0.84rem; line-height: 1.6; margin-bottom: 12px;">
-        "대표님, 운명수는 단순한 숫자가 아니라 매일 내 무의식을 깨우는 <strong>'마인드 앵커(닻)'</strong>입니다.
-        중요한 결정을 앞두셨을 때는 언제나 수호 방위인 <strong>${compass.dir}</strong>을 향해 심호흡하시고,
-        지갑이나 스마트폰 배경화면에 수호 숫자 <strong>${data.seoncheon.join(', ')}</strong>을 간직해 보세요.
-        부정적인 기운은 물러가고 당당한 번영의 기운이 깃들 것입니다."
-      </p>
-      <div style="text-align: right; color: #94a3b8; font-size: 0.74rem;">
-        — 사주로또 v2.1 명리 큐레이션 센터
+      <div>
+        <h3 class="card-main-title">평생본원 공식 수리 인증서</h3>
+        <p class="card-subtitle">하늘이 정해준 태생적 고유 명판과 불변의 명리 코드</p>
+      </div>
+
+      <div class="card-body-content">
+        <div class="certificate-frame">
+          <div class="cert-stamp">명리공인<br>정통수리<br>認 證</div>
+          <div class="cert-header">
+            <div class="cert-title">평생본원 수리 인증서</div>
+            <div class="cert-num">발급번호: ${certId}</div>
+          </div>
+          
+          <div style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 8px;">
+            귀하(${birthStr}生)의 명리원식을 분석하여 평생을 관통하는 수리를 다음과 같이 공인합니다.
+          </div>
+
+          <div class="cert-number-showcase">
+            <div class="cert-number-pill">
+              <span class="cert-pill-label">선천 천명수 (根)</span>
+              <div class="cert-pill-digits">${data.seoncheon.join(', ')}</div>
+            </div>
+            <div class="cert-number-pill" style="border-color: rgba(56,189,248,0.4);">
+              <span class="cert-pill-label">후천 개운수 (變)</span>
+              <div class="cert-pill-digits" style="color: #38bdf8;">${data.hucheon.join(', ')}</div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.74rem; color: #94a3b8; line-height: 1.45; text-align: left; padding: 0 4px;">
+            ※ 본 인증서는 동양 역학의 황금률에 따라 산출된 고유 불변의 수리로 평생 귀하의 삶에 길한 에너지를 부여합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="card-next-scroll-indicator">
+        <span>스크롤을 내리면 <strong>[하도·낙서 주역 비결]</strong>이 나타납니다</span>
+        <span class="scroll-arrow-bounce">⬇️</span>
+      </div>
+    </div>
+
+    <!-- [제4주제 화면]: 하도·낙서 (선천수와 후천수 의미 한 줄 더 명확히 추가) -->
+    <div class="destiny-screen-card" id="destiny-card-4">
+      <div class="card-header-row">
+        <span class="card-step-badge">☯️ 제4주제 · 하도(河圖)·낙서(洛書)</span>
+        <span class="card-progress-counter">4 / 6</span>
+      </div>
+      <div>
+        <h3 class="card-main-title">하도·낙서와 선천·후천수 의미</h3>
+        <p class="card-subtitle">5천 년 주역 역사가 증명하는 수리의 원천과 개운의 원리</p>
+      </div>
+
+      <div class="card-body-content">
+        <!-- 선천수 의미 한 줄 강조 -->
+        <div class="hado-meaning-box">
+          <strong>💡 하도 선천수(${data.seoncheon.join(', ')}):</strong><br>
+          하늘이 부여한 <strong>본질의 뿌리이자 불변의 천명 씨앗</strong>으로, 태어날 때 정해진 원초적 생명력의 바탕입니다.
+        </div>
+
+        <!-- 후천수 의미 한 줄 강조 -->
+        <div class="nakseo-meaning-box">
+          <strong>💡 낙서 후천수(${data.hucheon.join(', ')}):</strong><br>
+          인간의 선택과 환경을 통해 <strong>운을 열어주는 변화의 열쇠이자 개운의 도구</strong>입니다.
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+          <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); padding: 10px; border-radius: 8px; text-align: center;">
+            <span style="color: #94a3b8; font-size: 0.72rem;">뿌리 (선천)</span>
+            <div style="color: #fbbf24; font-size: 1.4rem; font-weight: 900;">${data.seoncheon.join(', ')}</div>
+            <span style="color: #cbd5e1; font-size: 0.7rem;">기운 보강의 씨앗</span>
+          </div>
+          <div style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); padding: 10px; border-radius: 8px; text-align: center;">
+            <span style="color: #94a3b8; font-size: 0.72rem;">도구 (후천)</span>
+            <div style="color: #38bdf8; font-size: 1.4rem; font-weight: 900;">${data.hucheon.join(', ')}</div>
+            <span style="color: #cbd5e1; font-size: 0.7rem;">운을 트이게 하는 열쇠</span>
+          </div>
+        </div>
+
+        <div style="font-size: 0.76rem; color: #94a3b8; line-height: 1.5; margin-top: 6px; text-align: center;">
+          "선천수로 근본을 다지고, 후천수로 일상을 움직일 때 최상의 발복이 일어납니다."
+        </div>
+      </div>
+
+      <div class="card-next-scroll-indicator">
+        <span>스크롤을 내리면 <strong>[실생활 4대 운명수]</strong>가 나타납니다</span>
+        <span class="scroll-arrow-bounce">⬇️</span>
+      </div>
+    </div>
+
+    <!-- [제5주제 화면]: 실생활 운명수 가이드 (비밀번호, 전화번호, 차량번호, 주거 층수/호수) -->
+    <div class="destiny-screen-card" id="destiny-card-5">
+      <div class="card-header-row">
+        <span class="card-step-badge">💎 제5주제 · 실생활 운명수 가이드</span>
+        <span class="card-progress-counter">5 / 6</span>
+      </div>
+      <div>
+        <h3 class="card-main-title">실생활 4대 평생 맞춤 번호</h3>
+        <p class="card-subtitle">매일 쓰는 일상 속 번호에 길운의 주파수를 각인하는 방법</p>
+      </div>
+
+      <div class="card-body-content">
+        <div class="lifetime-number-grid">
+          <!-- 1. 통장/도어락 비밀번호 -->
+          <div class="lifetime-number-card">
+            <div class="lifetime-card-header">
+              <span>💳</span>
+              <span>평생 금전 비밀번호</span>
+            </div>
+            <div class="lifetime-big-val">${data.bankPass}</div>
+            <div class="lifetime-sub-principle">통장·카드·도어락 4자리<br>(선천·후천 결실 조합)</div>
+          </div>
+
+          <!-- 2. 성공 차량 번호 -->
+          <div class="lifetime-number-card">
+            <div class="lifetime-card-header">
+              <span>🚗</span>
+              <span>안전·성공 차량번호</span>
+            </div>
+            <div class="lifetime-big-val">${data.carNum}</div>
+            <div class="lifetime-sub-principle">자동차 번호판 4자리<br>(사고 예방 &amp; 사업 번창)</div>
+          </div>
+
+          <!-- 3. 대박 전화번호 뒷자리 -->
+          <div class="lifetime-number-card" style="grid-column: span 2;">
+            <div class="lifetime-card-header">
+              <span>📱</span>
+              <span>인생 성공 골드 전화번호 (뒷자리 3선)</span>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin: 4px 0;">
+              ${data.phoneNumbers.map(p => `
+                <span style="font-size: 1.15rem; font-weight: 900; color: #fbbf24; background: rgba(255,255,255,0.06); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3);">${p}</span>
+              `).join('')}
+            </div>
+            <div class="lifetime-sub-principle">수리 81 영위격(榮華格) 기반 · 인복과 부귀를 부르는 황금 조합</div>
+          </div>
+
+          <!-- 4. 주거 층수 및 동호수 -->
+          <div class="lifetime-number-card" style="grid-column: span 2;">
+            <div class="lifetime-card-header">
+              <span>🏢</span>
+              <span>재물이 쌓이는 주거 층수 &amp; 동호수</span>
+            </div>
+            <div style="font-size: 0.98rem; font-weight: 800; color: #38bdf8; margin: 3px 0;">
+              길한 층수: ${data.floorList && data.floorList.length ? data.floorList.join('층, ') + '층' : '2층, 7층, 12층, 17층, 22층'}
+            </div>
+            <div class="lifetime-sub-principle">
+              추천 호수: ${data.roomList && data.roomList.length ? data.roomList.join(', ') : '702호, 1202호, 1702호'} (오행 상생 길운 라인)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-next-scroll-indicator">
+        <span>스크롤을 내리면 <strong>[인생 수호 비책 가이드]</strong>가 나타납니다</span>
+        <span class="scroll-arrow-bounce">⬇️</span>
+      </div>
+    </div>
+
+    <!-- [제6주제 화면]: 영자 실장의 인생 수호 비책 가이드 -->
+    <div class="destiny-screen-card" id="destiny-card-6" style="border-color: rgba(245, 158, 11, 0.6); background: linear-gradient(165deg, #131b2e 0%, #1e1b38 50%, #291a3a 100%);">
+      <div class="card-header-row">
+        <span class="card-step-badge" style="background: linear-gradient(135deg, rgba(236,72,153,0.25), rgba(245,158,11,0.25)); border-color: #f472b6; color: #f472b6;">🌸 제6주제 · 인생 수호 비책</span>
+        <span class="card-progress-counter">6 / 6</span>
+      </div>
+      <div>
+        <h3 class="card-main-title" style="color: #fbbf24;">영자 실장의 인생 수호 비책 가이드</h3>
+        <p class="card-subtitle">대표님의 매일을 승리로 이끄는 실천형 마음가짐</p>
+      </div>
+
+      <div class="card-body-content">
+        <div style="background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 14px; border: 1px solid rgba(245,158,11,0.25);">
+          <p style="color: #f1f5f9; font-size: 0.86rem; line-height: 1.65; margin-bottom: 10px;">
+            "대표님, 운명수는 단순한 숫자가 아니라 매일 내 무의식을 깨우는 <strong>'마인드 앵커(닻)'</strong>입니다.
+          </p>
+          <ul style="color: #cbd5e1; font-size: 0.8rem; line-height: 1.7; padding-left: 18px; margin: 0;">
+            <li><strong>매일 아침 앵커링:</strong> 스마트폰 배경화면에 수호수 <strong>${data.seoncheon.join(', ')}</strong>을 두어 긍정 주파수를 유지하세요.</li>
+            <li><strong>중요 결정 시 호흡:</strong> 중요한 결정을 앞두셨을 때는 언제나 수호 방위인 <strong>${compass.dir}</strong>을 향해 1분간 깊게 심호흡하세요.</li>
+            <li><strong>행운 컬러 활용:</strong> 중요한 미팅이나 계약 날에는 <strong>${compass.color}</strong> 계열의 타이, 스카프, 소품을 착용해보세요.</li>
+          </ul>
+        </div>
+
+        <div style="text-align: right; color: #94a3b8; font-size: 0.74rem; margin-top: 4px;">
+          — 사주로또 v2.1 VIP 명리 큐레이션 센터
+        </div>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <button type="button" id="btn-goto-lotto-track" class="btn-destiny-to-lotto">
+          <span>🍀 이번 주 사주맞춤 로또번호 뽑으러 가기</span>
+          <span>→</span>
+        </button>
       </div>
     </div>
   `;
+
+  // 6번째 카드 하단의 로또 탭 바로가기 버튼 이벤트 바인딩
+  const gotoLottoBtn = document.getElementById('btn-goto-lotto-track');
+  if (gotoLottoBtn) {
+    gotoLottoBtn.onclick = () => {
+      const tabLotto = document.getElementById('tab-lotto');
+      if (tabLotto) tabLotto.click();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  }
 }
 
 function renderSavedCount() {

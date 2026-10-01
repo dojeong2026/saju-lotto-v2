@@ -43,7 +43,17 @@
 
   <div class="container">
 
-    <!-- 1. 최신 1243회 당첨결과 및 1244회 진행 현황 -->
+    <!-- 1. 최상단 2대 줄기 탭 스위처 (모바일 앱 최상단 내비게이션 고정) -->
+    <nav class="track-tabs" id="main-track-tabs">
+      <button id="tab-lotto" class="tab-btn active" type="button">
+        <span>사주 로또 추출</span>
+      </button>
+      <button id="tab-destiny" class="tab-btn" type="button">
+        <span>사주 &amp; 평생 운명수</span>
+      </button>
+    </nav>
+
+    <!-- [트랙 1 전용] 최신 1243회 당첨결과 및 1244회 판매 현황 -->
     <section class="latest-lotto-dashboard" id="latest-lotto-dashboard">
       <div class="round-header">
         <h2 class="round-title"><span class="badge-gold">제1243회</span> 당첨결과</h2>
@@ -81,56 +91,9 @@
             <span class="status-label">누적 판매금</span>
             <span class="status-value" id="cumulative-sales">526억 8,284만원</span>
           </div>
-    </section>
-
-    <!-- 1-B. 천부명반 & 평생 대운 분석실 (사주 & 평생 운명수 탭 전용 대시보드) -->
-    <section class="destiny-master-dashboard" id="destiny-master-dashboard" style="display: none;">
-      <div class="destiny-board-header">
-        <div class="destiny-badge-row">
-          <span class="badge-oriental">🏛️ 천부명반(天賦命盤)</span>
-          <span class="destiny-badge-sub">평생 불변 수리(數理) 분석실</span>
-        </div>
-        <h2 class="destiny-board-title">나의 타고난 선천 기운 &amp; 평생 수호 비책</h2>
-        <p class="destiny-board-desc">하늘로부터 부여받은 년·월·일·시의 우주 에너지와 나를 지켜주는 평생 운명수</p>
-      </div>
-
-      <!-- 오행 에너지 5색 밸런스 카드 -->
-      <div class="destiny-ohaeng-summary-card">
-        <div class="destiny-card-top">
-          <span class="destiny-card-label">⚡ 5대 오행(五行) 에너지 분포</span>
-          <span class="destiny-card-hint" id="destiny-core-summary">수(水) 중심 · 화(火) 보강</span>
-        </div>
-        <div class="ohaeng-bars-container" id="destiny-ohaeng-bars">
-          <!-- JS 동적 렌더링 -->
-        </div>
-      </div>
-
-      <!-- 본원(일간) & 수호 3대 나침반 -->
-      <div class="destiny-compass-grid">
-        <div class="compass-item">
-          <span class="compass-label">나의 본원(日干)</span>
-          <strong class="compass-val gold" id="destiny-day-master">壬水 (지혜의 바다)</strong>
-        </div>
-        <div class="compass-item">
-          <span class="compass-label">평생 수호 방위</span>
-          <strong class="compass-val" id="destiny-compass-dir">남쪽 (열정·결실)</strong>
-        </div>
-        <div class="compass-item">
-          <span class="compass-label">평생 길운 색상</span>
-          <strong class="compass-val" id="destiny-compass-color">적색·자색 (화기운)</strong>
         </div>
       </div>
     </section>
-
-    <!-- 2. 2대 줄기 탭 스위처 -->
-    <nav class="track-tabs">
-      <button id="tab-lotto" class="tab-btn active" type="button">
-        <span>사주 로또 추출</span>
-      </button>
-      <button id="tab-destiny" class="tab-btn" type="button">
-        <span>사주 &amp; 평생 운명수</span>
-      </button>
-    </nav>
 
     <!-- 3. 사주 명리 정밀 진단 & 오행 숫자 처방 카드 (분석 완료 시 자동 노출) -->
     <section id="saju-summary-bar" class="saju-diagnosis-card" style="display: none;">
@@ -432,6 +395,6 @@
     </div>
   </div>
 
-  <script src="v2_1_app.js?v=2.2"></script>
+  <script src="v2_1_app.js?v=2.3"></script>
 </body>
 </html>

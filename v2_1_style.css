@@ -2192,3 +2192,312 @@ body {
   line-height: 1.3;
 }
 
+/* ==========================================================================
+   v2.1 [사주 & 평생 운명수] 1화면 1주제 맞춤 모바일 스크린 카드 스타일
+   가독성과 명확성을 극대화한 VIP 명리 리포트
+   ========================================================================== */
+.destiny-screen-card {
+  background: linear-gradient(165deg, #0d1527 0%, #151e36 60%, #1b193d 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.45);
+  border-radius: 18px;
+  padding: 20px 16px 16px;
+  margin-bottom: 24px;
+  min-height: min(580px, 84vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  scroll-margin-top: 60px;
+  animation: cardFadeIn 0.35s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 카드 상단 헤더 */
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.3));
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.card-progress-counter {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.card-main-title {
+  color: #ffffff;
+  font-size: 1.28rem;
+  font-weight: 900;
+  margin: 6px 0 4px;
+  letter-spacing: -0.5px;
+  line-height: 1.35;
+}
+
+.card-subtitle {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.card-body-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* 1. 사주 평가 본원 카드 전용 */
+.day-master-showcase {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.day-master-emblem {
+  font-size: 2.4rem;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+}
+
+.day-master-title-kor {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #fbbf24;
+  letter-spacing: -0.5px;
+}
+
+.day-master-nick {
+  font-size: 0.88rem;
+  color: #38bdf8;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.day-master-desc-box {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  text-align: left;
+}
+
+/* 2. 천부명반 오행 그래프 */
+.ohaeng-bars-wrapper {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.compass-summary-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.compass-sub-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.compass-sub-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  display: block;
+}
+
+.compass-sub-val {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #fbbf24;
+  margin-top: 3px;
+}
+
+/* 3. 공식 평생 수리 인증서 */
+.certificate-frame {
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border: 2px solid #d4af37;
+  box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.25), 0 8px 24px rgba(0, 0, 0, 0.5);
+  border-radius: 14px;
+  padding: 18px 14px;
+  position: relative;
+  text-align: center;
+}
+
+.cert-stamp {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  width: 58px;
+  height: 58px;
+  border: 2px dashed rgba(239, 68, 68, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  color: #ef4444;
+  font-weight: 900;
+  transform: rotate(-12deg);
+  pointer-events: none;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.cert-header {
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.cert-title {
+  color: #fbbf24;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.cert-num {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.cert-number-showcase {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.cert-number-pill {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 8px;
+  padding: 8px 4px;
+}
+
+.cert-pill-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  display: block;
+}
+
+.cert-pill-digits {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #fbbf24;
+  margin-top: 2px;
+}
+
+/* 4. 하도·낙서 의미 강조 박스 */
+.hado-meaning-box {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 4px solid #f59e0b;
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #f1f5f9;
+}
+
+.hado-meaning-box strong {
+  color: #fbbf24;
+}
+
+.nakseo-meaning-box {
+  background: rgba(56, 189, 248, 0.08);
+  border-left: 4px solid #38bdf8;
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #f1f5f9;
+}
+
+.nakseo-meaning-box strong {
+  color: #38bdf8;
+}
+
+/* 카드 하단 스크롤 인디케이터 */
+.card-next-scroll-indicator {
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.scroll-arrow-bounce {
+  color: #fbbf24;
+  animation: bounceArrow 1.5s infinite;
+  display: inline-block;
+}
+
+.btn-destiny-to-lotto {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #0f172a;
+  font-size: 0.94rem;
+  font-weight: 900;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.btn-destiny-to-lotto:active {
+  transform: scale(0.98);
+}
+
+
