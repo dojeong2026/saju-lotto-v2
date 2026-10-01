@@ -112,6 +112,8 @@ function initApp() {
   document.getElementById('saju-form-card').style.display = 'block';
   document.getElementById('lotto-result-section').style.display = 'none';
 
+  initModalSystem();
+
   if (state.savedProfile) {
     autoLoadProfile(state.savedProfile);
   }
@@ -1047,6 +1049,53 @@ function generateQrCodeDisplay(sheet) {
 // 9. 모달 시스템 전역 이벤트 등록
 // =================================================================
 function initModalSystem() {
+  // 상단 헤더 모바일 접속 QR 버튼
+  const btnMobile = document.getElementById('btn-mobile-connect');
+  const modalMobile = document.getElementById('modal-mobile-qr');
+  const btnCloseMobile = document.getElementById('btn-close-mobile-qr');
+  const btnConfirmMobile = document.getElementById('btn-confirm-mobile-qr');
+  const backdropMobile = document.getElementById('modal-mobile-qr-backdrop');
+  const mobileCanvas = document.getElementById('mobile-qr-canvas');
+
+  if (btnMobile && modalMobile) {
+    let mobileQrDone = false;
+    const mobileUrl = 'http://192.168.50.236:8080/index.html';
+
+    const openMobileModal = () => {
+      modalMobile.style.display = 'flex';
+      if (!mobileQrDone && mobileCanvas) {
+        mobileCanvas.innerHTML = '';
+        try {
+          if (typeof QRCode !== 'undefined') {
+            new QRCode(mobileCanvas, {
+              text: mobileUrl,
+              width: 190,
+              height: 190,
+              colorDark: '#000000',
+              colorLight: '#ffffff',
+              correctLevel: QRCode.CorrectLevel.M
+            });
+            mobileQrDone = true;
+          } else {
+            throw new Error('no qr');
+          }
+        } catch (e) {
+          mobileCanvas.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${encodeURIComponent(mobileUrl)}" alt="모바일 접속 QR" style="width:190px; height:190px; display:block; margin:0 auto;" />`;
+          mobileQrDone = true;
+        }
+      }
+    };
+
+    const closeMobileModal = () => {
+      modalMobile.style.display = 'none';
+    };
+
+    btnMobile.onclick = openMobileModal;
+    if (btnCloseMobile) btnCloseMobile.onclick = closeMobileModal;
+    if (btnConfirmMobile) btnConfirmMobile.onclick = closeMobileModal;
+    if (backdropMobile) backdropMobile.onclick = closeMobileModal;
+  }
+
   // 상단 헤더 보관함 버튼
   const headerVaultBtn = document.getElementById('btn-open-vault-top');
   if (headerVaultBtn) {

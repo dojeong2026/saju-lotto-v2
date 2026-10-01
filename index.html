@@ -37,6 +37,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <button id="btn-mobile-connect" class="vault-top-btn" type="button" style="margin-right: 6px; background: rgba(59, 130, 246, 0.2); border-color: rgba(96, 165, 250, 0.4); color: #93c5fd;">📱 모바일</button>
       <button id="btn-open-vault-top" class="vault-top-btn" type="button">📂 보관함 (<span id="header-saved-count">0</span>)</button>
     </div>
   </header>
@@ -386,6 +387,35 @@
     </div>
   </div>
 
-  <script src="v2_app.js?v=3.0"></script>
+  <!-- ================= [모달 4: 스마트폰 실시간 접속 QR] ================= -->
+  <div id="modal-mobile-qr" class="app-modal" style="display: none;">
+    <div class="modal-backdrop" id="modal-mobile-qr-backdrop"></div>
+    <div class="modal-dialog modal-qr-dialog">
+      <div class="modal-header qr-modal-header-clean">
+        <h3 class="modal-title qr-modal-title-big">📱 스마트폰 실시간 접속</h3>
+        <button type="button" class="btn-modal-close" id="btn-close-mobile-qr" aria-label="닫기">✕</button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="qr-frame-box" style="margin: 16px auto; padding: 12px; background: #ffffff; border-radius: 12px; display: inline-block;">
+          <div id="mobile-qr-canvas" class="qr-canvas-wrap"></div>
+        </div>
+        <div class="qr-guide-box" style="margin-top: 14px;">
+          <p class="qr-tip-desc" style="font-size: 0.95rem; line-height: 1.6; color: #f1f5f9;">
+            <strong style="color: #fbbf24;">스마트폰 기본 카메라로 위 QR을 비춰주세요!</strong><br>
+            <span class="qr-tip-sub" style="display:block; margin-top: 8px; color: #94a3b8; font-size: 0.84rem; line-height: 1.5;">
+              ※ PC와 스마트폰이 같은 Wi-Fi에 연결되어 있으면 즉시 열립니다.<br>
+              직접 주소 입력: <br>
+              <code style="display: inline-block; margin-top: 6px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; color: #38bdf8; font-size: 0.9rem; font-family: monospace;">http://192.168.50.236:8080/index.html</code>
+            </span>
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer qr-modal-footer">
+        <button type="button" id="btn-confirm-mobile-qr" class="btn-modal-primary" style="width: 100%;">확인 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="v2_app.js?v=3.1"></script>
 </body>
 </html>
