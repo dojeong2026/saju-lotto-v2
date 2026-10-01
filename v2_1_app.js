@@ -105,18 +105,20 @@ function initApp() {
   // 1시간 주기 실시간 자동 갱신 (1분마다 체크하여 시각 변경 시 즉시 반영)
   setInterval(updateSalesStatus, 60000);
 
-  // 초기 상태: 요약바와 결과는 닫고, 입력 폼만 깨끗하게 노출
+  // 초기 상태: 요약바와 결과는 닫고, 입력 폼만 깨끗하게 빈칸(선택하기)으로 노출
   const summaryBar = document.getElementById('saju-summary-bar');
   if (summaryBar) summaryBar.style.display = 'none';
 
   document.getElementById('saju-form-card').style.display = 'block';
   document.getElementById('lotto-result-section').style.display = 'none';
+  document.getElementById('view-destiny').style.display = 'none';
+
+  const destinyBoard = document.getElementById('destiny-master-dashboard');
+  if (destinyBoard) destinyBoard.style.display = 'none';
 
   initModalSystem();
 
-  if (state.savedProfile) {
-    autoLoadProfile(state.savedProfile);
-  }
+  // 대표님 지시: 첫 화면은 임의의 사주를 자동 로드하지 않고 깨끗한 빈칸(선택하기)으로 유지
 }
 
 function setupTabs() {
@@ -132,44 +134,79 @@ function setupTabs() {
   tabLotto.addEventListener('click', () => {
     tabLotto.classList.add('active');
     tabDestiny.classList.remove('active');
-    viewLotto.style.display = 'block';
-    viewDestiny.style.display = 'none';
+    state.currentTrack = 'lotto';
 
     // 1. [사주 로또 탭]: 로또 전광판 노출 & 운명수 명반 숨김
     if (lottoBoard) lottoBoard.style.display = 'block';
     if (destinyBoard) destinyBoard.style.display = 'none';
 
-    if (diagTitle) diagTitle.innerText = '사주 명리 정밀 진단';
-    if (diagBadge) {
-      diagBadge.style.display = 'inline-flex';
-      diagBadge.innerText = `${state.sheets.length || 1}장 (${(state.sheets.length || 1) * 5}게임)`;
-      diagBadge.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    // 폼 버튼 및 안내 문구 전환
+    const submitText = document.getElementById('btn-submit-text');
+    if (submitText) submitText.innerText = '내 사주 맞춤 번호 추출하기';
+    const modeBanner = document.getElementById('form-mode-banner');
+    if (modeBanner) {
+      modeBanner.innerHTML = '🔮 <strong>생년월일과 시간을 선택</strong>하시면 맞춤 행운 번호가 정밀 추출됩니다.';
+      modeBanner.style.color = '#fbbf24';
+      modeBanner.style.borderColor = 'rgba(245,158,11,0.25)';
+      modeBanner.style.background = 'rgba(245,158,11,0.1)';
     }
 
-    state.currentTrack = 'lotto';
+    if (state.sajuResult) {
+      viewLotto.style.display = 'block';
+      viewDestiny.style.display = 'none';
+      if (diagTitle) diagTitle.innerText = `${state.savedProfile ? state.savedProfile.birthDate : ''} 사주 명리 정밀 진단`;
+      if (diagBadge) {
+        diagBadge.style.display = 'inline-flex';
+        diagBadge.innerText = `${state.sheets.length || 1}장 (${(state.sheets.length || 1) * 5}게임)`;
+        diagBadge.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+      }
+    } else {
+      viewLotto.style.display = 'block';
+      viewDestiny.style.display = 'none';
+    }
   });
 
   tabDestiny.addEventListener('click', () => {
     tabDestiny.classList.add('active');
     tabLotto.classList.remove('active');
-    viewLotto.style.display = 'none';
-    viewDestiny.style.display = 'block';
+    state.currentTrack = 'destiny';
 
-    // 2. [사주 & 평생 운명수 탭]: 로또 전광판 전면 숨김 & 천부명반 대시보드 전면 노출!
+    // 2. [사주 & 평생 운명수 탭]: 로또 전광판 전면 숨김!
     if (lottoBoard) lottoBoard.style.display = 'none';
-    if (destinyBoard) destinyBoard.style.display = 'block';
 
-    if (diagTitle) diagTitle.innerText = '평생 본원 수리 인증서';
-    if (diagBadge) {
-      diagBadge.style.display = 'inline-flex';
-      diagBadge.innerText = '📜 평생 불변';
-      diagBadge.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
+    // 폼 버튼 및 안내 문구 전환
+    const submitText = document.getElementById('btn-submit-text');
+    if (submitText) submitText.innerText = '내 평생 운명수 정밀 분석하기';
+    const modeBanner = document.getElementById('form-mode-banner');
+    if (modeBanner) {
+      modeBanner.innerHTML = '🏛️ <strong>생년월일과 시간을 선택</strong>하시면 하늘이 내린 오행과 평생 운명수가 정밀 분석됩니다.';
+      modeBanner.style.color = '#38bdf8';
+      modeBanner.style.borderColor = 'rgba(56,189,248,0.3)';
+      modeBanner.style.background = 'rgba(56,189,248,0.1)';
     }
 
-    state.currentTrack = 'destiny';
     if (state.sajuResult) {
+      // 분석 완료 상태: 천부명반과 운명수 뷰 전면 노출
+      if (destinyBoard) destinyBoard.style.display = 'block';
+      viewLotto.style.display = 'none';
+      viewDestiny.style.display = 'block';
+
+      if (diagTitle) diagTitle.innerText = '평생 본원 수리 인증서';
+      if (diagBadge) {
+        diagBadge.style.display = 'inline-flex';
+        diagBadge.innerText = '📜 평생 불변';
+        diagBadge.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
+      }
+
       updateDestinyDashboard(state.sajuResult);
       renderDestinyView(state.sajuResult);
+    } else {
+      // 아직 사주 입력 전: 임의의 결과를 띄우지 않고 폼 입력으로 집중 유도
+      if (destinyBoard) destinyBoard.style.display = 'none';
+      viewLotto.style.display = 'none';
+      viewDestiny.style.display = 'none';
+      const formCard = document.getElementById('saju-form-card');
+      if (formCard) formCard.style.display = 'block';
     }
   });
 }
@@ -290,18 +327,47 @@ function runAnalysis(profile) {
     renderDestinyView(state.sajuResult);
     updateDestinyDashboard(state.sajuResult);
 
-    // 【핵심 UX 개선】 사주 진단 카드를 먼저 보여주고, 잠시 뒤 결과로 자연스럽게 이동
-    const diagScrollTarget = document.getElementById('saju-summary-bar');
-    if (diagScrollTarget && typeof diagScrollTarget.scrollIntoView === 'function') {
-      diagScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    // 1.5초 후 결과 티켓 영역으로 부드럽게 스크롤
-    setTimeout(() => {
-      const resSec = document.getElementById('lotto-result-section');
-      if (resSec && typeof resSec.scrollIntoView === 'function') {
-        resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const lottoBoard = document.getElementById('latest-lotto-dashboard');
+    const destinyBoard = document.getElementById('destiny-master-dashboard');
+    const viewLotto = document.getElementById('view-lotto');
+    const viewDestiny = document.getElementById('view-destiny');
+
+    if (state.currentTrack === 'destiny') {
+      if (lottoBoard) lottoBoard.style.display = 'none';
+      if (destinyBoard) destinyBoard.style.display = 'block';
+      if (viewLotto) viewLotto.style.display = 'none';
+      if (viewDestiny) viewDestiny.style.display = 'block';
+
+      const diagTitle = document.getElementById('diagnosis-title');
+      if (diagTitle) diagTitle.innerText = '평생 본원 수리 인증서';
+      const amountBadge = document.getElementById('diagnosis-amount-badge');
+      if (amountBadge) {
+        amountBadge.innerText = '📜 평생 불변';
+        amountBadge.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
       }
-    }, 1500);
+
+      if (destinyBoard && typeof destinyBoard.scrollIntoView === 'function') {
+        destinyBoard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      if (lottoBoard) lottoBoard.style.display = 'block';
+      if (destinyBoard) destinyBoard.style.display = 'none';
+      if (viewLotto) viewLotto.style.display = 'block';
+      if (viewDestiny) viewDestiny.style.display = 'none';
+
+      // 【핵심 UX 개선】 사주 진단 카드를 먼저 보여주고, 잠시 뒤 결과로 자연스럽게 이동
+      const diagScrollTarget = document.getElementById('saju-summary-bar');
+      if (diagScrollTarget && typeof diagScrollTarget.scrollIntoView === 'function') {
+        diagScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      // 1.5초 후 결과 티켓 영역으로 부드럽게 스크롤
+      setTimeout(() => {
+        const resSec = document.getElementById('lotto-result-section');
+        if (resSec && typeof resSec.scrollIntoView === 'function') {
+          resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 1500);
+    }
   } catch (err) {
     console.error('사주 분석 및 렌더링 오류:', err);
   }
