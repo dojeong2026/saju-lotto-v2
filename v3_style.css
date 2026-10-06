@@ -3526,11 +3526,52 @@ body {
   background: rgba(245, 158, 11, 0.3);
 }
 
-.btn-copy-num.copied {
-  background: #10b981;
-  border-color: #10b981;
-  color: #ffffff;
+/* 7. 온보딩 카드 내부 3대 차별성 칩 & 빅데이터 미니 바 */
+.onboarding-features-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 6px 0 12px;
+  flex-wrap: wrap;
 }
+
+.feat-chip {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.onboarding-stat-chip-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  flex-wrap: wrap;
+}
+
+.stat-mini-badge.hot {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.stat-mini-badge.cold {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.12);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
 
 
 
