@@ -110,189 +110,169 @@ function updateSalesStatus() {
   prizeElem.textContent = formatKoreanMoney(firstPrize);
 }
 
+function calculateTodayIljin() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+
+  const CHEONGAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+  const CHEONGAN_KOR = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'];
+  const JIJI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+  const JIJI_KOR = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해'];
+
+  // 천문역학 60갑자 일진 산출식 (기준: 2026.10.06 화 = 甲辰일)
+  const baseTime = new Date(2026, 9, 6).getTime();
+  const diffDays = Math.floor((now.getTime() - baseTime) / (24 * 60 * 60 * 1000));
+  
+  // 2026.10.06은 甲(0) 辰(4)
+  const ganIdx = ((0 + diffDays) % 10 + 10) % 10;
+  const jiIdx = ((4 + diffDays) % 12 + 12) % 12;
+
+  const ganjiStr = `${CHEONGAN[ganIdx]}${JIJI[jiIdx]}(${CHEONGAN_KOR[ganIdx]}${JIJI_KOR[jiIdx]})일`;
+
+  const ganjiElem = document.getElementById('today-iljin-ganji');
+  if (ganjiElem) ganjiElem.textContent = ganjiStr;
+
+  const descElem = document.getElementById('today-iljin-desc');
+  if (descElem) {
+    descElem.innerHTML = `💰 <strong>편재운 85% 상승일</strong> (뜻밖의 횡재와 귀인 조력 길조)`;
+  }
+
+  return { ganjiStr, ganIdx, jiIdx };
+}
+
 function initApp() {
+  calculateTodayIljin();
+  updateSalesStatus();
+  renderSavedCount();
   setupTabs();
   setupForm();
-  renderSavedCount();
-  updateSalesStatus();
-
-  // 1시간 주기 실시간 자동 갱신 (1분마다 체크하여 시각 변경 시 즉시 반영)
-  setInterval(updateSalesStatus, 60000);
-
-  // 초기 상태: 요약바와 결과는 닫고, 입력 폼만 깨끗하게 빈칸(선택하기)으로 노출
-  const summaryBar = document.getElementById('saju-summary-bar');
-  if (summaryBar) summaryBar.style.display = 'none';
-
-  document.getElementById('saju-form-card').style.display = 'block';
-  document.getElementById('lotto-result-section').style.display = 'none';
-  document.getElementById('view-destiny').style.display = 'none';
-
-  const destinyBoard = document.getElementById('destiny-master-dashboard');
-  if (destinyBoard) destinyBoard.style.display = 'none';
-
   initModalSystem();
 
-  // 대표님 지시: 첫 화면은 임의의 사주를 자동 로드하지 않고 깨끗한 빈칸(선택하기)으로 유지
+  checkProfileAndSetupHome();
+
+  // 1분 주기 갱신
+  setInterval(updateSalesStatus, 60000);
+}
+
+function checkProfileAndSetupHome() {
+  const dailyCard = document.getElementById('daily-home-card');
+  const formCard = document.getElementById('saju-form-card');
+  const userBirth = document.getElementById('daily-user-birth');
+
+  if (state.savedProfile && state.savedProfile.birthDate) {
+    // 재방문자: 오늘의 데일리 운세 카드 노출, 입력폼 숨김
+    if (dailyCard) dailyCard.style.display = 'block';
+    if (formCard) formCard.style.display = 'none';
+    if (userBirth) userBirth.textContent = state.savedProfile.birthDate;
+
+    // 폼 값도 미리 세팅해 둠
+    document.getElementById('birth-date').value = state.savedProfile.birthDate;
+    document.getElementById('birth-hour').value = state.savedProfile.birthHour;
+    document.getElementById('birth-city').value = state.savedProfile.birthCity;
+    document.getElementById('gender').value = state.savedProfile.gender;
+  } else {
+    // 신규 방문자: 단일 럭셔리 폼 카드 노출
+    if (dailyCard) dailyCard.style.display = 'none';
+    if (formCard) formCard.style.display = 'block';
+  }
 }
 
 function setupTabs() {
-  const tabLotto = document.getElementById('tab-lotto');
-  const tabDestiny = document.getElementById('tab-destiny');
+  const resTabLotto = document.getElementById('res-tab-lotto');
+  const resTabDestiny = document.getElementById('res-tab-destiny');
   const viewLotto = document.getElementById('view-lotto');
   const viewDestiny = document.getElementById('view-destiny');
-  const lottoBoard = document.getElementById('latest-lotto-dashboard');
-  const destinyBoard = document.getElementById('destiny-master-dashboard');
-  const diagTitle = document.getElementById('diagnosis-title');
-  const diagBadge = document.getElementById('diagnosis-amount-badge');
 
-  // [v3 ⑤] 운명수 맛보기 카드: 누르면 운명수 탭으로 전환 후 생년월일 입력으로 안내
-  const teaser = document.getElementById('destiny-teaser');
-  if (teaser) {
-    teaser.addEventListener('click', () => {
-      tabDestiny.click();
-      const formCard = document.getElementById('saju-form-card');
-      if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const dateInput = document.getElementById('birth-date');
-      if (dateInput) setTimeout(() => dateInput.focus({ preventScroll: true }), 400);
+  if (resTabLotto && resTabDestiny) {
+    resTabLotto.addEventListener('click', () => {
+      resTabLotto.classList.add('active');
+      resTabDestiny.classList.remove('active');
+      state.currentTrack = 'lotto';
+      if (viewLotto) viewLotto.style.display = 'block';
+      if (viewDestiny) viewDestiny.style.display = 'none';
+    });
+
+    resTabDestiny.addEventListener('click', () => {
+      resTabDestiny.classList.add('active');
+      resTabLotto.classList.remove('active');
+      state.currentTrack = 'destiny';
+      if (viewLotto) viewLotto.style.display = 'none';
+      if (viewDestiny) viewDestiny.style.display = 'block';
     });
   }
 
-  tabLotto.addEventListener('click', () => {
-    tabLotto.classList.add('active');
-    tabDestiny.classList.remove('active');
-    state.currentTrack = 'lotto';
+  // 결과 화면에서 "사주 변경" 버튼
+  const changeBtn = document.getElementById('btn-change-saju');
+  if (changeBtn) {
+    changeBtn.addEventListener('click', () => {
+      document.getElementById('screen-results').style.display = 'none';
+      document.getElementById('screen-onboarding').style.display = 'block';
+      document.getElementById('daily-home-card').style.display = 'none';
+      document.getElementById('saju-form-card').style.display = 'block';
 
-    // 1. [사주 로또 탭]: 로또 전광판 노출 & 운명수 명반 숨김
-    if (lottoBoard) lottoBoard.style.display = 'block';
-    if (destinyBoard) destinyBoard.style.display = 'none';
-
-    // 폼 버튼 및 안내 문구 전환
-    const submitText = document.getElementById('btn-submit-text');
-    if (submitText) submitText.innerText = '내 사주 맞춤 로또번호 추출하기';
-    const teaserTitle = document.getElementById('teaser-title');
-    if (teaserTitle) teaserTitle.innerHTML = '🔒 로또만? <strong>평생 쓰는 내 운명수</strong>도 있어요';
-    const modeBanner = document.getElementById('form-mode-banner');
-    if (modeBanner) {
-      modeBanner.innerHTML = '🔮 <strong>생년월일과 시간을 선택</strong>하시면 맞춤 행운 번호가 정밀 추출됩니다.';
-      modeBanner.style.color = '#fbbf24';
-      modeBanner.style.borderColor = 'rgba(245,158,11,0.25)';
-      modeBanner.style.background = 'rgba(245,158,11,0.1)';
-    }
-
-    if (state.sajuResult) {
-      viewLotto.style.display = 'block';
-      viewDestiny.style.display = 'none';
-      if (diagTitle) diagTitle.innerText = `${state.savedProfile ? state.savedProfile.birthDate : ''} 사주 명리 정밀 진단`;
-      if (diagBadge) {
-        diagBadge.style.display = 'inline-flex';
-        diagBadge.innerText = `${state.sheets.length || 1}장 (${(state.sheets.length || 1) * 5}게임)`;
-        diagBadge.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-      }
-    } else {
-      viewLotto.style.display = 'block';
-      viewDestiny.style.display = 'none';
-    }
-  });
-
-  tabDestiny.addEventListener('click', () => {
-    tabDestiny.classList.add('active');
-    tabLotto.classList.remove('active');
-    state.currentTrack = 'destiny';
-
-    const sajuSummaryBar = document.getElementById('saju-summary-bar');
-    const formCard = document.getElementById('saju-form-card');
-
-    // 1. [사주 & 평생 운명수 탭]: v3 A안 - 분석 전에는 당첨현황 유지, 분석 후에만 숨김(6대 카드 집중)
-    if (lottoBoard) lottoBoard.style.display = state.sajuResult ? 'none' : 'block';
-    if (destinyBoard) destinyBoard.style.display = 'none'; // 6대 순차 카드 내부로 완전 통합
-
-    // 폼 버튼 및 안내 문구 전환
-    const submitText = document.getElementById('btn-submit-text');
-    if (submitText) submitText.innerText = '내 운명수 정밀분석하기';
-    const teaserTitle = document.getElementById('teaser-title');
-    if (teaserTitle) teaserTitle.innerHTML = '🔒 생년월일만 넣으면 공개되는 <strong>나만의 운명수</strong>';
-    const modeBanner = document.getElementById('form-mode-banner');
-    if (modeBanner) {
-      modeBanner.innerHTML = '🏛️ <strong>생년월일과 시간을 선택</strong>하시면 하늘이 내린 오행과 평생 운명수가 정밀 분석됩니다.';
-      modeBanner.style.color = '#38bdf8';
-      modeBanner.style.borderColor = 'rgba(56,189,248,0.3)';
-      modeBanner.style.background = 'rgba(56,189,248,0.1)';
-    }
-
-    if (state.sajuResult) {
-      // 분석 완료 상태: 6대 주제 순차 스크롤 뷰 전면 노출
-      viewLotto.style.display = 'none';
-      viewDestiny.style.display = 'block';
-      if (sajuSummaryBar) sajuSummaryBar.style.display = 'none'; // 1주제 카드에 통합되었으므로 중복 숨김
-      if (formCard) formCard.style.display = 'none';
-
-      renderDestinyView(state.sajuResult);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      // 아직 사주 입력 전: 폼으로 집중
-      viewLotto.style.display = 'none';
-      viewDestiny.style.display = 'none';
-      if (sajuSummaryBar) sajuSummaryBar.style.display = 'none';
-      if (formCard) formCard.style.display = 'block';
-    }
-  });
+      const formCard = document.getElementById('saju-form-card');
+      if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 }
 
 function setupForm() {
   const form = document.getElementById('saju-form');
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const birthDate = document.getElementById('birth-date').value;
-    const birthHour = parseInt(document.getElementById('birth-hour').value, 10);
-    const birthCity = document.getElementById('birth-city').value;
-    const gender = document.getElementById('gender').value;
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const birthDate = document.getElementById('birth-date').value;
+      const birthHour = parseInt(document.getElementById('birth-hour').value, 10);
+      const birthCity = document.getElementById('birth-city').value;
+      const gender = document.getElementById('gender').value;
 
-    if (!birthDate) return;
+      if (!birthDate) return;
 
-    const profile = { birthDate, birthHour, birthCity, gender };
-    localStorage.setItem('saju_lotto_v2_profile', JSON.stringify(profile));
-    state.savedProfile = profile;
+      const profile = { birthDate, birthHour, birthCity, gender };
+      localStorage.setItem('saju_lotto_v2_profile', JSON.stringify(profile));
+      state.savedProfile = profile;
 
-    runAnalysis(profile);
-  });
-
-  // 기본 추출 금액 5,000원(1장 5게임) 설정 유지
-  state.selectedAmount = 5000;
-
-  // 사주 변경 버튼 클릭 시: 요약바 숨기고, 입력 폼만 열고, 결과 티켓은 숨김
-  const toggleBtn = document.getElementById('btn-toggle-saju');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      document.getElementById('saju-form-card').style.display = 'block';
-      document.getElementById('saju-summary-bar').style.display = 'none';
-      document.getElementById('lotto-result-section').style.display = 'none';
-      setLandingHooksVisible(true);
-      const briefingElem = document.getElementById('youngja-text');
-      if (briefingElem) {
-        briefingElem.innerHTML = `"대표님의 타고난 선천수를 정밀 분석해 드립니다."`;
-      }
-      document.getElementById('saju-form-card').scrollIntoView({ behavior: 'smooth' });
+      runAnalysis(profile, 'lotto');
     });
   }
+
+  // 재방문자 원터치 버튼 1: 1245회 5게임 즉시 발권
+  const btnDailyLotto = document.getElementById('btn-daily-quick-lotto');
+  if (btnDailyLotto) {
+    btnDailyLotto.addEventListener('click', () => {
+      if (state.savedProfile) {
+        runAnalysis(state.savedProfile, 'lotto');
+      }
+    });
+  }
+
+  // 재방문자 원터치 버튼 2: 내 평생 운명수 보기
+  const btnDailyDestiny = document.getElementById('btn-daily-view-destiny');
+  if (btnDailyDestiny) {
+    btnDailyDestiny.addEventListener('click', () => {
+      if (state.savedProfile) {
+        runAnalysis(state.savedProfile, 'destiny');
+      }
+    });
+  }
+
+  // 재방문자 카드에서 "다른 생년월일로 사주 다시 입력하기"
+  const btnReenter = document.getElementById('btn-reenter-saju');
+  if (btnReenter) {
+    btnReenter.addEventListener('click', () => {
+      document.getElementById('daily-home-card').style.display = 'none';
+      document.getElementById('saju-form-card').style.display = 'block';
+      const formCard = document.getElementById('saju-form-card');
+      if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  state.selectedAmount = 5000;
 }
 
-function autoLoadProfile(profile) {
-  document.getElementById('birth-date').value = profile.birthDate;
-  document.getElementById('birth-hour').value = profile.birthHour;
-  document.getElementById('birth-city').value = profile.birthCity;
-  document.getElementById('gender').value = profile.gender;
-  // 첫 방문 시에는 자동 실행하지 않고 폼을 보여줌
-}
-
-// [v3] 차별성 띠 + 운명수 맛보기 카드 + 통계 칩 표시/숨김 (분석 전에만 노출)
-function setLandingHooksVisible(visible) {
-  ['v3-only-strip', 'destiny-teaser', 'stat-mini-pill-bar'].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = visible ? '' : 'none';
-  });
-}
-
-function runAnalysis(profile) {
+function runAnalysis(profile, targetTrack = 'lotto') {
   try {
     const sheetCount = state.selectedAmount === 20000 ? 4 : (state.selectedAmount === 10000 ? 2 : 1);
     state.sheets = [];
@@ -303,104 +283,33 @@ function runAnalysis(profile) {
     state.isAllSheetsView = false;
     state.sajuResult = state.sheets[0];
 
-    // 모바일 1화면 핏: 분석 후 입력 폼은 닫고, 진단 카드로 전환!
-    const formCard = document.getElementById('saju-form-card');
-    if (formCard) formCard.style.display = 'none';
-    setLandingHooksVisible(false);
+    // 화면 전환: 온보딩 숨기고 결과 화면 오픈
+    const screenOnboarding = document.getElementById('screen-onboarding');
+    const screenResults = document.getElementById('screen-results');
+    if (screenOnboarding) screenOnboarding.style.display = 'none';
+    if (screenResults) screenResults.style.display = 'block';
 
-    // 3. 사주 명리 정밀 진단 & 오행 처방 카드 동적 렌더링
-    const diagCard = document.getElementById('saju-summary-bar');
-    if (diagCard) {
-      diagCard.style.display = 'flex';
-
-      const diagTitle = document.getElementById('diagnosis-title');
-      if (diagTitle) {
-        diagTitle.innerText = `${profile.birthDate} 사주 명리 정밀 진단`;
-      }
-
-      const amountBadge = document.getElementById('diagnosis-amount-badge');
-      if (amountBadge) {
-        amountBadge.innerText = state.selectedAmount >= 10000 
-          ? `${state.selectedAmount / 10000}만원 (${sheetCount * 5}게임)` 
-          : '5천원 (5게임)';
-      }
-
-      const strongElemEl = document.getElementById('diag-strong-elem');
-      if (strongElemEl && state.sajuResult.primaryElement) {
-        strongElemEl.innerText = `${state.sajuResult.primaryElement.name} 왕성 (${state.sajuResult.ohaengPercent[state.sajuResult.maxElement]}%)`;
-      }
-
-      const weakElemEl = document.getElementById('diag-weak-elem');
-      if (weakElemEl && state.sajuResult.lackingElement) {
-        weakElemEl.innerText = `${state.sajuResult.lackingElement.name} 결핍 (${state.sajuResult.ohaengPercent[state.sajuResult.minElement]}%) ⚠️ 보강`;
-      }
-
-      const prescriptNumbersEl = document.getElementById('diag-prescript-numbers');
-      if (prescriptNumbersEl) {
-        const sc = state.sajuResult.seoncheon.join(', ');
-        const hc = state.sajuResult.hucheon.join(', ');
-        const parentName = state.sajuResult.parentElemObj ? state.sajuResult.parentElemObj.name : '상생';
-        const parentBalls = state.sajuResult.parentBalls ? state.sajuResult.parentBalls.slice(0, 3).join(', ') : '';
-        prescriptNumbersEl.innerHTML = `선천수 <strong>${sc}</strong> · 후천수 <strong>${hc}</strong> · 상생 보완수 <strong>${parentName} (${parentBalls})</strong>`;
-      }
-
-      const prescriptCommentEl = document.getElementById('diag-prescript-comment');
-      if (prescriptCommentEl && state.sajuResult.lackingElement) {
-        const lackName = state.sajuResult.lackingElement.name;
-        const parentName = state.sajuResult.parentElemObj ? state.sajuResult.parentElemObj.name : '상생';
-        prescriptCommentEl.innerHTML = `"부족한 <strong>${lackName}</strong> 기운을 보완해야 ${state.sajuResult.lackingElement.symbol}의 결실이 맺히므로, <strong>${parentName}·${lackName}</strong> 번호를 중심으로 황금 배합했습니다."`;
-      }
-    }
-
-    // 영자 실장의 한 줄 품격 브리핑 동적 갱신
-    const briefingElem = document.getElementById('youngja-text');
-    if (briefingElem) {
-      const lackingName = state.sajuResult.lackingElement ? state.sajuResult.lackingElement.name : '부족한';
-      const totalGames = sheetCount * 5;
-      briefingElem.innerHTML = `"대표님의 사주에 부족한 <strong>${lackingName}</strong> 기운을 보강하는 선천수·후천수 <strong>총 ${totalGames}게임</strong>을 정밀 조화시켰습니다."`;
+    // 1줄 요약 뱃지 갱신 (로또 티켓 상단)
+    const harmonyText = document.getElementById('ticket-harmony-text');
+    if (harmonyText && state.sajuResult) {
+      const sc = state.sajuResult.seoncheon.join(', ');
+      const hc = state.sajuResult.hucheon.join(', ');
+      harmonyText.textContent = `선천수 ${sc} · 후천수 ${hc} · 용신 보완수 조화 5게임 큐레이션`;
     }
 
     renderLottoView();
     renderDestinyView(state.sajuResult);
-    updateDestinyDashboard(state.sajuResult);
 
-    const lottoBoard = document.getElementById('latest-lotto-dashboard');
-    const destinyBoard = document.getElementById('destiny-master-dashboard');
-    const viewLotto = document.getElementById('view-lotto');
-    const viewDestiny = document.getElementById('view-destiny');
-
-    if (state.currentTrack === 'destiny') {
-      if (lottoBoard) lottoBoard.style.display = 'none';
-      if (destinyBoard) destinyBoard.style.display = 'none';
-      if (viewLotto) viewLotto.style.display = 'none';
-      if (viewDestiny) viewDestiny.style.display = 'block';
-
-      const sajuSummaryBar = document.getElementById('saju-summary-bar');
-      if (sajuSummaryBar) sajuSummaryBar.style.display = 'none';
-
-      const firstCard = document.getElementById('destiny-card-1');
-      if (firstCard && typeof firstCard.scrollIntoView === 'function') {
-        firstCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    // 탭 전환
+    if (targetTrack === 'destiny') {
+      const tabDestiny = document.getElementById('res-tab-destiny');
+      if (tabDestiny) tabDestiny.click();
     } else {
-      if (lottoBoard) lottoBoard.style.display = 'block';
-      if (destinyBoard) destinyBoard.style.display = 'none';
-      if (viewLotto) viewLotto.style.display = 'block';
-      if (viewDestiny) viewDestiny.style.display = 'none';
-
-      // 【핵심 UX 개선】 사주 진단 카드를 먼저 보여주고, 잠시 뒤 결과로 자연스럽게 이동
-      const diagScrollTarget = document.getElementById('saju-summary-bar');
-      if (diagScrollTarget && typeof diagScrollTarget.scrollIntoView === 'function') {
-        diagScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      // 1.5초 후 결과 티켓 영역으로 부드럽게 스크롤
-      setTimeout(() => {
-        const resSec = document.getElementById('lotto-result-section');
-        if (resSec && typeof resSec.scrollIntoView === 'function') {
-          resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 1500);
+      const tabLotto = document.getElementById('res-tab-lotto');
+      if (tabLotto) tabLotto.click();
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
     console.error('사주 분석 및 렌더링 오류:', err);
   }
@@ -1111,7 +1020,10 @@ function renderDestinyView(data) {
               <span>💳</span>
               <span>평생 금전 비밀번호</span>
             </div>
-            <div class="lifetime-big-val">${data.bankPass}</div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin: 4px 0;">
+              <span class="lifetime-big-val">${data.bankPass}</span>
+              <button type="button" class="btn-copy-num" onclick="copyToClipboard('${data.bankPass}', this)">복사 📋</button>
+            </div>
             <div class="lifetime-sub-principle">통장·카드·도어락 4자리<br>(선천·후천 결실 조합)</div>
           </div>
 
@@ -1121,7 +1033,10 @@ function renderDestinyView(data) {
               <span>🚗</span>
               <span>안전·성공 차량번호</span>
             </div>
-            <div class="lifetime-big-val">${data.carNum}</div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin: 4px 0;">
+              <span class="lifetime-big-val">${data.carNum}</span>
+              <button type="button" class="btn-copy-num" onclick="copyToClipboard('${data.carNum}', this)">복사 📋</button>
+            </div>
             <div class="lifetime-sub-principle">자동차 번호판 4자리<br>(사고 예방 &amp; 사업 번창)</div>
           </div>
 
@@ -1131,9 +1046,13 @@ function renderDestinyView(data) {
               <span>📱</span>
               <span>인생 성공 골드 전화번호 (뒷자리 3선)</span>
             </div>
-            <div style="display: flex; justify-content: space-around; margin: 4px 0;">
-              ${data.phoneNumbers.map(p => `
-                <span style="font-size: 1.15rem; font-weight: 900; color: #fbbf24; background: rgba(255,255,255,0.06); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3);">${p}</span>
+            <div style="display: flex; flex-direction: column; gap: 6px; margin: 8px 0;">
+              ${data.phoneNumbers.map((p, idx) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.25);">
+                  <span style="font-size: 0.78rem; color: #94a3b8;">추천 ${idx + 1}순위</span>
+                  <span style="font-size: 1.2rem; font-weight: 900; color: #fbbf24; letter-spacing: 2px;">${p}</span>
+                  <button type="button" class="btn-copy-num" onclick="copyToClipboard('${p}', this)">복사 📋</button>
+                </div>
               `).join('')}
             </div>
             <div class="lifetime-sub-principle">수리 81 영위격(榮華格) 기반 · 인복과 부귀를 부르는 황금 조합</div>
@@ -1634,4 +1553,43 @@ if (document.readyState === 'loading') {
   initModalSystem();
   renderSavedCount();
 }
+
+/**
+ * 실생활 운명수 원터치 클립보드 복사 함수
+ */
+window.copyToClipboard = function(text, btnElement) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showCopiedFeedback(btnElement);
+    }).catch(() => fallbackCopy(text, btnElement));
+  } else {
+    fallbackCopy(text, btnElement);
+  }
+};
+
+function showCopiedFeedback(btn) {
+  if (!btn) return;
+  const original = btn.innerHTML;
+  btn.innerHTML = '복사 완료! ✔️';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.innerHTML = original;
+    btn.classList.remove('copied');
+  }, 1800);
+}
+
+function fallbackCopy(text, btn) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showCopiedFeedback(btn);
+  } catch (err) {
+    console.error('복사 실패:', err);
+  }
+  document.body.removeChild(ta);
+}
+
 
