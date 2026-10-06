@@ -42,37 +42,34 @@
     </div>
   </header>
 
-  <div class="container">
+  <div class="container compact-viewport-fit">
 
-    <!-- [상단 초슬림 듀얼 후킹 바]: 당첨번호(82억) + 오늘 일진 편재운 한눈에 -->
-    <section class="v3-top-hook-card" id="top-hook-card">
-      <div class="hook-top-row">
-        <div class="hook-lotto-badge-wrap">
-          <span class="badge-gold-slim">제1244회 당첨</span>
-          <span class="hook-prize-est">1245회 1등 예상 <strong id="est-first-prize" class="prize-gold">82억 4,000만원</strong></span>
+    <!-- [상단 초슬림 듀얼 후킹 바]: 당첨번호(84억) + 오늘 일진 한눈에 (높이 65px 압축) -->
+    <section class="v3-top-hook-card-compact" id="top-hook-card">
+      <div class="hook-row-one">
+        <div class="hook-badge-lotto">
+          <span class="badge-mini-gold">1244회</span>
+          <div class="hook-balls-mini">
+            <span class="ball-xs col-1">4</span>
+            <span class="ball-xs col-11">11</span>
+            <span class="ball-xs col-11">19</span>
+            <span class="ball-xs col-21">27</span>
+            <span class="ball-xs col-31">33</span>
+            <span class="ball-xs col-41">41</span>
+            <span class="plus-xs">+</span>
+            <span class="ball-xs col-21">24</span>
+          </div>
         </div>
-        <div class="hook-sales-text">
-          <span>누적 <span id="cumulative-sales">340억원</span></span>
-          <span id="sales-update-time">[실시간]</span>
+        <div class="hook-next-prize">
+          <span class="next-tag">1245회 1등</span>
+          <strong id="est-first-prize" class="prize-gold">84억 3,855만원</strong>
         </div>
       </div>
 
-      <!-- 1244회 당첨번호 미니볼 1줄 -->
-      <div class="hook-balls-row">
-        <div class="hook-ball col-1">4</div>
-        <div class="hook-ball col-11">11</div>
-        <div class="hook-ball col-11">19</div>
-        <div class="hook-ball col-21">27</div>
-        <div class="hook-ball col-31">33</div>
-        <div class="hook-ball col-41">41</div>
-        <span class="hook-ball-plus">+</span>
-        <div class="hook-ball col-21">24</div>
-      </div>
-
-      <!-- 오늘 일진 십신 기운 슬림 띠 -->
-      <div class="hook-iljin-strip">
-        <span class="iljin-pill">오늘 일진: <strong id="today-iljin-ganji">甲辰(갑진)일</strong></span>
-        <span class="iljin-desc" id="today-iljin-desc">💰 <strong>편재운 85% 상승일</strong> (뜻밖의 횡재와 귀인 조력 길조)</span>
+      <!-- 2행: 오늘 일진 편재운 슬림 띠 -->
+      <div class="hook-row-two">
+        <span class="iljin-tag">🌟 오늘 일진: <strong id="today-iljin-ganji">甲辰(갑진)일</strong></span>
+        <span class="iljin-text" id="today-iljin-desc">💰 <strong>편재운 85% 상승일</strong> (횡재수 길조)</span>
       </div>
     </section>
 
@@ -95,28 +92,27 @@
             <li>
               <span class="fortune-bullet">🌅</span>
               <div class="fortune-content">
-                <strong>오늘의 일진 기운:</strong>
-                <span id="daily-fortune-line1">갑진(甲辰) 편재일로 생각지 못한 횡재와 문서운의 조화가 강합니다.</span>
+                <strong>일진 기운:</strong>
+                <span id="daily-fortune-line1">갑진(甲辰) 편재일로 생각지 못한 횡재와 문서운 길조.</span>
               </div>
             </li>
             <li>
               <span class="fortune-bullet">🧭</span>
               <div class="fortune-content">
-                <strong>추천 방위·길시:</strong>
-                <span id="daily-fortune-line2">현재 계신 곳 기준 <strong>남동쪽 복권방</strong>, <strong>신시(15:30~17:29)</strong>가 황금 길시입니다.</span>
+                <strong>방위·길시:</strong>
+                <span id="daily-fortune-line2">현재 위치 기준 <strong>남동쪽 복권방</strong>, <strong>신시(15:30~17:29)</strong> 길시.</span>
               </div>
             </li>
             <li>
               <span class="fortune-bullet">🔑</span>
               <div class="fortune-content">
-                <strong>오늘의 일진 퀵 번호:</strong>
+                <strong>오늘의 퀵 번호:</strong>
                 <span id="daily-fortune-line3" class="daily-quick-balls">4 · 11 · 24 · 33 · 41</span>
               </div>
             </li>
           </ul>
         </div>
 
-        <!-- 재방문자 원터치 퀵 액션 버튼군 -->
         <div class="daily-action-grid">
           <button type="button" id="btn-daily-quick-lotto" class="btn-daily-primary">
             🎰 이번 주(1245회) 맞춤 5게임 즉시 발권
@@ -133,31 +129,27 @@
         </div>
       </section>
 
-      <!-- [B. 신규 방문 / 사주 입력 폼] 단일 럭셔리 온보딩 카드 -->
-      <section class="card-slim luxury-form-card" id="saju-form-card">
-        <div class="form-hero-header">
-          <div class="form-hero-badge">AI 정통 사주 명리학 엔진</div>
-          <h2 class="form-hero-title">이번 주 로또 5게임 &amp; 평생 운명수 동시 발행</h2>
-          <p class="form-hero-sub">생년월일시 입력으로 이번 주 로또번호와 평생 전화·비밀·차량번호를 한 번에 받으세요.</p>
-        </div>
-
-        <!-- 사주로또 3대 차별성 슬림 칩 -->
-        <div class="onboarding-features-row">
-          <span class="feat-chip">📱 평생 운명수</span>
-          <span class="feat-chip">🌏 진태양시 시차보정</span>
-          <span class="feat-chip">🔑 번호 추출이유 공개</span>
+      <!-- [B. 신규 방문 / 사주 입력 폼] 모바일 1화면 쏙 들어가는 단일 럭셔리 카드 -->
+      <section class="card-slim luxury-form-compact" id="saju-form-card">
+        <div class="form-compact-header">
+          <h2 class="form-compact-title">이번 주 로또 5게임 &amp; 평생 운명수 동시 발행</h2>
+          <div class="compact-features-chips">
+            <span class="c-chip">📱 평생 운명수</span>
+            <span class="c-chip">🌏 시차보정</span>
+            <span class="c-chip">🔑 이유 공개</span>
+          </div>
         </div>
 
         <form id="saju-form">
-          <div class="form-grid-slim">
-            <div class="form-group-slim">
+          <div class="form-grid-2x2">
+            <div class="form-item-compact">
               <label for="birth-date">생년월일 (양력)</label>
               <input type="date" id="birth-date" value="" required>
             </div>
-            <div class="form-group-slim">
+            <div class="form-item-compact">
               <label for="birth-hour">출생 시간</label>
               <select id="birth-hour" required>
-                <option value="" disabled selected>출생 시간 선택</option>
+                <option value="" disabled selected>시간 선택</option>
                 <option value="12">오시 (11:30~13:29)</option>
                 <option value="0">자시 (23:30~01:29)</option>
                 <option value="2">축시 (01:30~03:29)</option>
@@ -173,10 +165,10 @@
                 <option value="-1">시간 모름</option>
               </select>
             </div>
-            <div class="form-group-slim">
+            <div class="form-item-compact">
               <label for="birth-city">출생 지역 (시차보정)</label>
               <select id="birth-city" required>
-                <option value="" disabled selected>출생 지역 선택</option>
+                <option value="" disabled selected>지역 선택</option>
                 <option value="seoul">서울·경기 (-32분)</option>
                 <option value="busan">부산·경남 (-24분)</option>
                 <option value="daegu">대구·경북 (-26분)</option>
@@ -187,9 +179,8 @@
                 <option value="gangwon">강원 (-29분)</option>
                 <option value="jeju">제주 (-34분)</option>
               </select>
-              <span class="v3-offset-hint">💡 태어난 지역의 진태양시 시차를 보정하여 정확한 시주를 도출합니다</span>
             </div>
-            <div class="form-group-slim">
+            <div class="form-item-compact">
               <label for="gender">성별</label>
               <select id="gender" required>
                 <option value="" disabled selected>성별 선택</option>
@@ -199,20 +190,16 @@
             </div>
           </div>
 
-          <button type="submit" id="btn-submit-form" class="btn-slim-primary btn-submit-luxury">
+          <!-- 강력하고 눈에 확 띄는 골드 발권 버튼 -->
+          <button type="submit" id="btn-submit-form" class="btn-primary-hero-glow">
             <span id="btn-submit-text">✨ 맞춤 로또 5게임 &amp; 평생 운명수 동시 발행</span>
           </button>
 
-          <!-- 안심 개인정보 보호 보증 안내 -->
-          <div class="privacy-trust-badge">
-            <span class="trust-shield">🛡️</span>
-            <span class="trust-text"><strong>100% 온디바이스(기기 내) 연산</strong> · 생년월일 등 개인정보는 외부 서버로 일절 전송·저장되지 않습니다.</span>
-          </div>
-
-          <!-- 동행복권 역대 빅데이터 핫/콜드 미니 바 -->
-          <div class="onboarding-stat-chip-row">
-            <span class="stat-mini-badge hot">🔥 최근 핫넘버: 34 · 18 · 27 · 12</span>
-            <span class="stat-mini-badge cold">🧊 미출현 콜드: 7 · 23 · 15 · 2</span>
+          <!-- 슬림 안심 안내 & 빅데이터 미니 칩 (1줄) -->
+          <div class="compact-trust-stat-row">
+            <span class="trust-pill">🛡️ 기기 내 연산(안심)</span>
+            <span class="stat-pill-sm hot">🔥 핫: 34·18·27</span>
+            <span class="stat-pill-sm cold">🧊 콜드: 7·23·15</span>
           </div>
         </form>
       </section>
