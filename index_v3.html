@@ -44,112 +44,59 @@
 
   <div class="container compact-viewport-fit">
 
-    <!-- [상단 초슬림 듀얼 후킹 바]: 당첨번호(84억) + 오늘 일진 한눈에 (높이 65px 압축) -->
-    <section class="v3-top-hook-card-compact" id="top-hook-card">
-      <div class="hook-row-one">
-        <div class="hook-badge-lotto">
-          <span class="badge-mini-gold">1244회</span>
-          <div class="hook-balls-mini">
-            <span class="ball-xs col-1">4</span>
-            <span class="ball-xs col-11">11</span>
-            <span class="ball-xs col-11">19</span>
-            <span class="ball-xs col-21">27</span>
-            <span class="ball-xs col-31">33</span>
-            <span class="ball-xs col-41">41</span>
-            <span class="plus-xs">+</span>
-            <span class="ball-xs col-21">24</span>
-          </div>
+    <!-- ================= [1. 최상단: 로또 실전 전광판] ================= -->
+    <section class="lotto-main-board" id="lotto-main-board">
+      <div class="board-draw-row">
+        <div class="draw-info-left">
+          <span class="badge-round-gold">제1244회 당첨</span>
+          <span class="draw-date-text">10.03 추첨</span>
         </div>
-        <div class="hook-next-prize">
-          <span class="next-tag">1245회 1등</span>
-          <strong id="est-first-prize" class="prize-gold">84억 3,855만원</strong>
+        <div class="next-prize-box">
+          <span class="next-label">제1245회 예상 1등</span>
+          <strong id="est-first-prize" class="next-amount">84억 3,855만원</strong>
         </div>
       </div>
 
-      <!-- 2행: 오늘 일진 편재운 슬림 띠 -->
-      <div class="hook-row-two">
-        <span class="iljin-tag">🌟 오늘 일진: <strong id="today-iljin-ganji">甲辰(갑진)일</strong></span>
-        <span class="iljin-text" id="today-iljin-desc">💰 <strong>편재운 85% 상승일</strong> (횡재수 길조)</span>
+      <!-- 1244회 1등 당첨번호 공 7개 -->
+      <div class="lotto-balls-strip">
+        <span class="ball-m col-1">4</span>
+        <span class="ball-m col-11">11</span>
+        <span class="ball-m col-11">19</span>
+        <span class="ball-m col-21">27</span>
+        <span class="ball-m col-31">33</span>
+        <span class="ball-m col-41">41</span>
+        <span class="ball-plus-sign">+</span>
+        <span class="ball-m col-21">24</span>
+      </div>
+
+      <!-- 빅데이터 핫&콜드 요약 미니 바 -->
+      <div class="board-stat-sub">
+        <span class="stat-tag hot">🔥 최근 핫넘버: 34 · 18 · 27 · 12</span>
+        <span class="stat-tag cold">🧊 미출현 콜드: 7 · 23 · 15 · 2</span>
       </div>
     </section>
 
-    <!-- ================= [화면 1: 온보딩 / 입력 화면] ================= -->
-    <div id="screen-onboarding">
+    <!-- ================= [화면 1: 메인 화면 (로또 번호 추출기)] ================= -->
+    <div id="screen-main-lotto">
 
-      <!-- [A. 재방문 유저 전용] 오늘의 3줄 일진 운세 & 1245회 퀵 발권 대시보드 (프로필 저장 시 노출) -->
-      <section class="daily-home-card" id="daily-home-card" style="display: none;">
-        <div class="daily-card-header">
-          <div class="daily-user-tag">
-            <span class="user-avatar">🔮</span>
-            <span>대표님 (<strong id="daily-user-birth">1984.10.04</strong>生)</span>
-          </div>
-          <span class="daily-badge-today">오늘의 데일리 브리핑</span>
-        </div>
-
-        <div class="daily-fortune-box">
-          <h3 class="daily-fortune-title">📜 오늘의 3줄 일진 명리 운세</h3>
-          <ul class="daily-fortune-list">
-            <li>
-              <span class="fortune-bullet">🌅</span>
-              <div class="fortune-content">
-                <strong>일진 기운:</strong>
-                <span id="daily-fortune-line1">갑진(甲辰) 편재일로 생각지 못한 횡재와 문서운 길조.</span>
-              </div>
-            </li>
-            <li>
-              <span class="fortune-bullet">🧭</span>
-              <div class="fortune-content">
-                <strong>방위·길시:</strong>
-                <span id="daily-fortune-line2">현재 위치 기준 <strong>남동쪽 복권방</strong>, <strong>신시(15:30~17:29)</strong> 길시.</span>
-              </div>
-            </li>
-            <li>
-              <span class="fortune-bullet">🔑</span>
-              <div class="fortune-content">
-                <strong>오늘의 퀵 번호:</strong>
-                <span id="daily-fortune-line3" class="daily-quick-balls">4 · 11 · 24 · 33 · 41</span>
-              </div>
-            </li>
-          </ul>
-        </div>
-
-        <div class="daily-action-grid">
-          <button type="button" id="btn-daily-quick-lotto" class="btn-daily-primary">
-            🎰 이번 주(1245회) 맞춤 5게임 즉시 발권
-          </button>
-          <button type="button" id="btn-daily-view-destiny" class="btn-daily-secondary">
-            📱 내 평생 운명수 (전화·비번·차량) 보기
-          </button>
-        </div>
-
-        <div class="daily-reenter-wrap">
-          <button type="button" id="btn-reenter-saju" class="btn-link-reenter">
-            ✏️ 다른 생년월일로 사주 다시 입력하기
-          </button>
-        </div>
-      </section>
-
-      <!-- [B. 신규 방문 / 사주 입력 폼] 모바일 1화면 쏙 들어가는 단일 럭셔리 카드 -->
-      <section class="card-slim luxury-form-compact" id="saju-form-card">
-        <div class="form-compact-header">
-          <h2 class="form-compact-title">이번 주 로또 5게임 &amp; 평생 운명수 동시 발행</h2>
-          <div class="compact-features-chips">
-            <span class="c-chip">📱 평생 운명수</span>
-            <span class="c-chip">🌏 시차보정</span>
-            <span class="c-chip">🔑 이유 공개</span>
-          </div>
+      <!-- 로또 메인 카드: 내 사주 기운 맞춤 로또 5게임 추출 -->
+      <section class="card-lotto-extract" id="lotto-extract-card">
+        <div class="extract-card-header">
+          <span class="extract-badge">🎯 동행복권 6/45 맞춤 추출</span>
+          <h2 class="extract-title">기계식 자동 번호는 그만!<br>이번 주 1등 도전 나만의 5게임</h2>
+          <p class="extract-sub">내 생년월일의 타고난 기운과 오행을 조화시켜 황금 5게임을 정밀 추출합니다.</p>
         </div>
 
         <form id="saju-form">
           <div class="form-grid-2x2">
-            <div class="form-item-compact">
+            <div class="form-group-box">
               <label for="birth-date">생년월일 (양력)</label>
               <input type="date" id="birth-date" value="" required>
             </div>
-            <div class="form-item-compact">
+            <div class="form-group-box">
               <label for="birth-hour">출생 시간</label>
               <select id="birth-hour" required>
-                <option value="" disabled selected>시간 선택</option>
+                <option value="" disabled selected>출생 시간 선택</option>
                 <option value="12">오시 (11:30~13:29)</option>
                 <option value="0">자시 (23:30~01:29)</option>
                 <option value="2">축시 (01:30~03:29)</option>
@@ -165,10 +112,10 @@
                 <option value="-1">시간 모름</option>
               </select>
             </div>
-            <div class="form-item-compact">
+            <div class="form-group-box">
               <label for="birth-city">출생 지역 (시차보정)</label>
               <select id="birth-city" required>
-                <option value="" disabled selected>지역 선택</option>
+                <option value="" disabled selected>출생 지역 선택</option>
                 <option value="seoul">서울·경기 (-32분)</option>
                 <option value="busan">부산·경남 (-24분)</option>
                 <option value="daegu">대구·경북 (-26분)</option>
@@ -180,7 +127,7 @@
                 <option value="jeju">제주 (-34분)</option>
               </select>
             </div>
-            <div class="form-item-compact">
+            <div class="form-group-box">
               <label for="gender">성별</label>
               <select id="gender" required>
                 <option value="" disabled selected>성별 선택</option>
@@ -190,39 +137,42 @@
             </div>
           </div>
 
-          <!-- 강력하고 눈에 확 띄는 골드 발권 버튼 -->
-          <button type="submit" id="btn-submit-form" class="btn-primary-hero-glow">
-            <span id="btn-submit-text">✨ 맞춤 로또 5게임 &amp; 평생 운명수 동시 발행</span>
+          <!-- 메인 CTA 버튼: 로또 5게임 추출 -->
+          <button type="submit" id="btn-submit-form" class="btn-lotto-extract-main">
+            <span id="btn-submit-text">🎰 이번 주 1245회 행운 5게임 추출하기</span>
           </button>
 
-          <!-- 슬림 안심 안내 & 빅데이터 미니 칩 (1줄) -->
-          <div class="compact-trust-stat-row">
-            <span class="trust-pill">🛡️ 기기 내 연산(안심)</span>
-            <span class="stat-pill-sm hot">🔥 핫: 34·18·27</span>
-            <span class="stat-pill-sm cold">🧊 콜드: 7·23·15</span>
+          <div class="extract-trust-foot">
+            <span>🛡️ 100% 기기 내 연산 · 개인정보 외부 전송 0%</span>
+            <span>🔑 왜 이 번호인지 추출 근거 공개</span>
           </div>
         </form>
       </section>
 
+      <!-- 대표님 지시: 사주에 더 관심 있는 사람만 누르는 별도 평생수 배너 -->
+      <section class="banner-destiny-gateway" id="banner-destiny-gateway">
+        <div class="gateway-text-wrap">
+          <span class="gateway-badge">사주 심층 분석</span>
+          <strong class="gateway-title">📱 평생 쓰는 내 운명수도 궁금하신가요?</strong>
+          <span class="gateway-desc">선천수·후천수로 푸는 내 전화번호 뒷자리 · 통장 비밀번호 · 차량번호</span>
+        </div>
+        <button type="button" id="btn-open-destiny-gateway" class="btn-gateway-go">
+          확인하기 ›
+        </button>
+      </section>
+
     </div>
 
-    <!-- ================= [화면 2: 결과 화면 (무중복 2대 티켓 분리)] ================= -->
+    <!-- ================= [화면 2: 로또 추출 결과 티켓 뷰] ================= -->
     <div id="screen-results" style="display: none;">
 
-      <!-- 결과 상단 무중복 2대 탭 스위처 & 사주 변경 버튼 -->
-      <div class="result-sticky-nav">
-        <nav class="result-tabs" id="result-dual-tabs">
-          <button id="res-tab-lotto" class="res-tab-btn active" type="button">
-            <span class="res-tab-icon">🎰</span>
-            <span class="res-tab-title">이번 주 로또 실전 티켓</span>
-          </button>
-          <button id="res-tab-destiny" class="res-tab-btn" type="button">
-            <span class="res-tab-icon">📱</span>
-            <span class="res-tab-title">내 평생 운명수 카드</span>
-          </button>
-        </nav>
-        <button id="btn-change-saju" class="btn-change-saju" type="button" title="사주 정보 변경">
-          사주 변경 ✏️
+      <!-- 결과 상단 네비게이션: 다시 뽑기 & 평생수 전환 버튼 -->
+      <div class="result-action-bar">
+        <button id="btn-back-to-input" class="btn-sub-nav" type="button">
+          ‹ 다시 입력
+        </button>
+        <button id="btn-switch-to-destiny" class="btn-highlight-nav" type="button">
+          📱 내 평생 운명수(전화·비번·차량) 보기 ›
         </button>
       </div>
 
@@ -325,13 +275,19 @@
         </section>
       </main>
 
-      <!-- ================= [결과 탭 2: 내 평생 운명수 (로또 공 0%)] ================= -->
-      <main id="view-destiny" style="display: none;">
-        <section id="destiny-content">
-          <!-- JS에서 사주 & 평생 운명수(전화·비번·차량번호) 렌더링 -->
-        </section>
-      </main>
+    </div>
 
+    <!-- ================= [화면 3: 평생 운명수 심층 리포트 (사주에 관심 있는 사람 전용)] ================= -->
+    <div id="screen-view-destiny" style="display: none;">
+      <div class="destiny-nav-bar">
+        <button id="btn-back-to-lotto-ticket" class="btn-sub-nav" type="button">
+          ‹ 로또 번호 티켓으로 돌아가기
+        </button>
+        <span class="destiny-nav-tag">📜 사주 평생수 심층 리포트</span>
+      </div>
+      <section id="destiny-content">
+        <!-- JS에서 사주 & 평생 운명수(전화·비번·차량번호) 렌더링 -->
+      </section>
     </div>
 
     <!-- 면책 문구 -->

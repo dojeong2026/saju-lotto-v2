@@ -142,78 +142,71 @@ function calculateTodayIljin() {
   return { ganjiStr, ganIdx, jiIdx };
 }
 
+function showScreen(screenName) {
+  const mainScreen = document.getElementById('screen-main-lotto');
+  const resultScreen = document.getElementById('screen-results');
+  const destinyScreen = document.getElementById('screen-view-destiny');
+
+  if (mainScreen) mainScreen.style.display = (screenName === 'main') ? 'block' : 'none';
+  if (resultScreen) resultScreen.style.display = (screenName === 'results') ? 'block' : 'none';
+  if (destinyScreen) destinyScreen.style.display = (screenName === 'destiny') ? 'block' : 'none';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function initApp() {
-  calculateTodayIljin();
   updateSalesStatus();
   renderSavedCount();
-  setupTabs();
+  setupNavigation();
   setupForm();
   initModalSystem();
 
-  checkProfileAndSetupHome();
+  // 첫 화면은 무조건 로또 추출 메인 화면으로 시작!
+  showScreen('main');
 
-  // 1분 주기 갱신
+  // 1분 주기 판매현황 자동 갱신
   setInterval(updateSalesStatus, 60000);
 }
 
-function checkProfileAndSetupHome() {
-  const dailyCard = document.getElementById('daily-home-card');
-  const formCard = document.getElementById('saju-form-card');
-  const userBirth = document.getElementById('daily-user-birth');
-
-  if (state.savedProfile && state.savedProfile.birthDate) {
-    // 재방문자: 오늘의 데일리 운세 카드 노출, 입력폼 숨김
-    if (dailyCard) dailyCard.style.display = 'block';
-    if (formCard) formCard.style.display = 'none';
-    if (userBirth) userBirth.textContent = state.savedProfile.birthDate;
-
-    // 폼 값도 미리 세팅해 둠
-    document.getElementById('birth-date').value = state.savedProfile.birthDate;
-    document.getElementById('birth-hour').value = state.savedProfile.birthHour;
-    document.getElementById('birth-city').value = state.savedProfile.birthCity;
-    document.getElementById('gender').value = state.savedProfile.gender;
-  } else {
-    // 신규 방문자: 단일 럭셔리 폼 카드 노출
-    if (dailyCard) dailyCard.style.display = 'none';
-    if (formCard) formCard.style.display = 'block';
-  }
-}
-
-function setupTabs() {
-  const resTabLotto = document.getElementById('res-tab-lotto');
-  const resTabDestiny = document.getElementById('res-tab-destiny');
-  const viewLotto = document.getElementById('view-lotto');
-  const viewDestiny = document.getElementById('view-destiny');
-
-  if (resTabLotto && resTabDestiny) {
-    resTabLotto.addEventListener('click', () => {
-      resTabLotto.classList.add('active');
-      resTabDestiny.classList.remove('active');
-      state.currentTrack = 'lotto';
-      if (viewLotto) viewLotto.style.display = 'block';
-      if (viewDestiny) viewDestiny.style.display = 'none';
-    });
-
-    resTabDestiny.addEventListener('click', () => {
-      resTabDestiny.classList.add('active');
-      resTabLotto.classList.remove('active');
-      state.currentTrack = 'destiny';
-      if (viewLotto) viewLotto.style.display = 'none';
-      if (viewDestiny) viewDestiny.style.display = 'block';
+function setupNavigation() {
+  // 1. 결과 화면에서 "다시 입력" 버튼
+  const backToInputBtn = document.getElementById('btn-back-to-input');
+  if (backToInputBtn) {
+    backToInputBtn.addEventListener('click', () => {
+      showScreen('main');
     });
   }
 
-  // 결과 화면에서 "사주 변경" 버튼
-  const changeBtn = document.getElementById('btn-change-saju');
-  if (changeBtn) {
-    changeBtn.addEventListener('click', () => {
-      document.getElementById('screen-results').style.display = 'none';
-      document.getElementById('screen-onboarding').style.display = 'block';
-      document.getElementById('daily-home-card').style.display = 'none';
-      document.getElementById('saju-form-card').style.display = 'block';
+  // 2. 결과 화면에서 "평생 운명수 보기" 버튼
+  const switchToDestinyBtn = document.getElementById('btn-switch-to-destiny');
+  if (switchToDestinyBtn) {
+    switchToDestinyBtn.addEventListener('click', () => {
+      showScreen('destiny');
+    });
+  }
 
-      const formCard = document.getElementById('saju-form-card');
-      if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // 3. 평생 운명수 화면에서 "로또 티켓으로 돌아가기" 버튼
+  const backToTicketBtn = document.getElementById('btn-back-to-lotto-ticket');
+  if (backToTicketBtn) {
+    backToTicketBtn.addEventListener('click', () => {
+      showScreen('results');
+    });
+  }
+
+  // 4. 메인 화면 하단의 "평생 운명수 궁금하신가요?" 배너 클릭
+  const gatewayBtn = document.getElementById('btn-open-destiny-gateway');
+  if (gatewayBtn) {
+    gatewayBtn.addEventListener('click', () => {
+      if (state.savedProfile) {
+        runAnalysis(state.savedProfile, 'destiny');
+      } else {
+        const formCard = document.getElementById('lotto-extract-card');
+        if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const dateInput = document.getElementById('birth-date');
+        if (dateInput) {
+          dateInput.focus();
+        }
+      }
     });
   }
 }
@@ -234,45 +227,14 @@ function setupForm() {
       localStorage.setItem('saju_lotto_v2_profile', JSON.stringify(profile));
       state.savedProfile = profile;
 
-      runAnalysis(profile, 'lotto');
-    });
-  }
-
-  // 재방문자 원터치 버튼 1: 1245회 5게임 즉시 발권
-  const btnDailyLotto = document.getElementById('btn-daily-quick-lotto');
-  if (btnDailyLotto) {
-    btnDailyLotto.addEventListener('click', () => {
-      if (state.savedProfile) {
-        runAnalysis(state.savedProfile, 'lotto');
-      }
-    });
-  }
-
-  // 재방문자 원터치 버튼 2: 내 평생 운명수 보기
-  const btnDailyDestiny = document.getElementById('btn-daily-view-destiny');
-  if (btnDailyDestiny) {
-    btnDailyDestiny.addEventListener('click', () => {
-      if (state.savedProfile) {
-        runAnalysis(state.savedProfile, 'destiny');
-      }
-    });
-  }
-
-  // 재방문자 카드에서 "다른 생년월일로 사주 다시 입력하기"
-  const btnReenter = document.getElementById('btn-reenter-saju');
-  if (btnReenter) {
-    btnReenter.addEventListener('click', () => {
-      document.getElementById('daily-home-card').style.display = 'none';
-      document.getElementById('saju-form-card').style.display = 'block';
-      const formCard = document.getElementById('saju-form-card');
-      if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      runAnalysis(profile, 'results');
     });
   }
 
   state.selectedAmount = 5000;
 }
 
-function runAnalysis(profile, targetTrack = 'lotto') {
+function runAnalysis(profile, targetScreen = 'results') {
   try {
     const sheetCount = state.selectedAmount === 20000 ? 4 : (state.selectedAmount === 10000 ? 2 : 1);
     state.sheets = [];
@@ -283,35 +245,20 @@ function runAnalysis(profile, targetTrack = 'lotto') {
     state.isAllSheetsView = false;
     state.sajuResult = state.sheets[0];
 
-    // 화면 전환: 온보딩 숨기고 결과 화면 오픈
-    const screenOnboarding = document.getElementById('screen-onboarding');
-    const screenResults = document.getElementById('screen-results');
-    if (screenOnboarding) screenOnboarding.style.display = 'none';
-    if (screenResults) screenResults.style.display = 'block';
-
     // 1줄 요약 뱃지 갱신 (로또 티켓 상단)
     const harmonyText = document.getElementById('ticket-harmony-text');
     if (harmonyText && state.sajuResult) {
       const sc = state.sajuResult.seoncheon.join(', ');
       const hc = state.sajuResult.hucheon.join(', ');
-      harmonyText.textContent = `선천수 ${sc} · 후천수 ${hc} · 용신 보완수 조화 5게임 큐레이션`;
+      harmonyText.textContent = `선천수 ${sc} · 후천수 ${hc} · 오행 상생 조화 5게임 큐레이션`;
     }
 
     renderLottoView();
     renderDestinyView(state.sajuResult);
 
-    // 탭 전환
-    if (targetTrack === 'destiny') {
-      const tabDestiny = document.getElementById('res-tab-destiny');
-      if (tabDestiny) tabDestiny.click();
-    } else {
-      const tabLotto = document.getElementById('res-tab-lotto');
-      if (tabLotto) tabLotto.click();
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showScreen(targetScreen);
   } catch (err) {
-    console.error('사주 분석 및 렌더링 오류:', err);
+    console.error('사주 로또 분석 및 렌더링 오류:', err);
   }
 }
 
