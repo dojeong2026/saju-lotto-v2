@@ -1,0 +1,3021 @@
+/* ==========================================================================
+   사주로또 v2 - 모바일 한 화면 핏(Fit) & 고밀도 콤팩트 럭셔리 스타일
+   불필요한 공백 제거, 1게임당 1블록 컴팩트 정렬, 모바일 화면 최적화
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --bg-deep: #090d16;
+  --bg-card: #131b2e;
+  --border-gold: rgba(245, 158, 11, 0.35);
+  --border-gold-bright: #f59e0b;
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --text-gold: #fbbf24;
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Pretendard', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  line-height: 1.4;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 0 10px 40px;
+}
+
+/* ================= 1. 최상단 프리미엄 브랜딩 헤더 ================= */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: rgba(9, 13, 22, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.22);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-emblem {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.45));
+}
+
+.emblem-svg {
+  width: 100%;
+  height: 100%;
+  animation: emblemPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes emblemPulse {
+  0% { transform: scale(0.97); filter: brightness(0.95); }
+  100% { transform: scale(1.03); filter: brightness(1.15); }
+}
+
+.brand-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.brand-title {
+  font-size: 1.12rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+.brand-kor {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 60%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 동양 명리학 전통 붉은 칠기 낙관 뱃지 */
+.seal-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  font-family: 'Batang', 'Song Myung', serif;
+  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+  color: #fef08a;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(254, 240, 138, 0.5);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0,0,0,0.3);
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+}
+
+.ver-badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+  color: #0b1120;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.3);
+}
+
+.brand-badge-ai {
+  font-size: 0.66rem;
+  font-weight: 800;
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 1px 7px;
+  border-radius: 4px;
+  letter-spacing: -0.2px;
+  vertical-align: middle;
+}
+
+.brand-sub {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.v1-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.v1-btn:hover {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+/* ================= 2. 영자 실장 AI 큐레이터 앰버서더 바 ================= */
+.youngja-ambassador {
+  margin: 10px 0 12px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.55) 0%, rgba(15, 23, 42, 0.75) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.curator-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.curator-avatar-wrapper {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.curator-avatar-svg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+}
+
+.status-pulse-dot {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border: 2px solid #0f172a;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #10b981;
+  animation: pulseGreen 2s infinite ease-in-out;
+}
+
+@keyframes pulseGreen {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.75; }
+}
+
+.curator-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.curator-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.curator-name {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+.curator-badge-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 1px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.curator-statement {
+  font-size: 0.79rem;
+  color: #cbd5e1;
+  line-height: 1.35;
+  margin: 0;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.curator-statement strong {
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.curator-side-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.68rem;
+  color: #f59e0b;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.pulse-ring-icon {
+  color: #fbbf24;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 440px) {
+  .curator-side-badge {
+    display: none;
+  }
+}
+
+/* ================= 2. 최신 1243회 당첨 대시보드 (슬림 럭셔리 핏) ================= */
+.latest-lotto-dashboard {
+  background: linear-gradient(180deg, #131b2e 0%, #0d1322 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin: 0 0 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.round-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.round-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-gold {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.round-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.prize-gold {
+  color: #fbbf24;
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+.prize-sky {
+  color: #38bdf8;
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+.big-ball-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px 0 10px;
+}
+
+.big-ball {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffffff;
+  box-shadow: inset -2px -2px 4px rgba(0,0,0,0.6), inset 1px 1px 3px rgba(255,255,255,0.4), 0 3px 6px rgba(0,0,0,0.4);
+}
+
+.ball-plus {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text-muted);
+}
+
+.prize-bar {
+  display: flex;
+  justify-content: space-between;
+  background: #1f2937;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: #d1d5db;
+}
+
+.prize-bar strong {
+  color: #fbbf24;
+}
+
+.next-round-status {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.next-round-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
+
+.next-round-tag {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.3px;
+}
+
+.next-round-time {
+  font-size: 0.82rem;
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.next-round-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.status-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  letter-spacing: -0.2px;
+  font-weight: 600;
+}
+
+.status-value {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #e2e8f0;
+}
+
+.status-value.highlight {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fbbf24;
+}
+
+/* ================= 3. 2대 줄기 탭 스위처 ================= */
+.track-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.4));
+  color: #fff;
+  border-color: var(--border-gold-bright);
+}
+
+/* ================= 4. 사주 명리 정밀 진단 & 오행 숫자 처방 카드 ================= */
+.saju-diagnosis-card {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.diagnosis-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.diagnosis-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.diagnosis-icon {
+  font-size: 0.95rem;
+}
+
+.diagnosis-subject {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.diagnosis-amount-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.btn-toggle-saju {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-toggle-saju:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+.diagnosis-element-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.element-diag-chip {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.element-diag-chip .diag-label {
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.chip-strong {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.chip-strong strong {
+  color: #60a5fa;
+  font-weight: 800;
+}
+
+.chip-weak {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.chip-weak strong {
+  color: #f87171;
+  font-weight: 800;
+}
+
+.diagnosis-prescription-row {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prescription-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: #cbd5e1;
+}
+
+.prescript-badge {
+  background: #f59e0b;
+  color: #0b1120;
+  font-weight: 800;
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.prescript-detail strong {
+  color: #fbbf24;
+  font-weight: 800;
+}
+
+.prescript-comment {
+  font-size: 0.75rem;
+  color: #fde68a;
+  line-height: 1.35;
+  margin: 0;
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+/* 사주 입력 폼 (슬림) */
+.card-slim {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.form-grid-slim {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.form-group-slim {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group-slim.full {
+  grid-column: span 2;
+}
+
+.form-group-slim label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.form-group-slim input, .form-group-slim select {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+}
+
+/* 구매 금액 선택기 (5천원 / 1만원 / 2만원) */
+.purchase-amount-box {
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.amount-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.amount-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.btn-amount-chip {
+  background: #1e293b;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.btn-amount-chip .chip-krw {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.btn-amount-chip .chip-desc {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.btn-amount-chip.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
+  border-color: #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.btn-amount-chip.active .chip-krw {
+  color: #fbbf24;
+}
+
+.btn-amount-chip.active .chip-desc {
+  color: #fef08a;
+}
+
+.btn-slim-primary {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #000;
+  font-size: 1.05rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* 🔒 안심 개인정보 보호 보증 뱃지 */
+.privacy-trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-top: 8px;
+}
+
+.trust-shield {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.trust-text {
+  font-size: 0.72rem;
+  color: #a7f3d0;
+  line-height: 1.4;
+}
+
+.trust-text strong {
+  color: #34d399;
+}
+
+/* ================= 다중 장수(1만원, 2만원) 시트 네비게이션 ================= */
+.ticket-sheet-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  background: #1e293b;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+}
+
+.sheet-tabs-wrap {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.sheet-tab-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sheet-tab-btn.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #0b1120;
+  border-color: #f59e0b;
+}
+
+.btn-toggle-sheets {
+  background: none;
+  border: none;
+  color: #fbbf24;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ================= 5. [핵심] 한 화면 쏙 들어가는 컴팩트 황금 티켓 ================= */
+.compact-ticket {
+  background: #ffffff;
+  color: #111827;
+  padding: 16px 14px 12px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  margin-top: 6px;
+}
+
+.ticket-top-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1.5px dashed #9ca3af;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+.ticket-title-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ticket-main-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.ticket-date-time {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.ticket-round-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.ticket-round-col .stamp-badge {
+  background: #dc2626;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.25);
+}
+
+.draw-sched {
+  font-size: 0.72rem;
+  color: #b91c1c;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ================= 게임 1줄 행: 좌측 세로 A/B/C/D/E 배지 + 우측 타이틀/볼 ================= */
+.game-compact-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dotted #e2e8f0;
+}
+
+/* 좌측 연한 회색 바탕의 품격 있는 세로 알파벳 배지 */
+.game-letter-sidebar {
+  width: 44px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.game-letter {
+  font-size: 1.55rem;
+  font-weight: 800;
+  font-family: 'Batang', 'Times New Roman', serif;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.game-main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.game-title-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.game-meaning-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.game-meaning-desc {
+  font-size: 0.68rem;
+  color: #334155;
+  font-weight: 700;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: normal;
+  word-break: keep-all;
+  line-height: 1.3;
+}
+
+.game-balls-line {
+  display: flex;
+  align-items: center;
+}
+
+.compact-ball-group {
+  display: flex;
+  gap: 6px;
+}
+
+.compact-ball-group {
+  display: flex;
+  gap: 5px;
+}
+
+.compact-ball {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #ffffff;
+  box-shadow: inset -1.5px -1.5px 3px rgba(0,0,0,0.5), inset 1px 1px 2px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ================= 5-1. 대길(大吉) 구매 비책 가이드 (방위 & 최적 시간) ================= */
+.ticket-lucky-guide {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1.5px solid #f59e0b;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.12);
+}
+
+.guide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed rgba(217, 119, 6, 0.35);
+}
+
+.guide-badge {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #9a3412;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.guide-origin-note {
+  font-size: 0.73rem;
+  color: #78350f;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.guide-origin-note strong {
+  color: #b45309;
+}
+
+.guide-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.guide-card {
+  background: #ffffff;
+  border: 1.2px solid #fde68a;
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.guide-icon-wrap {
+  font-size: 1.35rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.guide-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.guide-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.guide-main-val {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #1e3a8a;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+.guide-sub-desc {
+  font-size: 0.72rem;
+  color: #475569;
+  line-height: 1.35;
+  margin-top: 3px;
+  word-break: keep-all;
+}
+
+@media (max-width: 480px) {
+  .guide-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================= 6. 볼 색상 ================= */
+.col-1  { background: radial-gradient(circle at 35% 35%, #f59e0b, #d97706); } /* 황금 */
+.col-11 { background: radial-gradient(circle at 35% 35%, #3b82f6, #1d4ed8); } /* 파랑 */
+.col-21 { background: radial-gradient(circle at 35% 35%, #ef4444, #b91c1c); } /* 빨강 */
+.col-31 { background: radial-gradient(circle at 35% 35%, #94a3b8, #475569); } /* 회색 */
+.col-41 { background: radial-gradient(circle at 35% 35%, #10b981, #047857); } /* 초록 */
+
+/* ================= 7. 버튼 및 푸터 ================= */
+/* 상단 헤더 보관함 버튼 */
+.vault-top-btn {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.2s ease;
+}
+
+.vault-top-btn:hover {
+  background: rgba(245, 158, 11, 0.3);
+  border-color: #fbbf24;
+  color: #fff;
+}
+
+/* 복권방 현장 즉시 구매 퀵 툴 (OMR & QR) */
+.purchase-tools-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.btn-tool-omr, .btn-tool-qr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-tool-omr {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(185, 28, 28, 0.25) 100%);
+  border: 1.5px solid #ef4444;
+  color: #fca5a5;
+}
+
+.btn-tool-omr:hover {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.25) 0%, rgba(185, 28, 28, 0.4) 100%);
+  border-color: #f87171;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-tool-qr {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(2, 132, 199, 0.25) 100%);
+  border: 1.5px solid #0284c7;
+  color: #7dd3fc;
+}
+
+.btn-tool-qr:hover {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.25) 0%, rgba(2, 132, 199, 0.4) 100%);
+  border-color: #38bdf8;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-tool-omr .tool-icon, .btn-tool-qr .tool-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.btn-tool-omr .tool-text, .btn-tool-qr .tool-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.tool-sub {
+  font-size: 0.68rem;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.ticket-action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-add-sheet {
+  width: 100%;
+  padding: 12px;
+  border: 1.5px solid #f59e0b;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.22) 100%);
+  color: #fbbf24;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-add-sheet:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.35) 100%);
+  border-color: #fbbf24;
+}
+
+.save-vault-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 8px;
+}
+
+.btn-save-compact {
+  padding: 11px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  background: #1e293b;
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-save-compact:hover {
+  background: #334155;
+  color: #fff;
+}
+
+.btn-vault-open {
+  padding: 11px 8px;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.1);
+  color: #fde68a;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-vault-open:hover {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b;
+}
+
+.disclaimer-compact {
+  text-align: center;
+  padding: 16px 8px;
+  color: #64748b;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 20px;
+}
+
+/* ================= 8. 공통 모달 시스템 ================= */
+.app-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.modal-dialog {
+  position: relative;
+  background: #0f172a;
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 158, 11, 0.15);
+  z-index: 10;
+  overflow: hidden;
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #1e293b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fbbf24;
+  margin: 0;
+}
+
+.modal-subtitle {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.btn-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.btn-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.modal-body {
+  padding: 14px 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #1e293b;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-modal-primary {
+  background: #d97706;
+  border: none;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-modal-primary:hover {
+  background: #b45309;
+}
+
+.btn-modal-sub {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #94a3b8;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-modal-sub:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+/* ================= 9. 내 번호 보관함 스타일 ================= */
+.vault-empty-state {
+  text-align: center;
+  padding: 36px 16px;
+  color: #94a3b8;
+}
+
+.vault-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.vault-empty-text {
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.vault-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vault-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 14px;
+  transition: all 0.2s ease;
+}
+
+.vault-card:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.vault-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vault-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vault-round-pill {
+  background: #d97706;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.vault-time-text {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.vault-card-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-vault-action {
+  font-size: 0.72rem;
+  padding: 3px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-vault-action:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fbbf24;
+}
+
+.btn-vault-action.delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.vault-games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vault-game-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vault-game-tag {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #cbd5e1;
+  width: 14px;
+  text-align: center;
+}
+
+.vault-balls-group {
+  display: flex;
+  gap: 4px;
+}
+
+.vault-ball {
+  width: 24px;
+  height: 24px;
+  font-size: 0.75rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ================= 10. 실제 로또 6/45 OMR 마킹 종이 스타일 (한 화면 컴팩트 핏) ================= */
+.modal-omr-dialog {
+  max-width: 520px;
+}
+
+.omr-modal-header-slim {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: #1e293b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.omr-modal-body-compact {
+  padding: 8px 10px;
+  background: #0b1120;
+}
+
+.omr-modal-footer-slim {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: #1e293b;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-slim-confirm {
+  padding: 6px 14px;
+  font-size: 0.82rem;
+}
+
+.omr-sheet-tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 6px;
+  overflow-x: auto;
+}
+
+.omr-tab-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.omr-tab-chip.active {
+  background: #d97706;
+  border-color: #fbbf24;
+  color: #fff;
+}
+
+/* 실제 OMR 종이 재질 느낌 (한 화면 쏙 핏) */
+.omr-slip-paper {
+  background: #fffdf5;
+  color: #1e293b;
+  border: 2px solid #dc2626;
+  border-radius: 6px;
+  padding: 6px 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.omr-top-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1.5px solid #dc2626;
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+
+.omr-lotto-logo {
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #dc2626;
+  letter-spacing: -0.3px;
+}
+
+.omr-sub-info {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #b91c1c;
+}
+
+/* OMR 게임 섹션 (A~E): 지브라 교차 배경색 */
+.omr-game-section {
+  display: flex;
+  align-items: center;
+  padding: 3px 4px;
+  gap: 6px;
+  border-radius: 3px;
+  margin-bottom: 3px;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.omr-game-section:last-child {
+  margin-bottom: 0;
+}
+
+/* 홀수 게임(A, C, E): 따뜻한 로또 용지 미색(크림색) */
+.omr-game-section.omr-bg-cream {
+  background-color: #fffdec;
+}
+
+/* 짝수 게임(B, D): 깨끗한 순백색 */
+.omr-game-section.omr-bg-white {
+  background-color: #ffffff;
+}
+
+/* 좌측 선명하고 단정한 A, B, C, D, E 라벨 */
+.omr-game-label {
+  font-family: 'Arial Black', -apple-system, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #dc2626;
+  width: 20px;
+  text-align: center;
+  border-right: 1.5px solid #dc2626;
+  padding-right: 4px;
+  line-height: 1;
+}
+
+/* 9개 열 컴팩트 숫자 그리드 */
+.omr-grid-45 {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 2px;
+  flex: 1;
+}
+
+/* 개별 숫자 마킹 칸 (세로 17px 컴팩트 고가독성) */
+.omr-cell {
+  height: 17px;
+  border: 1px solid #ef4444;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #dc2626;
+  background: #ffffff;
+  position: relative;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.omr-game-section.omr-bg-cream .omr-cell:not(.marked) {
+  background: #fffdf5;
+}
+
+/* 컴퓨터용 싸인펜으로 진하게 마킹된 상태 [ █ ] */
+.omr-cell.marked {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+  font-weight: 900;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.9);
+}
+
+.omr-cell.marked span {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.omr-guide-tip {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-right: auto;
+}
+
+/* ================= 11. 모바일 슬립지 QR 스타일 ================= */
+.modal-qr-dialog {
+  max-width: 440px;
+}
+
+.qr-modal-header-clean {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px;
+  background: #1e293b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.qr-modal-title-big {
+  font-size: 1.45rem !important;
+  font-weight: 900 !important;
+  color: #fbbf24 !important;
+  letter-spacing: -0.3px;
+  margin: 0;
+  text-align: center;
+}
+
+.qr-modal-header-clean .btn-modal-close {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 다중 장수 탭 (1장, 2장, 3장, 4장) - 세련된 캡슐 칩 디자인 */
+.qr-sheet-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto 10px auto;
+  padding: 3px 6px;
+  background: rgba(15, 23, 42, 0.75);
+  border-radius: 20px;
+  width: fit-content;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.qr-tab-chip {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qr-tab-chip:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.qr-tab-chip.active {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  border-color: #fbbf24;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+}
+
+.qr-frame-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 14px 8px 14px;
+  margin: 4px auto;
+  max-width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.qr-canvas-wrap {
+  width: 190px;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+
+.qr-canvas-wrap img, .qr-canvas-wrap canvas {
+  width: 190px !important;
+  height: 190px !important;
+  display: block;
+}
+
+.qr-round-info {
+  margin-top: 6px;
+  color: #0f172a;
+  font-size: 0.82rem;
+  font-weight: 800;
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 6px;
+  width: 100%;
+  text-align: center;
+}
+
+.qr-guide-box {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.qr-tip-desc {
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  margin: 0;
+  font-weight: 600;
+}
+
+.qr-tip-sub {
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 400;
+}
+
+.qr-games-preview {
+  margin-top: 8px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(3, auto);
+  gap: 4px 8px;
+  text-align: left;
+}
+
+.qr-game-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.qr-game-label {
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: 900;
+  color: #fbbf24;
+  font-size: 0.85rem;
+  width: 14px;
+  text-align: center;
+}
+
+.qr-balls-row {
+  display: flex;
+  gap: 2px;
+}
+
+.qr-balls-row .vault-ball {
+  width: 20px;
+  height: 20px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* QR 모달 내부 오픈소스 라이선스 고지 */
+.qr-opensource-notice {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  line-height: 1.4;
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  padding: 8px 4px 0 4px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.qr-opensource-notice a {
+  color: #38bdf8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.qr-opensource-notice a:hover {
+  color: #7dd3fc;
+}
+
+/* ================= 모바일 게임 행 반응형 조정 ================= */
+@media (max-width: 420px) {
+  .game-meaning-title {
+    font-size: 0.82rem;
+  }
+
+  .game-meaning-desc {
+    font-size: 0.62rem;
+  }
+
+  .compact-ball {
+    width: 30px;
+    height: 30px;
+    font-size: 0.92rem;
+  }
+
+  .game-compact-row {
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .game-letter-sidebar {
+    width: 36px;
+  }
+
+  .game-letter {
+    font-size: 1.3rem;
+  }
+
+  .brand-title {
+    font-size: 1.05rem;
+  }
+
+  .brand-sub {
+    font-size: 0.6rem;
+  }
+}
+
+/* ==========================================================================
+   v2.1 [사주 & 평생 운명수] 전용 천부명반 대시보드 & 심층 4대 챕터 스타일
+   ========================================================================== */
+.destiny-master-dashboard {
+  background: linear-gradient(145deg, #0b1329 0%, #151c38 60%, #1e1b4b 100%);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: var(--radius-md);
+  padding: 16px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: fadeInDestiny 0.35s ease-out;
+}
+
+@keyframes fadeInDestiny {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.destiny-board-header {
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.destiny-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.badge-oriental {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: -0.3px;
+}
+
+.destiny-badge-sub {
+  color: #fbbf24;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.destiny-board-title {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.destiny-board-desc {
+  color: #94a3b8;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+/* 오행 바 인포그래픽 */
+.destiny-ohaeng-summary-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.destiny-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.destiny-card-label {
+  color: #e2e8f0;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.destiny-card-hint {
+  color: #fbbf24;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ohaeng-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ohaeng-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+}
+
+.ohaeng-bar-name {
+  width: 50px;
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+.ohaeng-bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ohaeng-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fill-wood  { background: linear-gradient(90deg, #10b981, #059669); }
+.fill-fire  { background: linear-gradient(90deg, #ef4444, #dc2626); }
+.fill-earth { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.fill-metal { background: linear-gradient(90deg, #94a3b8, #64748b); }
+.fill-water { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+
+.ohaeng-bar-pct {
+  width: 32px;
+  text-align: right;
+  color: #f1f5f9;
+  font-weight: 800;
+}
+
+/* 나침반 그리드 */
+.destiny-compass-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.compass-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.compass-label {
+  display: block;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.compass-val {
+  font-size: 0.82rem;
+  color: #f8fafc;
+  font-weight: 800;
+}
+
+.compass-val.gold {
+  color: #fbbf24;
+}
+
+/* 전문 4대 챕터 상세 카드 스타일 */
+.destiny-chapter-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.chapter-badge {
+  display: inline-block;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.chapter-title {
+  color: #ffffff;
+  font-size: 1.08rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.4px;
+}
+
+.chapter-desc {
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+/* 4대 평생 운명수 그리드 */
+.lifetime-number-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.lifetime-number-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 8px;
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.lifetime-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.lifetime-big-val {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #fbbf24;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.lifetime-sub-principle {
+  font-size: 0.7rem;
+  color: #cbd5e1;
+  line-height: 1.3;
+}
+
+/* ==========================================================================
+   v2.1 [사주 & 평생 운명수] 1화면 1주제 맞춤 모바일 스크린 카드 스타일
+   가독성과 명확성을 극대화한 VIP 명리 리포트
+   ========================================================================== */
+.destiny-screen-card {
+  background: linear-gradient(165deg, #0d1527 0%, #151e36 60%, #1b193d 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.45);
+  border-radius: 18px;
+  padding: 20px 16px 16px;
+  margin-bottom: 24px;
+  min-height: min(580px, 84vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  scroll-margin-top: 60px;
+  animation: cardFadeIn 0.35s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 카드 상단 헤더 */
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.3));
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.card-progress-counter {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.card-main-title {
+  color: #ffffff;
+  font-size: 1.28rem;
+  font-weight: 900;
+  margin: 6px 0 4px;
+  letter-spacing: -0.5px;
+  line-height: 1.35;
+}
+
+.card-subtitle {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.card-body-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* 1. 사주 평가 본원 카드 전용 */
+.day-master-showcase {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.day-master-emblem {
+  font-size: 2.4rem;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+}
+
+.day-master-title-kor {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #fbbf24;
+  letter-spacing: -0.5px;
+}
+
+.day-master-nick {
+  font-size: 0.88rem;
+  color: #38bdf8;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.day-master-desc-box {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  text-align: left;
+}
+
+/* 2. 천부명반 오행 그래프 */
+.ohaeng-bars-wrapper {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.compass-summary-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.compass-sub-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.compass-sub-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  display: block;
+}
+
+.compass-sub-val {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #fbbf24;
+  margin-top: 3px;
+}
+
+/* 3. 공식 평생 수리 인증서 */
+.certificate-frame {
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border: 2px solid #d4af37;
+  box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.25), 0 8px 24px rgba(0, 0, 0, 0.5);
+  border-radius: 14px;
+  padding: 18px 14px;
+  position: relative;
+  text-align: center;
+}
+
+.cert-stamp {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  width: 58px;
+  height: 58px;
+  border: 2px dashed rgba(239, 68, 68, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  color: #ef4444;
+  font-weight: 900;
+  transform: rotate(-12deg);
+  pointer-events: none;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.cert-header {
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.cert-title {
+  color: #fbbf24;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.cert-num {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.cert-number-showcase {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.cert-number-pill {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 8px;
+  padding: 8px 4px;
+}
+
+.cert-pill-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  display: block;
+}
+
+.cert-pill-digits {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #fbbf24;
+  margin-top: 2px;
+}
+
+/* 4. 하도·낙서 의미 강조 박스 */
+.hado-meaning-box {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 4px solid #f59e0b;
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #f1f5f9;
+}
+
+.hado-meaning-box strong {
+  color: #fbbf24;
+}
+
+.nakseo-meaning-box {
+  background: rgba(56, 189, 248, 0.08);
+  border-left: 4px solid #38bdf8;
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #f1f5f9;
+}
+
+.nakseo-meaning-box strong {
+  color: #38bdf8;
+}
+
+/* 카드 하단 스크롤 인디케이터 */
+.card-next-scroll-indicator {
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.scroll-arrow-bounce {
+  color: #fbbf24;
+  animation: bounceArrow 1.5s infinite;
+  display: inline-block;
+}
+
+.btn-destiny-to-lotto {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #0f172a;
+  font-size: 0.94rem;
+  font-weight: 900;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.btn-destiny-to-lotto:active {
+  transform: scale(0.98);
+}
+
+/* ==========================================================================
+   [v3] 차별성 극대화 랜딩 전용 스타일
+   ========================================================================== */
+
+.brand-sub-hl {
+  color: #fbbf24;
+  font-weight: 800;
+}
+
+/* ② 슬림 당첨현황 */
+.v3-slim-board {
+  margin-top: 10px;
+  padding: 10px 12px 9px;
+}
+
+.slim-board-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.v3-slim-board .round-title {
+  font-size: 0.92rem;
+}
+
+.v3-slim-board .round-date {
+  font-size: 0.76rem;
+  color: #cbd5e1;
+}
+
+.v3-slim-board .prize-gold {
+  font-size: 0.84rem;
+}
+
+.v3-slim-board .big-ball-row {
+  gap: 5px;
+  margin: 8px 0 8px;
+}
+
+.v3-slim-board .big-ball {
+  width: 32px;
+  height: 32px;
+  font-size: 0.98rem;
+}
+
+.slim-next-row,
+.slim-next-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.slim-next-row {
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  padding-top: 7px;
+}
+
+.slim-next-row .next-round-tag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.slim-next-prize {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.slim-next-prize strong {
+  color: #fbbf24;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.slim-next-sub {
+  margin-top: 2px;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.slim-next-sub #sales-update-time {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+/* ③ 사주로또에만 있는 3가지 띠 */
+.only-strip {
+  margin: 0 0 10px;
+  padding: 9px 10px 10px;
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(56, 189, 248, 0.08) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.only-strip::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  animation: onlyShine 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes onlyShine {
+  0%, 60% { left: -60%; }
+  100% { left: 130%; }
+}
+
+.only-strip-title {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  text-align: center;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+
+.only-strip-title strong {
+  color: #fbbf24;
+  font-weight: 900;
+}
+
+.only-strip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.only-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1px;
+  padding: 7px 4px;
+  background: rgba(9, 13, 22, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+}
+
+.only-chip-icon {
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.only-chip strong {
+  font-size: 0.8rem;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.only-chip span:last-child {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  letter-spacing: -0.03em;
+}
+
+/* ④ 탭 부제 + ONLY 뱃지 */
+.v3-tabs {
+  margin-bottom: 10px;
+}
+
+.v3-tabs .tab-btn {
+  position: relative;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 6px 9px;
+  transition: all 0.2s ease;
+}
+
+.v3-tabs .tab-main {
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.v3-tabs .tab-sub {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.v3-tabs .tab-btn.active .tab-sub {
+  color: #fde68a;
+}
+
+#tab-destiny.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 116, 144, 0.4));
+  border-color: #38bdf8;
+}
+
+#tab-destiny.active .tab-sub {
+  color: #bae6fd;
+}
+
+.tab-only-badge {
+  position: absolute;
+  top: -8px;
+  right: 6px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #0b1120;
+  background: linear-gradient(135deg, #fde047, #f59e0b);
+  padding: 2px 6px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.5);
+  animation: onlyPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes onlyPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* ⑤ 운명수 맛보기 카드 */
+.destiny-teaser {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  margin: 0 0 10px;
+  padding: 9px 12px;
+  color: inherit;
+  background: linear-gradient(135deg, rgba(14, 116, 144, 0.22) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1px dashed rgba(56, 189, 248, 0.5);
+  border-radius: var(--radius-md);
+  transition: transform 0.15s ease, border-color 0.2s ease;
+}
+
+.destiny-teaser:hover {
+  border-color: #38bdf8;
+}
+
+.destiny-teaser:active {
+  transform: scale(0.985);
+}
+
+.teaser-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.teaser-title {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+}
+
+.teaser-title strong {
+  color: #7dd3fc;
+  font-weight: 800;
+}
+
+.teaser-go {
+  font-size: 0.74rem;
+  color: #38bdf8;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.teaser-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.teaser-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.teaser-label {
+  color: #cbd5e1;
+}
+
+.teaser-val {
+  display: inline-flex;
+  gap: 3px;
+  font-family: 'Courier New', monospace;
+}
+
+.teaser-val i,
+.teaser-val b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 20px;
+  border-radius: 4px;
+  font-style: normal;
+  font-size: 0.72rem;
+}
+
+.teaser-val i {
+  color: #475569;
+  background: rgba(255, 255, 255, 0.05);
+  filter: blur(0.4px);
+}
+
+.teaser-val b {
+  color: #0b1120;
+  background: #fbbf24;
+  font-weight: 900;
+  font-size: 0.82rem;
+}
+
+/* ⑥ 시차보정 강조 힌트 */
+.v3-offset-hint {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.66rem;
+  color: #7dd3fc;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+@media (max-width: 380px) {
+  .v3-slim-board .big-ball { width: 28px; height: 28px; font-size: 0.88rem; }
+  .only-chip strong { font-size: 0.74rem; }
+  .v3-tabs .tab-main { font-size: 0.84rem; }
+}
+
+/* ==========================================================================
+   [v3 수익화 & 재방문 도구 스타일]
+   1. 최하단 고정 광고 슬롯
+   2. 핫&콜드 통계 칩
+   3. 보관함 자동 채점 하이라이트
+   ========================================================================== */
+
+/* 1. 최하단 고정 광고 슬롯 (60px) */
+.fixed-bottom-ad-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1.5px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+.ad-inner-wrap {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ad-badge-tag {
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #0b1120;
+  background: #fbbf24;
+  padding: 2px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.ad-content-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.ad-title-hl {
+  font-size: 0.82rem;
+  color: #fff;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ad-desc-sub {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-ad-cta {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #0f172a;
+  border: none;
+  font-size: 0.74rem;
+  font-weight: 900;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+}
+
+/* 본문 컨테이너 바닥 여백 추가 (하단 광고에 가려짐 방지) */
+.container {
+  padding-bottom: 80px !important;
+}
+
+/* 2. 핫&콜드 미니 통계 칩 */
+.stat-mini-pill-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.stat-mini-pill {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(19, 27, 46, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+}
+
+.stat-pill-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.stat-pill-tag.tag-hot {
+  color: #f87171;
+}
+
+.stat-pill-tag.tag-cold {
+  color: #38bdf8;
+}
+
+.stat-pill-nums {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #e2e8f0;
+  font-family: 'Courier New', monospace;
+  letter-spacing: -0.3px;
+}
+
+/* 3. 보관함 채점 하이라이트 */
+.vault-game-row.has-win {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  padding: 4px 6px;
+}
+
+.vault-game-tag-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vault-match-badge {
+  font-size: 0.66rem;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 999px;
+  letter-spacing: -0.2px;
+}
+
+.vault-match-badge.rank-1 { background: #eab308; color: #000; box-shadow: 0 0 8px #eab308; }
+.vault-match-badge.rank-2 { background: #94a3b8; color: #000; }
+.vault-match-badge.rank-3 { background: #d97706; color: #fff; }
+.vault-match-badge.rank-4 { background: #10b981; color: #fff; }
+.vault-match-badge.rank-5 { background: #3b82f6; color: #fff; }
+.vault-match-badge.rank-none { background: rgba(255, 255, 255, 0.1); color: #94a3b8; }
+
+.vault-ball.ball-hit {
+  transform: scale(1.08);
+  box-shadow: 0 0 8px #fbbf24, inset 0 0 4px #fff;
+  border: 1.5px solid #fff;
+}
+
+.vault-ball.ball-bonus {
+  transform: scale(1.05);
+  box-shadow: 0 0 6px #38bdf8;
+  border: 1.5px dashed #38bdf8;
+}
+
+/* 리워드 태그 */
+.reward-tag {
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 4px;
+}
+
+
+

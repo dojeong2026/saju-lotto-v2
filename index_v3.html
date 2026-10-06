@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>사주로또 v3 - 이번 주 로또번호부터 평생 쓰는 내 운명수까지</title>
+  <meta name="description" content="출생지 시차보정 사주 분석으로 이번 주 로또번호와 평생 쓰는 전화번호·비밀번호·차량번호 운명수를 추천합니다. 번호를 고른 이유까지 공개합니다.">
+  <link rel="stylesheet" href="v3_style.css?v=3.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+  <!-- 최상단 프리미엄 브랜딩 헤더 -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <div class="brand-emblem">
+        <svg class="emblem-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="url(#gold-grad-header)" stroke-width="1.8"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C14.76 22 17.26 20.88 19.07 19.07C17.26 17.26 14.76 16.14 12 16.14C9.24 16.14 6.74 17.26 4.93 19.07C3.12 17.26 2 14.76 2 12C2 6.48 6.48 2 12 2Z" fill="url(#gold-grad-header)" fill-opacity="0.2"/>
+          <circle cx="12" cy="7" r="2.2" fill="#fbbf24"/>
+          <circle cx="12" cy="17" r="2.2" fill="#d97706"/>
+          <path d="M12 9.2V14.8" stroke="#fbbf24" stroke-width="1.2" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="gold-grad-header" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#fde047"/>
+              <stop offset="0.5" stop-color="#d4af37"/>
+              <stop offset="1" stop-color="#b45309"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text-wrap">
+        <h1 class="brand-title">
+          <span class="brand-kor">사주로또</span>
+          <span class="brand-badge-ai">AI 명리 분석</span>
+        </h1>
+        <span class="brand-sub">이번 주 로또번호부터 <strong class="brand-sub-hl">평생 쓰는 내 전화번호까지</strong></span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btn-open-vault-top" class="vault-top-btn" type="button">📂 보관함 (<span id="header-saved-count">0</span>)</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- [v3 ②] 최상단 슬림 당첨현황 (A안: 이용자가 가장 궁금한 정보 먼저, 공간은 절반으로) -->
+    <section class="latest-lotto-dashboard v3-slim-board" id="latest-lotto-dashboard">
+      <div class="slim-board-top">
+        <h2 class="round-title"><span class="badge-gold">제1244회</span> 당첨번호</h2>
+        <span class="round-date">10.03(토) · 1등 <strong class="prize-gold">22억 8,419만원</strong> (11명)</span>
+      </div>
+
+      <div class="big-ball-row">
+        <div class="big-ball col-1">4</div>
+        <div class="big-ball col-11">11</div>
+        <div class="big-ball col-11">19</div>
+        <div class="big-ball col-21">27</div>
+        <div class="big-ball col-31">33</div>
+        <div class="big-ball col-41">41</div>
+        <span class="ball-plus">+</span>
+        <div class="big-ball col-21">24</div>
+      </div>
+
+      <!-- 다음 회차 판매 현황 (1시간 단위 자동 갱신 연동) - 한 줄 압축 -->
+      <div class="slim-next-row">
+        <span class="next-round-tag" id="next-round-tag">다음 회차(1244회) 판매 현황</span>
+        <span class="slim-next-prize">예상 1등 <strong id="est-first-prize">126억 7,069만원</strong></span>
+      </div>
+      <div class="slim-next-sub">
+        <span>누적 판매 <span id="cumulative-sales">526억 8,284만원</span></span>
+        <span id="sales-update-time">[10월 1일, 18시 현재]</span>
+      </div>
+    </section>
+
+    <!-- [v3 ③] 사주로또에만 있는 3가지 (차별성 띠) -->
+    <section class="only-strip" id="v3-only-strip" aria-label="사주로또에만 있는 3가지">
+      <div class="only-strip-title">✨ 다른 사주로또 앱엔 없는 <strong>3가지</strong></div>
+      <div class="only-strip-grid">
+        <div class="only-chip">
+          <span class="only-chip-icon">📱</span>
+          <strong>평생 운명수</strong>
+          <span>전화·비번·차량번호</span>
+        </div>
+        <div class="only-chip">
+          <span class="only-chip-icon">🌏</span>
+          <strong>출생지 시차보정</strong>
+          <span>진짜 태어난 시(時)</span>
+        </div>
+        <div class="only-chip">
+          <span class="only-chip-icon">🔑</span>
+          <strong>번호 이유 공개</strong>
+          <span>왜 이 번호인지</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- [v3 ④] 2대 줄기 탭 스위처 (부제 + ONLY 뱃지) -->
+    <nav class="track-tabs v3-tabs" id="main-track-tabs">
+      <button id="tab-lotto" class="tab-btn active" type="button">
+        <span class="tab-main">🎰 사주 로또 추출</span>
+        <span class="tab-sub">이번 주 행운번호 5게임</span>
+      </button>
+      <button id="tab-destiny" class="tab-btn" type="button">
+        <span class="tab-only-badge">ONLY</span>
+        <span class="tab-main">📜 사주 &amp; 평생 운명수</span>
+        <span class="tab-sub">전화·비번·차량번호</span>
+      </button>
+    </nav>
+
+    <!-- [v3 ⑤] 운명수 맛보기 카드 (분석 전에만 노출, 누르면 운명수 탭으로) -->
+    <button type="button" class="destiny-teaser" id="destiny-teaser">
+      <div class="teaser-head">
+        <span class="teaser-title" id="teaser-title">🔒 로또만? <strong>평생 쓰는 내 운명수</strong>도 있어요</span>
+        <span class="teaser-go">열어보기 ›</span>
+      </div>
+      <div class="teaser-rows">
+        <div class="teaser-row"><span class="teaser-label">📱 재물운 전화번호 뒷자리</span><span class="teaser-val"><i>●</i><i>●</i><b>7</b><i>●</i></span></div>
+        <div class="teaser-row"><span class="teaser-label">🔐 통장·카드 비밀번호</span><span class="teaser-val"><i>●</i><i>●</i><i>●</i><i>●</i></span></div>
+        <div class="teaser-row"><span class="teaser-label">🚗 차량번호 끝 4자리</span><span class="teaser-val"><i>●</i><b>3</b><i>●</i><i>●</i></span></div>
+      </div>
+    </button>
+
+    <!-- [v3 통계 칩] 사주 무관 유저를 위한 역대 빅데이터 핫&콜드 넘버 요약 -->
+    <div class="stat-mini-pill-bar" id="stat-mini-pill-bar">
+      <div class="stat-mini-pill">
+        <span class="stat-pill-tag tag-hot">🔥 최근 핫넘버</span>
+        <span class="stat-pill-nums">34 · 18 · 27 · 12 · 43</span>
+      </div>
+      <div class="stat-mini-pill">
+        <span class="stat-pill-tag tag-cold">🧊 미출현 콜드</span>
+        <span class="stat-pill-nums">7 · 23 · 15 · 2 · 31</span>
+      </div>
+    </div>
+
+    <!-- 3. 사주 명리 정밀 진단 & 오행 숫자 처방 카드 (분석 완료 시 자동 노출) -->
+    <section id="saju-summary-bar" class="saju-diagnosis-card" style="display: none;">
+      <!-- 상단 헤더: 생년월일 + 발행 장수 + 사주 변경 버튼 -->
+      <div class="diagnosis-top-row">
+        <div class="diagnosis-meta">
+          <span class="diagnosis-icon">🔮</span>
+          <span class="diagnosis-subject" id="diagnosis-title">사주 명리 정밀 진단</span>
+          <span class="diagnosis-amount-badge" id="diagnosis-amount-badge">1장 (5게임)</span>
+        </div>
+        <button id="btn-toggle-saju" class="btn-toggle-saju" type="button">사주 변경 ✏️</button>
+      </div>
+
+      <!-- 1행: 오행 기운 진단 (왕성한 기운 vs 부족한 결핍 기운) -->
+      <div class="diagnosis-element-row">
+        <div class="element-diag-chip chip-strong">
+          <span class="diag-label">중심 기운</span>
+          <strong id="diag-strong-elem">목(木) 왕성</strong>
+        </div>
+        <div class="element-diag-chip chip-weak">
+          <span class="diag-label">결핍 기운</span>
+          <strong id="diag-weak-elem">금(金) 부족 ⚠️</strong>
+        </div>
+      </div>
+
+      <!-- 2행: 숫자 처방 근거 (선천수 · 상생수 · 보완수) -->
+      <div class="diagnosis-prescription-row">
+        <div class="prescription-line">
+          <span class="prescript-badge">🔑 숫자 처방</span>
+          <span class="prescript-detail" id="diag-prescript-numbers">
+            선천수 <strong>4, 9</strong> · 후천수 <strong>6, 7</strong> · 상생 보완수 <strong>5, 10 (토생금)</strong>
+          </span>
+        </div>
+        <p class="prescript-comment" id="diag-prescript-comment">
+          "부족한 금(金) 기운을 채워 재물과 결실운을 보강하도록 금·토 번호를 황금 배합했습니다."
+        </p>
+      </div>
+    </section>
+
+    <!-- 4. 사주 입력 폼 (모바일 핏) -->
+    <section class="card-slim" id="saju-form-card">
+      <div class="form-mode-banner" id="form-mode-banner" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.82rem; color: #fbbf24; text-align: center;">
+        🔮 <strong>생년월일과 시간을 선택</strong>하시면 맞춤 행운 번호가 정밀 추출됩니다.
+      </div>
+      <form id="saju-form">
+        <div class="form-grid-slim">
+          <div class="form-group-slim">
+            <label for="birth-date">생년월일 (양력)</label>
+            <input type="date" id="birth-date" value="" required>
+          </div>
+          <div class="form-group-slim">
+            <label for="birth-hour">출생 시간</label>
+            <select id="birth-hour" required>
+              <option value="" disabled selected>출생 시간 선택</option>
+              <option value="12">오시 (11:30~13:29)</option>
+              <option value="0">자시 (23:30~01:29)</option>
+              <option value="2">축시 (01:30~03:29)</option>
+              <option value="4">인시 (03:30~05:29)</option>
+              <option value="6">묘시 (05:30~07:29)</option>
+              <option value="8">진시 (07:30~09:29)</option>
+              <option value="10">사시 (09:30~11:29)</option>
+              <option value="14">미시 (13:30~15:29)</option>
+              <option value="16">신시 (15:30~17:29)</option>
+              <option value="18">유시 (17:30~19:29)</option>
+              <option value="20">술시 (19:30~21:29)</option>
+              <option value="22">해시 (21:30~23:29)</option>
+              <option value="-1">시간 모름</option>
+            </select>
+          </div>
+          <div class="form-group-slim">
+            <label for="birth-city">출생 지역 (시차보정)</label>
+            <select id="birth-city" required>
+              <option value="" disabled selected>출생 지역 선택</option>
+              <option value="seoul">서울·경기 (-32분)</option>
+              <option value="busan">부산·경남 (-24분)</option>
+              <option value="daegu">대구·경북 (-26분)</option>
+              <option value="incheon">인천 (-33분)</option>
+              <option value="gwangju">광주·전남 (-33분)</option>
+              <option value="daejeon">대전·충청 (-31분)</option>
+              <option value="ulsan">울산 (-23분)</option>
+              <option value="gangwon">강원 (-29분)</option>
+              <option value="jeju">제주 (-34분)</option>
+            </select>
+            <span class="v3-offset-hint">💡 대부분 앱은 이 보정이 없어 태어난 시(時)가 틀어질 수 있어요</span>
+          </div>
+          <div class="form-group-slim">
+            <label for="gender">성별</label>
+            <select id="gender" required>
+              <option value="" disabled selected>성별 선택</option>
+              <option value="male">남성</option>
+              <option value="female">여성</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit-form" class="btn-slim-primary">
+          <span id="btn-submit-text">내 사주 맞춤 로또번호 추출하기</span>
+        </button>
+
+        <!-- 안심 개인정보 보호 보증 안내 -->
+        <div class="privacy-trust-badge">
+          <span class="trust-shield">🛡️</span>
+          <span class="trust-text"><strong>100% 온디바이스(기기 내) 연산</strong> · 생년월일 등 개인정보는 외부 서버로 일절 전송·수집·저장되지 않습니다.</span>
+        </div>
+      </form>
+    </section>
+
+    <!-- ================= [제1줄기: 로또 번호 추출 뷰] ================= -->
+    <main id="view-lotto">
+      <section id="lotto-result-section" style="display: none;">
+        
+        <!-- 다중 장수(1만원, 2만원) 전환 탭 -->
+        <div id="ticket-sheet-nav" class="ticket-sheet-nav" style="display: none;">
+          <div class="sheet-tabs-wrap" id="sheet-tabs-wrap">
+            <!-- JS 동적 탭 -->
+          </div>
+          <button id="btn-toggle-all-sheets" class="btn-toggle-sheets" type="button">전체 펼쳐보기 ▾</button>
+        </div>
+
+        <!-- [핵심] 한 화면 쏙 들어오는 컴팩트 티켓 -->
+        <div class="compact-ticket" id="compact-ticket">
+          <div class="ticket-top-summary">
+            <div class="ticket-title-col">
+              <h3 class="ticket-main-title">사주 조화 맞춤 행운 티켓</h3>
+              <span class="ticket-date-time" id="ticket-issue-time">발행: 2026.09.30 (수)</span>
+            </div>
+            <div class="ticket-round-col">
+              <span class="stamp-badge" id="ticket-sheet-badge">제1244회 (1장)</span>
+              <span class="draw-sched" id="ticket-draw-sched">10.03(토) 20:35 추첨</span>
+            </div>
+          </div>
+
+          <!-- 좌측 세로 A~E 배지가 달린 게임 목록 -->
+          <div id="ticket-games">
+            <!-- JS로 동적 렌더링 -->
+          </div>
+
+          <!-- 추천 방위 & 최적 구매 시간 프리미엄 명리 비책 가이드 -->
+          <div class="ticket-lucky-guide">
+            <div class="guide-header">
+              <span class="guide-badge">🌟 복권 구매 명리 비책</span>
+              <span class="guide-origin-note">📍 기준: <strong>자택 또는 직장(현재 출발지)</strong></span>
+            </div>
+            <div class="guide-cards-grid">
+              <div class="guide-card guide-direction">
+                <div class="guide-icon-wrap">🧭</div>
+                <div class="guide-info">
+                  <div class="guide-label">추천 구매 방위</div>
+                  <div class="guide-main-val" id="ticket-direction">-</div>
+                  <div class="guide-sub-desc" id="ticket-direction-desc">-</div>
+                </div>
+              </div>
+              <div class="guide-card guide-time">
+                <div class="guide-icon-wrap">⏰</div>
+                <div class="guide-info">
+                  <div class="guide-label">최적 구매 길시(吉時)</div>
+                  <div class="guide-main-val" id="ticket-time">-</div>
+                  <div class="guide-sub-desc" id="ticket-time-desc">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 복권방 현장 즉시 구매 퀵 툴 (OMR 마킹 뷰 & 모바일 슬립지 QR) -->
+        <div class="purchase-tools-group">
+          <button id="btn-open-omr" class="btn-tool-omr" type="button">
+            <span class="tool-icon">🔴</span>
+            <div class="tool-text">
+              <span class="tool-title">실제 로또 OMR 종이 마킹 뷰</span>
+              <span class="tool-sub">복권방 빨간 슬립지 1:1 싱크 마킹</span>
+            </div>
+          </button>
+          <button id="btn-open-qr" class="btn-tool-qr" type="button">
+            <span class="tool-icon">📱</span>
+            <div class="tool-text">
+              <span class="tool-title">로또 바로 구매 QR</span>
+              <span class="tool-sub">복권방에서 대면 마킹 없이 출력</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- 티켓 액션 버튼군 (리워드 광고 수익화 동선 장착) -->
+        <div class="ticket-action-group">
+          <button id="btn-add-sheet" class="btn-add-sheet" type="button">
+            <span class="reward-tag">🎬 5초 무료</span>
+            <span class="reward-text">추가 5게임 더 뽑기 (+5천원 다른 조화 조합)</span>
+          </button>
+          <div class="save-vault-row">
+            <button id="btn-save-numbers" class="btn-save-compact" type="button">
+              💾 이번 번호 내 폰에 보관하기
+            </button>
+            <button id="btn-open-vault" class="btn-vault-open" type="button">
+              📂 보관함 보기 (<span id="saved-count-badge">0</span>)
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= [제2줄기: 사주 & 운명수 뷰] ================= -->
+    <main id="view-destiny" style="display: none;">
+      <section id="destiny-content">
+        <div class="card-slim" style="text-align: center; padding: 24px 14px;">
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            사주를 입력하시면 선천수·후천수 및 전화번호 추천이 열립니다.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- 면책 문구 -->
+    <footer class="disclaimer-compact">
+      본 서비스는 정통 명리학의 상생 원리와 통계 데이터를 바탕으로 한 '상징적 행운 큐레이션'이며 당첨을 확정·보장하지 않습니다.
+    </footer>
+
+  </div>
+
+  <!-- ================= [최하단 고정: 💰 수익화 배너 슬롯 (Ad Slot)] ================= -->
+  <aside class="fixed-bottom-ad-bar" id="fixed-bottom-ad-bar" aria-label="스폰서 광고 영역">
+    <div class="ad-inner-wrap">
+      <div class="ad-badge-tag">AD</div>
+      <div class="ad-content-text">
+        <strong class="ad-title-hl">✨ [프리미엄 멤버십] 월 1,900원</strong>
+        <span class="ad-desc-sub">광고 100% 제거 &amp; 평생 운명수(전화+비번+차량) 완결판 리포트</span>
+      </div>
+      <button type="button" class="btn-ad-cta" id="btn-ad-upgrade">혜택보기 ›</button>
+    </div>
+  </aside>
+
+  <!-- ================= [모달 1: 내 번호 보관함] ================= -->
+  <div id="modal-vault" class="app-modal" style="display: none;">
+    <div class="modal-backdrop" id="modal-vault-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h3 class="modal-title">📂 내 행운 번호 보관함</h3>
+          <span class="modal-subtitle">내 폰에 안전하게 보관된 사주 번호 목록입니다.</span>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-vault" aria-label="닫기">✕</button>
+      </div>
+      <div class="modal-body" id="vault-list-container">
+        <!-- JS 동적 렌더링 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-clear-vault" class="btn-modal-sub">전체 비우기</button>
+        <button type="button" id="btn-confirm-vault" class="btn-modal-primary">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= [모달 2: 실제 로또 6/45 OMR 마킹 종이 뷰] ================= -->
+  <div id="modal-omr" class="app-modal" style="display: none;">
+    <div class="modal-backdrop" id="modal-omr-backdrop"></div>
+    <div class="modal-dialog modal-omr-dialog">
+      <div class="modal-header omr-modal-header-slim">
+        <div class="modal-title-wrap">
+          <h3 class="modal-title">🔴 실제 로또 6/45 OMR 마킹 종이</h3>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-omr" aria-label="닫기">✕</button>
+      </div>
+      <div class="modal-body omr-modal-body-compact">
+        <!-- 장수 선택 탭 (복수 장수일 때) -->
+        <div class="omr-sheet-tabs" id="omr-sheet-tabs"></div>
+        <!-- 실제 OMR 슬립지 시각화 -->
+        <div class="omr-slip-paper" id="omr-slip-paper">
+          <!-- JS 동적 렌더링 -->
+        </div>
+      </div>
+      <div class="modal-footer omr-modal-footer-slim">
+        <span class="omr-guide-tip">💡 빨간 OMR 종이에 검정 컴퓨터용 싸인펜으로 칠하듯 1:1 마킹하세요!</span>
+        <button type="button" id="btn-confirm-omr" class="btn-modal-primary btn-slim-confirm">확인 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= [모달 3: 로또 바로 구매 QR] ================= -->
+  <div id="modal-qr" class="app-modal" style="display: none;">
+    <div class="modal-backdrop" id="modal-qr-backdrop"></div>
+    <div class="modal-dialog modal-qr-dialog">
+      <div class="modal-header qr-modal-header-clean">
+        <h3 class="modal-title qr-modal-title-big">로또 바로구매 QR</h3>
+        <button type="button" class="btn-modal-close" id="btn-close-qr" aria-label="닫기">✕</button>
+      </div>
+      <div class="modal-body text-center">
+        <!-- 다중 장수 QR 탭 -->
+        <div class="qr-sheet-tabs" id="qr-sheet-tabs"></div>
+
+        <div class="qr-frame-box">
+          <div id="qr-code-canvas-container" class="qr-canvas-wrap"></div>
+          <div class="qr-round-info" id="qr-round-info">제1244회 로또 구매용</div>
+        </div>
+
+        <div class="qr-guide-box">
+          <p class="qr-tip-desc">
+            복권방 카운터 스캐너에 이 화면을 대어주세요.<br>
+            <span class="qr-tip-sub">(휴대폰 화면 밝기를 올리시면 더욱 빠르게 인식됩니다)</span>
+          </p>
+        </div>
+
+        <div class="qr-games-preview" id="qr-games-preview">
+          <!-- 번호 요약 preview -->
+        </div>
+
+        <!-- 오픈소스 라이선스 고지 (QR 모달 내부 전용 배치) -->
+        <div class="qr-opensource-notice">
+          모바일 슬립지 QR 발권 기능은 오픈소스 <a href="https://github.com/davidshimjs/qrcodejs" target="_blank" rel="noopener noreferrer">QRCode.js</a> (Copyright © 2012 davidshimjs, MIT License)를 준수하여 구현되었습니다.
+        </div>
+      </div>
+      <div class="modal-footer qr-modal-footer">
+        <button type="button" id="btn-confirm-qr" class="btn-modal-primary" style="width: 100%;">확인 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="v3_app.js?v=3.0"></script>
+</body>
+</html>
