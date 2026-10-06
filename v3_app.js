@@ -164,6 +164,14 @@ function initApp() {
   // 첫 화면은 무조건 로또 추출 메인 화면으로 시작!
   showScreen('main');
 
+  // URL 파라미터 기반 검증 데모 지원 (?demo=ticket 또는 ?demo=destiny)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('demo') === 'ticket') {
+    runAnalysis({ birthDate: '1985-05-15', birthHour: 12, birthCity: 'seoul', gender: 'male' }, 'results');
+  } else if (urlParams.get('demo') === 'destiny') {
+    runAnalysis({ birthDate: '1985-05-15', birthHour: 12, birthCity: 'seoul', gender: 'male' }, 'destiny');
+  }
+
   // 1분 주기 판매현황 자동 갱신
   setInterval(updateSalesStatus, 60000);
 }
@@ -193,21 +201,43 @@ function setupNavigation() {
     });
   }
 
-  // 4. 메인 화면 하단의 "평생 운명수 궁금하신가요?" 배너 클릭
+  // 4. 사주 평생 운명수 추출 공통 처리 함수
+  function handleDestinyExtraction() {
+    const dateInput = document.getElementById('birth-date');
+    const hourInput = document.getElementById('birth-hour');
+    const cityInput = document.getElementById('birth-city');
+    const genderInput = document.getElementById('gender');
+
+    const birthDate = dateInput ? dateInput.value : '';
+    const birthHour = hourInput ? parseInt(hourInput.value, 10) : NaN;
+    const birthCity = cityInput ? cityInput.value : '';
+    const gender = genderInput ? genderInput.value : '';
+
+    if (birthDate && !isNaN(birthHour) && birthCity && gender) {
+      const profile = { birthDate, birthHour, birthCity, gender };
+      localStorage.setItem('saju_lotto_v2_profile', JSON.stringify(profile));
+      state.savedProfile = profile;
+      runAnalysis(profile, 'destiny');
+    } else if (state.savedProfile) {
+      runAnalysis(state.savedProfile, 'destiny');
+    } else {
+      alert('생년월일과 출생 정보를 입력하시면 나만의 평생 운명수(전화·비밀번호·차량번호)를 확인하실 수 있습니다.');
+      const formCard = document.getElementById('lotto-extract-card');
+      if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (dateInput) dateInput.focus();
+    }
+  }
+
+  // 폼 내부 평생수 별도 추출 버튼
+  const destinyFormBtn = document.getElementById('btn-submit-destiny-form');
+  if (destinyFormBtn) {
+    destinyFormBtn.addEventListener('click', handleDestinyExtraction);
+  }
+
+  // 메인 하단 평생 운명수 배너 클릭
   const gatewayBtn = document.getElementById('btn-open-destiny-gateway');
   if (gatewayBtn) {
-    gatewayBtn.addEventListener('click', () => {
-      if (state.savedProfile) {
-        runAnalysis(state.savedProfile, 'destiny');
-      } else {
-        const formCard = document.getElementById('lotto-extract-card');
-        if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        const dateInput = document.getElementById('birth-date');
-        if (dateInput) {
-          dateInput.focus();
-        }
-      }
-    });
+    gatewayBtn.addEventListener('click', handleDestinyExtraction);
   }
 }
 
