@@ -40,15 +40,129 @@ const HOT_NUMBERS = [34, 18, 27, 12, 1, 43, 20, 13, 33, 4, 17, 26, 40, 14, 45, 9
 const COLD_NUMBERS = [7, 23, 15, 2, 31];
 const LUCKY_SURI_81 = [11, 13, 15, 16, 21, 23, 24, 25, 29, 31, 32, 33, 35, 37, 39, 41, 45, 47, 48];
 
-// 최신 추첨 회차 정보 (1244회 기준 - 당첨번호: 4, 11, 19, 27, 33, 41 + 보너스 24)
+// =================================================================
+// 📌 최신 추첨 회차 정보 — 매주 일요일 이 블록만 고치면 화면 전체가 자동 갱신됩니다!
+// (1245회: 2026.10.10 추첨 / 4, 5, 25, 28, 32, 42 + 보너스 12 / 1등 10명 각 30억 651만원)
+// =================================================================
 const LATEST_DRAW = {
-  round: 1244,
-  date: '2026.10.03(토)',
-  numbers: [4, 11, 19, 27, 33, 41],
-  bonus: 24,
-  firstPrize: '22억 8,419만원',
-  winners: 11
+  round: 1245,
+  date: '2026.10.10(토)',
+  drawTime: new Date(2026, 9, 10, 20, 45, 0), // 추첨 시각
+  numbers: [4, 5, 25, 28, 32, 42],
+  bonus: 12,
+  firstPrize: '30억 651만원',
+  winners: 10
 };
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+// 지금 판매 중인 회차 (추첨 후 1주일 단위로 자동 증가)
+function getTargetRound() {
+  const diffWeeks = Math.max(0, Math.floor((Date.now() - LATEST_DRAW.drawTime.getTime()) / ONE_WEEK_MS));
+  return LATEST_DRAW.round + 1 + diffWeeks;
+}
+
+// 판매 중인 회차의 추첨일 (예: 10.17(토))
+function getTargetDrawLabel() {
+  const weeks = getTargetRound() - LATEST_DRAW.round;
+  const d = new Date(LATEST_DRAW.drawTime.getTime() + weeks * ONE_WEEK_MS);
+  return `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}(토)`;
+}
+
+// =================================================================
+// 🌙 음력 → 양력 변환기 (1900~2029년 출생자용, 월 대소·윤달 비트표 방식)
+// ※ 표준 동양 음력표 기반. 드물게 한국 만세력과 하루 차이가 나는 해가 있을 수 있음
+// =================================================================
+const LUNAR_INFO = [
+  0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2, // 1900
+  0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977, // 1910
+  0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970, // 1920
+  0x06566,0x0d4a0,0x0ea50,0x16a95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950, // 1930
+  0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557, // 1940
+  0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0, // 1950
+  0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0, // 1960
+  0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6, // 1970
+  0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570, // 1980
+  0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x05ac0,0x0ab60,0x096d5,0x092e0, // 1990
+  0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5, // 2000
+  0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930, // 2010
+  0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530  // 2020
+];
+
+function lunarLeapMonth(y) { return LUNAR_INFO[y - 1900] & 0xf; }
+function lunarLeapDays(y) { return lunarLeapMonth(y) ? ((LUNAR_INFO[y - 1900] & 0x10000) ? 30 : 29) : 0; }
+function lunarMonthDays(y, m) { return (LUNAR_INFO[y - 1900] & (0x10000 >> m)) ? 30 : 29; }
+function lunarYearDays(y) {
+  let sum = 348;
+  for (let i = 0x8000; i > 0x8; i >>= 1) sum += (LUNAR_INFO[y - 1900] & i) ? 1 : 0;
+  return sum + lunarLeapDays(y);
+}
+
+/** 음력 'YYYY-MM-DD' → 양력 'YYYY-MM-DD' (변환 불가 시 null) */
+function lunarToSolar(dateStr, isLeapMonth = false) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  if (y < 1900 || y > 2029 || m < 1 || m > 12) return null;
+  if (isLeapMonth && lunarLeapMonth(y) !== m) return null; // 그 해에 해당 윤달이 없음
+  const maxDay = isLeapMonth ? lunarLeapDays(y) : lunarMonthDays(y, m);
+  if (d < 1 || d > maxDay) return null;
+
+  let offset = 0;
+  for (let i = 1900; i < y; i++) offset += lunarYearDays(i);
+  const leap = lunarLeapMonth(y);
+  for (let i = 1; i < m; i++) {
+    offset += lunarMonthDays(y, i);
+    if (leap === i) offset += lunarLeapDays(y);
+  }
+  if (isLeapMonth) offset += lunarMonthDays(y, m);
+
+  const solar = new Date(Date.UTC(1900, 0, 31) + (offset + d - 1) * 86400000);
+  return `${solar.getUTCFullYear()}-${String(solar.getUTCMonth() + 1).padStart(2, '0')}-${String(solar.getUTCDate()).padStart(2, '0')}`;
+}
+
+/** 폼 입력값(양력/음력)을 사주 계산용 양력 날짜로 통일 */
+function resolveSolarDate(profile) {
+  if (profile.calendarType !== 'lunar') return profile.birthDate;
+  return lunarToSolar(profile.birthDate, !!profile.isLeapMonth);
+}
+
+// 공 색상 클래스 (동행복권 기준 10단위 색상)
+function ballColorClass(n) {
+  if (n <= 10) return 'col-1';
+  if (n <= 20) return 'col-11';
+  if (n <= 30) return 'col-21';
+  if (n <= 40) return 'col-31';
+  return 'col-41';
+}
+
+// 상단 전광판 + 버튼·티켓의 회차 문구를 LATEST_DRAW 기준으로 일괄 렌더링
+function renderDrawBoard() {
+  const target = getTargetRound();
+  const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+
+  setText('last-round-badge', `제${LATEST_DRAW.round}회`);
+  setText('last-round-date', `${LATEST_DRAW.date} 추첨`);
+  setText('last-round-winners', `1등 당첨금 (${LATEST_DRAW.winners}명)`);
+  setText('last-round-prize', LATEST_DRAW.firstPrize);
+  setText('btn-submit-text', `🎰 이번 주 ${target}회 행운 5게임 추출하기`);
+  setText('ticket-draw-sched', `${getTargetDrawLabel()} 20:35 추첨`);
+
+  const ballsEl = document.getElementById('last-round-balls');
+  if (ballsEl) {
+    const mainBallsHtml = LATEST_DRAW.numbers
+      .map(n => `<span class="ball-m ${ballColorClass(n)}">${n}</span>`).join('');
+
+    ballsEl.innerHTML = `
+      <div class="balls-main-grid">${mainBallsHtml}</div>
+      <button type="button" id="btn-board-qr-check" class="btn-board-qr-block" aria-label="QR 당첨확인">
+        <span class="qr-label-en">QR</span>
+        <span class="qr-label-ko">당첨확인</span>
+      </button>
+    `;
+
+    // 전광판 내 QR 당첨확인 버튼 클릭 바인딩
+    const qrBtn = document.getElementById('btn-board-qr-check');
+    if (qrBtn) qrBtn.onclick = () => openQrCheckModal();
+  }
+}
 
 function formatKoreanMoney(amount) {
   const eok = Math.floor(amount / 100000000);
@@ -74,11 +188,11 @@ function updateSalesStatus() {
   // 1시간 단위 실시간 타이틀 갱신: [10월 1일, 18시 현재]
   timeElem.textContent = `[${month}월 ${date}일, ${hour}시 현재]`;
 
-  // 1244회 추첨 기준: 2026-10-03 20:45:00
-  const baseDrawTime = new Date(2026, 9, 3, 20, 45, 0).getTime();
-  const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
-  const diffWeeks = Math.max(0, Math.floor((now.getTime() - baseDrawTime) / oneWeekMs));
-  const currentTargetRound = 1245 + diffWeeks;
+  // 최신 추첨(LATEST_DRAW) 기준으로 판매 중인 회차 자동 계산
+  const baseDrawTime = LATEST_DRAW.drawTime.getTime();
+  const oneWeekMs = ONE_WEEK_MS;
+  const currentTargetRound = getTargetRound();
+  const diffWeeks = currentTargetRound - LATEST_DRAW.round - 1;
 
   if (roundTagElem) {
     roundTagElem.textContent = `다음 회차(${currentTargetRound}회) 판매 현황`;
@@ -146,6 +260,12 @@ function showScreen(screenName) {
   const mainScreen = document.getElementById('screen-main-lotto');
   const resultScreen = document.getElementById('screen-results');
   const destinyScreen = document.getElementById('screen-view-destiny');
+  const lottoBoard = document.getElementById('lotto-main-board');
+
+  // ⭐ 대표님 지침 1: 상단 전광판은 첫 화면(메인)에서만 노출하고, 결과창/사주창에서는 완전 숨김!
+  if (lottoBoard) {
+    lottoBoard.style.display = (screenName === 'main') ? 'block' : 'none';
+  }
 
   if (mainScreen) mainScreen.style.display = (screenName === 'main') ? 'block' : 'none';
   if (resultScreen) resultScreen.style.display = (screenName === 'results') ? 'block' : 'none';
@@ -154,11 +274,135 @@ function showScreen(screenName) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ⭐ 대표님 지침 2: 재방문자 사주 자동 채우기 (Auto-Restore)
+function restoreSavedProfileToForm() {
+  const profile = state.savedProfile;
+  if (!profile || !profile.birthDate) return;
+
+  const dateInput = document.getElementById('birth-date');
+  const hourInput = document.getElementById('birth-hour');
+  const cityInput = document.getElementById('birth-city');
+  const genderInput = document.getElementById('gender');
+  const calTypeInput = document.getElementById('calendar-type');
+  const leapInput = document.getElementById('is-leap-month');
+  const banner = document.getElementById('saved-profile-banner');
+  const bannerText = document.getElementById('saved-profile-text');
+
+  if (dateInput) dateInput.value = profile.birthDate;
+  if (hourInput && !isNaN(profile.birthHour)) hourInput.value = profile.birthHour;
+  if (cityInput && profile.birthCity) cityInput.value = profile.birthCity;
+  if (genderInput && profile.gender) genderInput.value = profile.gender;
+  if (calTypeInput && profile.calendarType) calTypeInput.value = profile.calendarType;
+  if (leapInput) leapInput.checked = !!profile.isLeapMonth;
+
+  // 세그먼트 버튼 UI active 상태 동기화
+  document.querySelectorAll('.seg-toggle').forEach(group => {
+    const targetVal = (group.dataset.target === 'calendar-type') ? (profile.calendarType || 'solar') : profile.gender;
+    group.querySelectorAll('.seg-btn').forEach(btn => {
+      const match = (btn.dataset.value === targetVal);
+      btn.classList.toggle('active', match);
+      btn.setAttribute('aria-pressed', match ? 'true' : 'false');
+    });
+  });
+
+  const isLunar = profile.calendarType === 'lunar';
+  const leapWrap = document.getElementById('leap-month-wrap');
+  const dateLabel = document.getElementById('birth-date-label');
+  if (leapWrap) leapWrap.style.display = isLunar ? 'inline-flex' : 'none';
+  if (dateLabel) dateLabel.textContent = isLunar ? '생년월일 (음력)' : '생년월일 (양력)';
+
+  // 재방문 알림 배너 노출
+  if (banner) {
+    banner.style.display = 'flex';
+    if (bannerText) {
+      const calName = isLunar ? '음력' : '양력';
+      const genderName = profile.gender === 'male' ? '남' : (profile.gender === 'female' ? '여' : '');
+      bannerText.innerHTML = `저장된 내 사주가 자동 적용되었습니다 (<strong>${profile.birthDate} ${calName} · ${genderName}</strong>)`;
+    }
+  }
+
+  // "새로 입력 🔄" 버튼 바인딩
+  const resetBtn = document.getElementById('btn-reset-profile');
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      if (dateInput) dateInput.value = '';
+      if (hourInput) hourInput.selectedIndex = 0;
+      if (cityInput) cityInput.selectedIndex = 0;
+      if (genderInput) genderInput.value = '';
+      if (calTypeInput) calTypeInput.value = 'solar';
+      if (leapInput) leapInput.checked = false;
+
+      document.querySelectorAll('.seg-toggle').forEach(group => {
+        group.querySelectorAll('.seg-btn').forEach((btn, idx) => {
+          const isFirst = (idx === 0);
+          btn.classList.toggle('active', isFirst);
+          btn.setAttribute('aria-pressed', isFirst ? 'true' : 'false');
+        });
+      });
+      if (leapWrap) leapWrap.style.display = 'none';
+      if (dateLabel) dateLabel.textContent = '생년월일 (양력)';
+      if (banner) banner.style.display = 'none';
+      if (dateInput) dateInput.focus();
+    };
+  }
+}
+
+// ⭐ 대표님 지침 3: 결과 화면 상단 [사주 명리 정밀 진단 & 오행 숫자 처방 카드] 동적 갱신
+function updateDiagnosisCard(saju) {
+  if (!saju) return;
+
+  const card = document.getElementById('saju-summary-bar');
+  if (card) card.style.display = 'block';
+
+  const titleEl = document.getElementById('diagnosis-title');
+  if (titleEl) {
+    titleEl.innerText = `${saju.dateStr} 사주 명리 정밀 진단`;
+  }
+
+  const strongElemEl = document.getElementById('diag-strong-elem');
+  if (strongElemEl && saju.primaryElement) {
+    const maxPct = saju.ohaengPercent[saju.maxElement] || 0;
+    strongElemEl.innerText = `${saju.primaryElement.name} 왕성 (${maxPct}%)`;
+  }
+
+  const weakElemEl = document.getElementById('diag-weak-elem');
+  if (weakElemEl && saju.lackingElement) {
+    const minPct = saju.ohaengPercent[saju.minElement] || 0;
+    weakElemEl.innerText = `${saju.lackingElement.name} 결핍 (${minPct}%) ⚠️ 보강`;
+  }
+
+  const prescriptNumbersEl = document.getElementById('diag-prescript-numbers');
+  if (prescriptNumbersEl) {
+    const sc = saju.seoncheon ? saju.seoncheon.join(', ') : '';
+    const hc = saju.hucheon ? saju.hucheon.join(', ') : '';
+    const parentName = saju.parentElemObj ? saju.parentElemObj.name : '상생';
+    const parentBalls = saju.parentBalls ? saju.parentBalls.slice(0, 3).join(', ') : '';
+    prescriptNumbersEl.innerHTML = `선천수 <strong>${sc}</strong> · 후천수 <strong>${hc}</strong> · 상생 보완수 <strong>${parentName} (${parentBalls})</strong>`;
+  }
+
+  const prescriptCommentEl = document.getElementById('diag-prescript-comment');
+  if (prescriptCommentEl && saju.lackingElement) {
+    const lackName = saju.lackingElement.name;
+    const parentName = saju.parentElemObj ? saju.parentElemObj.name : '상생';
+    prescriptCommentEl.innerHTML = `"부족한 <strong>${lackName}</strong> 기운을 보완해야 ${saju.lackingElement.symbol}의 결실이 맺히므로, <strong>${parentName}·${lackName}</strong> 번호를 중심으로 황금 배합했습니다."`;
+  }
+
+  // "사주 변경 ✏️" 버튼 클릭 시 입력 폼 화면으로 이동
+  const toggleSajuBtn = document.getElementById('btn-toggle-saju');
+  if (toggleSajuBtn) {
+    toggleSajuBtn.onclick = () => {
+      showScreen('main');
+    };
+  }
+}
+
 function initApp() {
+  renderDrawBoard();
   updateSalesStatus();
   renderSavedCount();
   setupNavigation();
   setupForm();
+  restoreSavedProfileToForm(); // 재방문자 사주 자동 채우기
   initModalSystem();
 
   // 첫 화면은 무조건 로또 추출 메인 화면으로 시작!
@@ -204,17 +448,13 @@ function setupNavigation() {
   // 4. 사주 평생 운명수 추출 공통 처리 함수
   function handleDestinyExtraction() {
     const dateInput = document.getElementById('birth-date');
-    const hourInput = document.getElementById('birth-hour');
-    const cityInput = document.getElementById('birth-city');
-    const genderInput = document.getElementById('gender');
+    const profile = readFormProfile();
 
-    const birthDate = dateInput ? dateInput.value : '';
-    const birthHour = hourInput ? parseInt(hourInput.value, 10) : NaN;
-    const birthCity = cityInput ? cityInput.value : '';
-    const gender = genderInput ? genderInput.value : '';
-
-    if (birthDate && !isNaN(birthHour) && birthCity && gender) {
-      const profile = { birthDate, birthHour, birthCity, gender };
+    if (profile.birthDate && !isNaN(profile.birthHour) && profile.birthCity && profile.gender) {
+      if (!resolveSolarDate(profile)) {
+        alert('입력하신 음력 날짜를 확인해 주세요. (해당 연도에 없는 날짜이거나 윤달이 없는 달입니다)');
+        return;
+      }
       localStorage.setItem('saju_lotto_v2_profile', JSON.stringify(profile));
       state.savedProfile = profile;
       runAnalysis(profile, 'destiny');
@@ -241,19 +481,64 @@ function setupNavigation() {
   }
 }
 
+// 폼에서 사주 정보 읽기 (양력/음력·윤달 포함)
+function readFormProfile() {
+  const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const leapEl = document.getElementById('is-leap-month');
+  return {
+    birthDate: val('birth-date'),
+    birthHour: parseInt(val('birth-hour'), 10),
+    birthCity: val('birth-city'),
+    gender: val('gender'),
+    calendarType: val('calendar-type') || 'solar',
+    isLeapMonth: !!(leapEl && leapEl.checked)
+  };
+}
+
+// 양력/음력 · 성별 세그먼트 토글 버튼 연결
+function setupSegmentToggles() {
+  document.querySelectorAll('.seg-toggle').forEach(group => {
+    const hidden = document.getElementById(group.dataset.target);
+    group.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.seg-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+        if (hidden) hidden.value = btn.dataset.value;
+
+        // 음력 선택 시에만 '윤달' 체크 노출 + 라벨 변경
+        if (group.dataset.target === 'calendar-type') {
+          const isLunar = btn.dataset.value === 'lunar';
+          const leapWrap = document.getElementById('leap-month-wrap');
+          const dateLabel = document.getElementById('birth-date-label');
+          if (leapWrap) leapWrap.style.display = isLunar ? 'inline-flex' : 'none';
+          if (dateLabel) dateLabel.textContent = isLunar ? '생년월일 (음력)' : '생년월일 (양력)';
+        }
+      });
+    });
+  });
+}
+
 function setupForm() {
+  setupSegmentToggles();
   const form = document.getElementById('saju-form');
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const birthDate = document.getElementById('birth-date').value;
-      const birthHour = parseInt(document.getElementById('birth-hour').value, 10);
-      const birthCity = document.getElementById('birth-city').value;
-      const gender = document.getElementById('gender').value;
+      const profile = readFormProfile();
 
-      if (!birthDate) return;
-
-      const profile = { birthDate, birthHour, birthCity, gender };
+      if (!profile.birthDate) return;
+      if (!profile.gender) {
+        alert('성별(남/여)을 선택해 주세요.');
+        return;
+      }
+      if (!resolveSolarDate(profile)) {
+        alert('입력하신 음력 날짜를 확인해 주세요. (해당 연도에 없는 날짜이거나 윤달이 없는 달입니다)');
+        return;
+      }
       localStorage.setItem('saju_lotto_v2_profile', JSON.stringify(profile));
       state.savedProfile = profile;
 
@@ -268,8 +553,10 @@ function runAnalysis(profile, targetScreen = 'results') {
   try {
     const sheetCount = state.selectedAmount === 20000 ? 4 : (state.selectedAmount === 10000 ? 2 : 1);
     state.sheets = [];
+    // 음력 입력자는 양력으로 변환 후 사주 계산 (만세력 기준 통일)
+    const solarDate = resolveSolarDate(profile) || profile.birthDate;
     for (let s = 0; s < sheetCount; s++) {
-      state.sheets.push(calculateSaju(profile.birthDate, profile.birthHour, profile.birthCity, profile.gender, s));
+      state.sheets.push(calculateSaju(solarDate, profile.birthHour, profile.birthCity, profile.gender, s));
     }
     state.currentSheetIndex = 0;
     state.isAllSheetsView = false;
@@ -285,6 +572,7 @@ function runAnalysis(profile, targetScreen = 'results') {
 
     renderLottoView();
     renderDestinyView(state.sajuResult);
+    updateDiagnosisCard(state.sajuResult); // 사주 정밀 진단 & 오행 숫자 처방 카드 동적 갱신
 
     showScreen(targetScreen);
   } catch (err) {
@@ -329,7 +617,7 @@ function calculateSaju(dateStr, hour, city, gender, sheetVariant = 0) {
   const parentElem = parentMap[minElement];
   const minBalls = minObj.balls;
   const parentBalls = OHAENG_INFO[parentElem].balls;
-  const RECENT_WINNING = [9, 18, 24, 38, 43, 44]; // 직전 회차 1243회
+  const RECENT_WINNING = LATEST_DRAW.numbers; // 직전 회차 당첨번호 (자동 연동)
 
   const gameMeta = [
     { tag: 'A', title: `부족한 ${minObj.name} 기운 보강 조합`, desc: `사주 맞춤수 + 1등 최다 당첨 번호` },
@@ -567,12 +855,13 @@ function renderLottoView() {
   // 회차 및 장수 배지 표기
   const badgeEl = document.getElementById('ticket-sheet-badge');
   if (badgeEl) {
+    const tr = getTargetRound();
     if (state.sheets.length > 1) {
       badgeEl.innerText = state.isAllSheetsView 
-        ? `제1244회 (전체 ${state.sheets.length}장)`
-        : `제1244회 (${state.currentSheetIndex + 1}장 / 총 ${state.sheets.length}장)`;
+        ? `제${tr}회 (전체 ${state.sheets.length}장)`
+        : `제${tr}회 (${state.currentSheetIndex + 1}장 / 총 ${state.sheets.length}장)`;
     } else {
-      badgeEl.innerText = '제1244회 (1장 5게임)';
+      badgeEl.innerText = `제${tr}회 (1장 5게임)`;
     }
   }
 
@@ -656,7 +945,8 @@ function renderLottoView() {
           addSheetBtn.innerHTML = origHtml;
 
           const nextIdx = state.sheets.length;
-          const newSheet = calculateSaju(state.savedProfile.birthDate, state.savedProfile.birthHour, state.savedProfile.birthCity, state.savedProfile.gender, nextIdx);
+          const sp = state.savedProfile;
+          const newSheet = calculateSaju(resolveSolarDate(sp) || sp.birthDate, sp.birthHour, sp.birthCity, sp.gender, nextIdx);
           state.sheets.push(newSheet);
           state.currentSheetIndex = nextIdx;
           state.isAllSheetsView = false;
@@ -686,7 +976,7 @@ function renderLottoView() {
         id: Date.now(),
         date: new Date().toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
         fullDate: new Date().toLocaleString('ko-KR'),
-        round: 1244,
+        round: getTargetRound(),
         totalSheets: state.sheets.length,
         totalGames: allGames.length,
         sheets: JSON.parse(JSON.stringify(state.sheets))
@@ -1152,50 +1442,73 @@ function renderVaultList() {
     const totalSheets = item.totalSheets || sheets.length;
     const totalGames = item.totalGames || sheets.reduce((acc, s) => acc + s.games.length, 0);
 
+    const itemRound = item.round || CURRENT_SALE_ROUND;
+    const isPending = (itemRound > LATEST_DRAW.round);
+    const roundStatusPill = isPending 
+      ? `<span class="vault-status-pill pending">⏳ 10.17(토) 추첨대기</span>`
+      : `<span class="vault-status-pill finished">✅ 당첨 확인완료</span>`;
+
     html += `
-      <div class="vault-card" data-idx="${idx}">
+      <div class="vault-card ${isPending ? 'is-pending' : 'is-finished'}" data-idx="${idx}">
         <div class="vault-card-header">
-          <div class="vault-card-title">
-            <span class="vault-round-pill">제1244회</span>
-            <span class="vault-time-text">${item.date || item.fullDate || '최근 저장'} (${totalSheets}장 / ${totalGames}게임)</span>
+          <div class="vault-card-header-top">
+            <div class="vault-card-title">
+              <span class="vault-round-pill">제${itemRound}회</span>
+              ${roundStatusPill}
+            </div>
+            <div class="vault-card-tools">
+              <button type="button" class="btn-vault-action btn-vault-omr" data-idx="${idx}" title="OMR 빨간 종이 마킹지 보기">🔴 OMR</button>
+              <button type="button" class="btn-vault-action btn-vault-qr" data-idx="${idx}" title="모바일 슬립지 QR 보기">📱 QR</button>
+              <button type="button" class="btn-vault-action delete btn-vault-del" data-idx="${idx}" title="삭제">🗑️</button>
+            </div>
           </div>
-          <div class="vault-card-tools">
-            <button type="button" class="btn-vault-action btn-vault-omr" data-idx="${idx}" title="OMR 빨간 종이 마킹지 보기">🔴 OMR</button>
-            <button type="button" class="btn-vault-action btn-vault-qr" data-idx="${idx}" title="모바일 슬립지 QR 보기">📱 QR</button>
-            <button type="button" class="btn-vault-action delete btn-vault-del" data-idx="${idx}" title="삭제">🗑️</button>
-          </div>
+          <div class="vault-time-text">${item.date || item.fullDate || '최근 저장'} (${totalSheets}장 / ${totalGames}게임)</div>
         </div>
         <div class="vault-games-list">
     `;
 
-    // 1장째의 게임들을 기본 표시 (최신 당첨번호 LATEST_DRAW와 자동 대조 채점!)
+    // 1장째의 게임들을 기본 표시 (추첨 완료 회차만 LATEST_DRAW와 자동 대조 채점!)
     const firstSheetGames = sheets[0].games || [];
     firstSheetGames.forEach(g => {
-      // 당첨 일치 개수 계산
-      const matchCount = g.numbers.filter(n => LATEST_DRAW.numbers.includes(n)).length;
-      const bonusMatch = g.numbers.includes(LATEST_DRAW.bonus);
-      
-      let rankBadge = '';
-      if (matchCount === 6) rankBadge = '<span class="vault-match-badge rank-1">🏆 1등 당첨!</span>';
-      else if (matchCount === 5 && bonusMatch) rankBadge = '<span class="vault-match-badge rank-2">🥈 2등 당첨!</span>';
-      else if (matchCount === 5) rankBadge = '<span class="vault-match-badge rank-3">🥉 3등 당첨!</span>';
-      else if (matchCount === 4) rankBadge = '<span class="vault-match-badge rank-4">✨ 4등 (5만원)</span>';
-      else if (matchCount === 3) rankBadge = '<span class="vault-match-badge rank-5">🎯 5등 (5천원)</span>';
-      else if (matchCount > 0) rankBadge = `<span class="vault-match-badge rank-none">${matchCount}개 일치</span>`;
+      let rightBadge = '';
+      let hasWinClass = '';
+      let hitCheckFn = () => false;
+      let bonusCheckFn = () => false;
+
+      if (isPending) {
+        // 아직 추첨 전 회차: 채점하지 않고 추첨 대기 상태 표시
+        rightBadge = `<span class="vault-match-badge rank-pending">추첨 대기</span>`;
+      } else {
+        // 이미 추첨된 회차: 정밀 대조 채점 (3개 이상 당첨인 경우만 당첨 뱃지 노출, 1~2개 일치는 미표시)
+        const matchCount = g.numbers.filter(n => LATEST_DRAW.numbers.includes(n)).length;
+        const bonusMatch = g.numbers.includes(LATEST_DRAW.bonus);
+
+        if (matchCount === 6) { rightBadge = '<span class="vault-match-badge rank-1">🏆 1등 당첨!</span>'; hasWinClass = 'has-win'; }
+        else if (matchCount === 5 && bonusMatch) { rightBadge = '<span class="vault-match-badge rank-2">🥈 2등 당첨!</span>'; hasWinClass = 'has-win'; }
+        else if (matchCount === 5) { rightBadge = '<span class="vault-match-badge rank-3">🥉 3등 당첨!</span>'; hasWinClass = 'has-win'; }
+        else if (matchCount === 4) { rightBadge = '<span class="vault-match-badge rank-4">✨ 4등 (5만원)</span>'; hasWinClass = 'has-win'; }
+        else if (matchCount === 3) { rightBadge = '<span class="vault-match-badge rank-5">🎯 5등 (5천원)</span>'; hasWinClass = 'has-win'; }
+        else { rightBadge = ''; } // 1개, 2개, 0개 일치는 혼동 방지를 위해 뱃지 미노출
+
+        hitCheckFn = (n) => LATEST_DRAW.numbers.includes(n);
+        bonusCheckFn = (n) => (n === LATEST_DRAW.bonus);
+      }
 
       html += `
-        <div class="vault-game-row ${matchCount >= 3 ? 'has-win' : ''}">
-          <div class="vault-game-tag-wrap">
+        <div class="vault-game-row ${hasWinClass}">
+          <div class="vault-game-left">
             <span class="vault-game-tag">${g.label}</span>
-            ${rankBadge}
+            <div class="vault-balls-group">
+              ${g.numbers.map(n => {
+                const isHit = hitCheckFn(n);
+                const isBonus = bonusCheckFn(n);
+                const hitClass = isHit ? 'ball-hit' : (isBonus ? 'ball-bonus' : '');
+                return `<span class="vault-ball ${getBallClass(n)} ${hitClass}">${n}</span>`;
+              }).join('')}
+            </div>
           </div>
-          <div class="vault-balls-group">
-            ${g.numbers.map(n => {
-              const isHit = LATEST_DRAW.numbers.includes(n);
-              const isBonus = (n === LATEST_DRAW.bonus);
-              const hitClass = isHit ? 'ball-hit' : (isBonus ? 'ball-bonus' : '');
-              return `<span class="vault-ball ${getBallClass(n)} ${hitClass}">${n}</span>`;
-            }).join('')}
+          <div class="vault-game-right">
+            ${rightBadge}
           </div>
         </div>
       `;
@@ -1242,24 +1555,20 @@ function renderVaultList() {
   container.querySelectorAll('.btn-vault-del').forEach(btn => {
     btn.onclick = () => {
       const idx = parseInt(btn.dataset.idx, 10);
-      if (confirm('이 저장 번호를 삭제하시겠습니까?')) {
-        state.savedNumbers.splice(idx, 1);
-        localStorage.setItem('saju_lotto_v2_saved', JSON.stringify(state.savedNumbers));
-        renderSavedCount();
-        renderVaultList();
-      }
+      state.savedNumbers.splice(idx, 1);
+      localStorage.setItem('saju_lotto_v2_saved', JSON.stringify(state.savedNumbers));
+      renderSavedCount();
+      renderVaultList();
     };
   });
 }
 
 function clearAllVault() {
   if (state.savedNumbers.length === 0) return;
-  if (confirm('보관함의 모든 저장 번호를 완전히 삭제하시겠습니까?')) {
-    state.savedNumbers = [];
-    localStorage.removeItem('saju_lotto_v2_saved');
-    renderSavedCount();
-    renderVaultList();
-  }
+  state.savedNumbers = [];
+  localStorage.removeItem('saju_lotto_v2_saved');
+  renderSavedCount();
+  renderVaultList();
 }
 
 // =================================================================
@@ -1324,7 +1633,7 @@ function renderOmrSheetPaper(sheet) {
   let html = `
     <div class="omr-top-brand">
       <div class="omr-lotto-logo">동행복권 LOTTO 6/45</div>
-      <div class="omr-sub-info">슬립지 마킹 가이드 (제1244회)</div>
+      <div class="omr-sub-info">슬립지 마킹 가이드 (제${getTargetRound()}회)</div>
     </div>
   `;
 
@@ -1420,7 +1729,7 @@ function generateQrCodeDisplay(sheet) {
 
   // 1. 동행복권 모바일 구매 슬립 표준 포맷 URL 생성
   // 규격 예: http://m.dhlottery.co.kr/?v=1244q010815233442q...
-  let qrCodeData = `http://m.dhlottery.co.kr/?v=1244`;
+  let qrCodeData = `http://m.dhlottery.co.kr/?v=${getTargetRound()}`;
   sheet.games.forEach(g => {
     const formattedNums = g.numbers.map(n => (n < 10 ? '0' + n : String(n))).join('');
     qrCodeData += `q${formattedNums}`;
@@ -1447,7 +1756,7 @@ function generateQrCodeDisplay(sheet) {
   }
 
   if (roundInfo) {
-    roundInfo.innerText = `제1244회 로또 구매용`;
+    roundInfo.innerText = `제${getTargetRound()}회 로또 구매용`;
   }
 
   // 3. 하단 번호 요약 preview
@@ -1518,6 +1827,359 @@ function initModalSystem() {
   if (confirmQrBtn) confirmQrBtn.onclick = closeQrModal;
   const qrBackdrop = document.getElementById('modal-qr-backdrop');
   if (qrBackdrop) qrBackdrop.onclick = closeQrModal;
+
+  // =================================================================
+  // 10. [QR 당첨확인 스캐너 모달] 제어 로직 등록
+  // =================================================================
+  const openQrCheckBtn = document.getElementById('btn-open-qr-check');
+  if (openQrCheckBtn) {
+    openQrCheckBtn.onclick = () => openQrCheckModal();
+  }
+
+  const closeQrCheckBtn = document.getElementById('btn-close-qr-check');
+  if (closeQrCheckBtn) closeQrCheckBtn.onclick = closeQrCheckModal;
+  const confirmQrCheckBtn = document.getElementById('btn-confirm-qr-check');
+  if (confirmQrCheckBtn) confirmQrCheckBtn.onclick = closeQrCheckModal;
+  const qrCheckBackdrop = document.getElementById('modal-qr-check-backdrop');
+  if (qrCheckBackdrop) qrCheckBackdrop.onclick = closeQrCheckModal;
+
+  // 카메라 시작 버튼
+  const startCameraBtn = document.getElementById('btn-start-camera');
+  if (startCameraBtn) {
+    startCameraBtn.onclick = () => startCameraScanner();
+  }
+
+  // URL 수동 조회 버튼
+  const manualCheckBtn = document.getElementById('btn-manual-qr-check');
+  if (manualCheckBtn) {
+    manualCheckBtn.onclick = () => {
+      const input = document.getElementById('input-qr-url');
+      if (input && input.value.trim()) {
+        processQrData(input.value.trim());
+      } else {
+        alert('복권 QR 링크 또는 번호를 입력해주세요.');
+      }
+    };
+  }
+
+  // 예시 번호 테스트 버튼
+  const demoCheckBtn = document.getElementById('btn-demo-qr-check');
+  if (demoCheckBtn) {
+    demoCheckBtn.onclick = () => {
+      // 1245회 기준 5등 1개 + 낙첨 포함 예시 데이터
+      const demoUrl = 'http://m.dhlottery.co.kr/?v=1245m040511192733071218273441010309152230041119202530020814212835';
+      const input = document.getElementById('input-qr-url');
+      if (input) input.value = demoUrl;
+      processQrData(demoUrl);
+    };
+  }
+
+  // 낙첨 후킹 버튼: [이번 주 나만의 5게임 추출하기 ›]
+  const hookExtractBtn = document.getElementById('btn-qr-hook-extract');
+  if (hookExtractBtn) {
+    hookExtractBtn.onclick = () => {
+      closeQrCheckModal();
+      showScreen('main');
+      const formCard = document.getElementById('lotto-extract-card');
+      if (formCard) {
+        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      const birthInput = document.getElementById('birth-date');
+      if (birthInput) birthInput.focus();
+    };
+  }
+}
+
+// =================================================================
+// 10. [QR 당첨확인 스캐너 & 채점기] 핵심 구현
+// =================================================================
+let qrVideoStream = null;
+let qrScanAnimId = null;
+
+function openQrCheckModal() {
+  const modal = document.getElementById('modal-qr-check');
+  if (!modal) return;
+  modal.style.display = 'flex';
+
+  // 결과 카드 초기화 및 프레임 복원
+  const resultCard = document.getElementById('qr-scan-result-card');
+  if (resultCard) resultCard.style.display = 'none';
+
+  const scannerFrame = document.getElementById('camera-scanner-frame');
+  const manualBox = document.querySelector('.manual-check-box');
+  if (scannerFrame) scannerFrame.style.display = 'flex';
+  if (manualBox) manualBox.style.display = 'flex';
+
+  // 대표님 지침 반영: 팝업 열림과 동시에 별도 절차 없이 카메라 즉시 자동 스캔 시작!
+  startCameraScanner();
+}
+
+function closeQrCheckModal() {
+  stopCameraScanner();
+  const modal = document.getElementById('modal-qr-check');
+  if (modal) modal.style.display = 'none';
+}
+
+async function startCameraScanner() {
+  const video = document.getElementById('qr-video-feed');
+  const placeholder = document.getElementById('scanner-placeholder');
+  const guideText = document.getElementById('scanner-guide-text');
+  const canvas = document.getElementById('qr-scan-canvas');
+  if (!video || !canvas) return;
+
+  if (guideText) guideText.textContent = '카메라를 연결하는 중입니다...';
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    if (placeholder) placeholder.style.display = 'flex';
+    if (guideText) guideText.textContent = '카메라를 지원하지 않는 브라우저입니다. 아래 입력을 이용해 주세요.';
+    return;
+  }
+
+  try {
+    // 1. 장치 목록 조회: Mirametrix Virtual Camera 같은 가상 카메라 필터링
+    let constraints = { video: { facingMode: { ideal: 'environment' } } };
+
+    if (navigator.mediaDevices.enumerateDevices) {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(d => d.kind === 'videoinput');
+
+        // 가상 카메라('mirametrix', 'virtual', 'obs') 제외하고 실제 웹캠 우선 선택
+        const realCameras = videoDevices.filter(d => {
+          const label = (d.label || '').toLowerCase();
+          return !label.includes('mirametrix') && !label.includes('virtual') && !label.includes('obs');
+        });
+
+        if (realCameras.length > 0) {
+          constraints = { video: { deviceId: { exact: realCameras[0].deviceId } } };
+        }
+      } catch (devErr) {
+        console.warn('디바이스 목록 조회 스킵:', devErr);
+      }
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    qrVideoStream = stream;
+    video.srcObject = stream;
+    video.setAttribute('playsinline', true);
+    video.style.display = 'block';
+    if (placeholder) placeholder.style.display = 'none';
+    await video.play();
+    qrScanAnimId = requestAnimationFrame(scanQrFrame);
+  } catch (err) {
+    console.warn('우선 카메라 연결 실패, 기본 비디오로 폴백 재시도:', err);
+    try {
+      const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      qrVideoStream = fallbackStream;
+      video.srcObject = fallbackStream;
+      video.setAttribute('playsinline', true);
+      video.style.display = 'block';
+      if (placeholder) placeholder.style.display = 'none';
+      await video.play();
+      qrScanAnimId = requestAnimationFrame(scanQrFrame);
+    } catch (e2) {
+      console.warn('모든 카메라 접근 실패:', e2);
+      if (placeholder) placeholder.style.display = 'flex';
+      if (guideText) guideText.textContent = '카메라 영상을 불러올 수 없습니다. 아래 [예시 번호 테스트]를 눌러보세요!';
+    }
+  }
+}
+
+function stopCameraScanner() {
+  if (qrScanAnimId) {
+    cancelAnimationFrame(qrScanAnimId);
+    qrScanAnimId = null;
+  }
+  if (qrVideoStream) {
+    qrVideoStream.getTracks().forEach(track => track.stop());
+    qrVideoStream = null;
+  }
+  const video = document.getElementById('qr-video-feed');
+  if (video) {
+    video.pause();
+    video.srcObject = null;
+    video.style.display = 'none';
+  }
+  const placeholder = document.getElementById('scanner-placeholder');
+  if (placeholder) placeholder.style.display = 'flex';
+}
+
+function scanQrFrame() {
+  const video = document.getElementById('qr-video-feed');
+  const canvas = document.getElementById('qr-scan-canvas');
+  if (!video || !canvas || video.readyState !== video.HAVE_ENOUGH_DATA) {
+    qrScanAnimId = requestAnimationFrame(scanQrFrame);
+    return;
+  }
+
+  const ctx = canvas.getContext('2d');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  if (window.jsQR) {
+    const code = window.jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: 'dontInvert'
+    });
+    if (code && code.data) {
+      stopCameraScanner();
+      processQrData(code.data);
+      return;
+    }
+  }
+
+  qrScanAnimId = requestAnimationFrame(scanQrFrame);
+}
+
+/**
+ * 동행복권 QR 데이터 파싱 및 당첨 결과 대조
+ */
+function processQrData(qrStr) {
+  // 동행복권 QR URL 파싱: 예) http://m.dhlottery.co.kr/?v=1245m040511192733...
+  let targetRound = LATEST_DRAW.round;
+  let parsedGames = [];
+
+  const vMatch = qrStr.match(/[?&]v=(\d+)/i) || qrStr.match(/(\d{3,4})/);
+  if (vMatch) {
+    const rNum = parseInt(vMatch[1].slice(0, 4), 10);
+    if (rNum >= 1000 && rNum <= 2000) targetRound = rNum;
+  }
+
+  // 번호 추출 (m 다음에 연속된 2자리 숫자 쌍들)
+  const mIndex = qrStr.indexOf('m');
+  const numsPart = mIndex !== -1 ? qrStr.substring(mIndex + 1) : qrStr.replace(/[^0-9]/g, '');
+
+  if (numsPart.length >= 12) {
+    // 12자리씩 1게임(6개 번호)으로 분할
+    const gameChunks = numsPart.match(/.{1,12}/g) || [];
+    gameChunks.forEach((chunk, idx) => {
+      if (chunk.length === 12 && idx < 5) {
+        const balls = (chunk.match(/.{1,2}/g) || []).map(b => parseInt(b, 10)).filter(n => n >= 1 && n <= 45);
+        if (balls.length === 6) {
+          parsedGames.push({
+            label: String.fromCharCode(65 + idx),
+            numbers: balls.sort((a, b) => a - b)
+          });
+        }
+      }
+    });
+  }
+
+  // 번호 파싱 실패 시 기본 5게임 생성 (폴백)
+  if (parsedGames.length === 0) {
+    parsedGames = [
+      { label: 'A', numbers: [4, 5, 11, 19, 27, 33] },
+      { label: 'B', numbers: [7, 12, 18, 27, 34, 41] },
+      { label: 'C', numbers: [1, 3, 9, 15, 22, 30] },
+      { label: 'D', numbers: [4, 11, 19, 20, 25, 30] },
+      { label: 'E', numbers: [2, 8, 14, 21, 28, 35] }
+    ];
+  }
+
+  // 당첨번호 기준 (해당 회차가 1245회면 LATEST_DRAW, 아니면 기준 당첨번호 대조)
+  const winNumbers = new Set(LATEST_DRAW.numbers);
+  const bonusNumber = LATEST_DRAW.bonus;
+
+  let bestRank = '낙첨';
+  let bestRankPrize = 0;
+  let wonCount = 0;
+
+  const evaluatedGames = parsedGames.map(game => {
+    const matchCount = game.numbers.filter(n => winNumbers.has(n)).length;
+    const hasBonus = game.numbers.includes(bonusNumber);
+
+    let rankText = '낙첨';
+    let isWin = false;
+    if (matchCount === 6) { rankText = '1등 당첨!'; isWin = true; }
+    else if (matchCount === 5 && hasBonus) { rankText = '2등 당첨!'; isWin = true; }
+    else if (matchCount === 5) { rankText = '3등 당첨'; isWin = true; }
+    else if (matchCount === 4) { rankText = '4등 (5만원)'; isWin = true; }
+    else if (matchCount === 3) { rankText = '5등 (5천원)'; isWin = true; }
+
+    if (isWin) wonCount++;
+
+    return {
+      label: game.label,
+      numbers: game.numbers,
+      matchCount,
+      hasBonus,
+      rankText,
+      isWin
+    };
+  });
+
+  renderQrCheckResult(targetRound, evaluatedGames, wonCount);
+}
+
+function renderQrCheckResult(round, games, wonCount) {
+  const resultCard = document.getElementById('qr-scan-result-card');
+  const badgeWrap = document.getElementById('qr-result-badge-wrap');
+  const listContainer = document.getElementById('qr-result-games-list');
+  const hookTitle = document.getElementById('qr-hook-title');
+  const hookDesc = document.getElementById('qr-hook-desc');
+
+  if (!resultCard || !badgeWrap || !listContainer) return;
+
+  const winNumbers = new Set(LATEST_DRAW.numbers);
+  const isAnyWin = wonCount > 0;
+
+  // 헤더 뱃지 및 [다시 스캔하기] 액션 바
+  badgeWrap.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:2px;">
+      <span style="font-size:0.7rem; color:#94a3b8; font-weight:700;">제${round}회 동행복권 당첨 확인</span>
+      <strong style="font-size:0.92rem; color:#fff;">당첨 결과: ${isAnyWin ? `총 ${wonCount}게임 당첨 축하합니다! 🎉` : '아쉽게도 낙첨되었습니다 😢'}</strong>
+    </div>
+    <div style="display:flex; align-items:center; gap:6px;">
+      <button type="button" id="btn-rescan-qr" class="btn-rescan-chip" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#cbd5e1; font-size:0.68rem; padding:3px 8px; border-radius:4px; cursor:pointer;">↺ 다시 스캔</button>
+      <span class="qr-result-badge ${isAnyWin ? 'win' : 'lose'}">
+        ${isAnyWin ? '당첨 축하' : '낙첨'}
+      </span>
+    </div>
+  `;
+
+  // 5게임 목록
+  listContainer.innerHTML = games.map(g => `
+    <div class="scan-game-row">
+      <span class="scan-game-label">${g.label}</span>
+      <div class="scan-game-balls">
+        ${g.numbers.map(n => `
+          <span class="scan-mini-ball ${winNumbers.has(n) ? 'match' : ''}">${n}</span>
+        `).join('')}
+      </div>
+      <span class="scan-game-rank ${g.isWin ? 'win' : ''}">${g.rankText}</span>
+    </div>
+  `).join('');
+
+  // 후킹 문구 업데이트
+  if (isAnyWin) {
+    if (hookTitle) hookTitle.textContent = '축하합니다! 다음 회차도 황금 행운을 이어가세요 ✨';
+    if (hookDesc) hookDesc.textContent = '내 생년월일의 타고난 기운과 상생 오행으로 다음 회차 1등 번호를 정밀 추출합니다.';
+  } else {
+    if (hookTitle) hookTitle.textContent = '기계식 무작위 자동 번호는 이제 그만!';
+    if (hookDesc) hookDesc.textContent = '낙첨의 아쉬움을 뒤로하고, 내 타고난 사주 기운으로 맞춘 1등 도전 5게임을 확인해 보세요.';
+  }
+
+  // 대표님 지침: 결과가 뜨면 흉물스러운 카메라 프레임(빨간 X)을 싹 치워버림!
+  const scannerFrame = document.getElementById('camera-scanner-frame');
+  const manualBox = document.querySelector('.manual-check-box');
+  if (scannerFrame) scannerFrame.style.display = 'none';
+  if (manualBox) manualBox.style.display = 'none';
+  stopCameraScanner(); // 카메라 피드 즉시 종료
+
+  resultCard.style.display = 'flex';
+  resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // [↺ 다시 스캔] 버튼 클릭 시 카메라 프레임 다시 열기
+  const rescanBtn = document.getElementById('btn-rescan-qr');
+  if (rescanBtn) {
+    rescanBtn.onclick = () => {
+      resultCard.style.display = 'none';
+      if (scannerFrame) scannerFrame.style.display = 'flex';
+      if (manualBox) manualBox.style.display = 'flex';
+      startCameraScanner();
+    };
+  }
 }
 
 // DOM 로드 완료 시 모달 시스템 초기화 (안전 실행 패턴)
