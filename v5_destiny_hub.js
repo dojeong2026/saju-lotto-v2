@@ -247,14 +247,11 @@
       
       let tagText = '균형';
       let tagClass = 'tag-norm';
-      if (isDefTarget) {
-        tagText = '결핍 보강';
-        tagClass = 'tag-def';
-      } else if (isZero) {
+      if (isZero) {
         tagText = '결핍';
         tagClass = 'tag-def';
       } else if (isExcess) {
-        tagText = '과다 조절';
+        tagText = '과다';
         tagClass = 'tag-excess';
       } else if (cnt === 1) {
         tagText = '약함';
