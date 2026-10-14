@@ -746,17 +746,16 @@ function updateDiagnosisCard(saju) {
   }
 
   if (prescriptCommentEl && saju.lackingElement) {
-    const lackName = saju.lackingElement.name;
     const parentName = saju.parentElemObj ? saju.parentElemObj.name : '상생';
-    let lackIntro = '';
+    let commentText = '';
     if (zeroElems.length > 1) {
       const shortList = zeroElems.map(el => EL_SHORT_MAP[el] || el).join(', ');
-      lackIntro = `부족한 ${shortList} 기운을 보완해야`;
+      commentText = `"부족한 ${shortList} 기운을 채우고 이를 돕는 상생수 ${parentName}을 더해, 결핍 보완 번호를 중심으로 황금 배합했습니다."`;
     } else {
-      const shortSingle = EL_SHORT_MAP[saju.minElement] || '부족한';
-      lackIntro = `부족한 ${shortSingle} 기운을 보완해야`;
+      const shortSingle = EL_SHORT_MAP[saju.minElement] || saju.lackingElement.name;
+      commentText = `"부족한 ${shortSingle} 기운을 채우고 이를 돕는 상생수 ${parentName}을 더해, 결핍 보완 번호를 중심으로 황금 배합했습니다."`;
     }
-    prescriptCommentEl.innerHTML = `"${lackIntro} ${saju.lackingElement.symbol}의 결실이 맺히므로, <strong>${parentName}·${lackName}</strong> 번호를 중심으로 황금 배합했습니다."`;
+    prescriptCommentEl.innerHTML = commentText;
   }
 
   // "사주 변경 ✏️" 버튼 클릭 시 입력 폼 화면으로 이동
