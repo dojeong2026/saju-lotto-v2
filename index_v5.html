@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>사주로또 v5 - 이번 주 로또번호부터 평생 쓰는 내 운명수까지</title>
+  <title>사주로또 v5 - 이번 주 로또 5게임부터 나와 가족의 평생 운명수까지</title>
   <meta name="description" content="출생지 시차보정 사주 분석으로 이번 주 로또번호와 평생 쓰는 전화번호·비밀번호·차량번호 운명수를 추천합니다. 번호를 고른 이유까지 공개합니다.">
-  <link rel="stylesheet" href="v5_style.css?v=5.0">
+  <link rel="stylesheet" href="v5_style.css?v=7.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
@@ -35,7 +35,7 @@
           <span class="brand-kor">사주로또</span>
           <span class="brand-badge-ai">AI 명리 분석</span>
         </h1>
-        <span class="brand-sub">이번 주 로또번호부터 <strong class="brand-sub-hl">평생 쓰는 내 전화번호까지</strong></span>
+        <span class="brand-sub">이번 주 로또 5게임부터 <strong class="brand-sub-hl">나와 가족의 평생 운명수까지</strong></span>
       </div>
     </div>
     <div class="header-actions">
@@ -79,7 +79,7 @@
         <!-- 우측: 다음 회차 판매 현황 (1분마다 자동 갱신) -->
         <div class="board-pane pane-next">
           <div class="pane-head">
-            <h2 class="pane-title" id="next-round-tag">다음 회차(1246회) 판매 현황</h2>
+            <h2 class="pane-title" id="next-round-tag">다음 1246회 판매 현황</h2>
           </div>
           <span class="pane-live-time" id="sales-update-time">[10월 12일, 11시 현재]</span>
           <div class="pane-stat-grid">
@@ -138,21 +138,42 @@
               <input type="text" id="custom-rel-name" class="custom-rel-input" placeholder="호칭 직접 입력" maxlength="6" style="display: none;">
             </div>
 
-            <!-- 1줄: 생년월일 + 출생 시간 -->
-            <div class="form-grid-2x2">
-              <div class="form-group-box">
+            <!-- 1줄: 생년월일(년·월·일 넉넉한 공간) + 양력/음력 토글 -->
+            <div class="form-row-ymd-cal">
+              <div class="form-group-box form-box-ymd">
                 <label for="birth-date" class="label-with-chip">
-                  <span id="birth-date-label">생년월일 (양력)</span>
+                  <span id="birth-date-label">생년월일</span>
                   <span class="leap-chip" id="leap-month-wrap" style="display: none;">
                     <input type="checkbox" id="is-leap-month"> 윤달
                   </span>
                 </label>
-                <input type="date" id="birth-date" value="" min="1900-01-01" max="2029-12-31">
+                <button type="button" id="birth-date-trigger" class="birth-date-trigger-btn" onclick="if(window.openWheelPicker) window.openWheelPicker();" aria-label="생년월일 선택">
+                  <span class="trigger-icon">📅</span>
+                  <span id="birth-date-display-text" class="trigger-text placeholder">생년월일</span>
+                  <span class="trigger-arrow">▼</span>
+                </button>
+                <input type="hidden" id="birth-date" value="">
+                <input type="hidden" id="birth-year" value="">
+                <input type="hidden" id="birth-month" value="">
+                <input type="hidden" id="birth-day" value="">
               </div>
-              <div class="form-group-box">
+
+              <div class="form-group-box form-box-cal">
+                <label class="label-muted">구분</label>
+                <input type="hidden" id="calendar-type" value="solar">
+                <div class="seg-toggle" data-target="calendar-type" role="group" aria-label="양력 음력 선택">
+                  <button type="button" class="seg-btn active" id="btn-cal-solar" data-value="solar" aria-pressed="true">양력</button>
+                  <button type="button" class="seg-btn" id="btn-cal-lunar" data-value="lunar" aria-pressed="false">음력</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2줄: 출생시간 · 출생지역 · 성별 3박스 황금비율 배치 -->
+            <div class="form-row-time-city-gender">
+              <div class="form-group-box form-box-time">
                 <label for="birth-hour">출생 시간</label>
-                <select id="birth-hour">
-                  <option value="" disabled selected>출생 시간 선택</option>
+                <select id="birth-hour" class="pill-select" aria-label="출생 시간">
+                  <option value="" selected>출생시간</option>
                   <option value="12">오시 (11:30~13:29)</option>
                   <option value="0">자시 (23:30~01:29)</option>
                   <option value="2">축시 (01:30~03:29)</option>
@@ -168,33 +189,30 @@
                   <option value="-1">시간 모름</option>
                 </select>
               </div>
-            </div>
 
-            <!-- 2줄: 양력/음력 · 출생지역 · 성별 3버튼 -->
-            <div class="form-row-3">
-              <input type="hidden" id="calendar-type" value="solar">
-              <div class="seg-toggle" data-target="calendar-type" role="group" aria-label="양력 음력 선택">
-                <button type="button" class="seg-btn active" id="btn-cal-solar" data-value="solar" aria-pressed="true">양력</button>
-                <button type="button" class="seg-btn" id="btn-cal-lunar" data-value="lunar" aria-pressed="false">음력</button>
+              <div class="form-group-box form-box-city">
+                <label for="birth-city">출생지역</label>
+                <select id="birth-city" class="pill-select" aria-label="출생 지역 (시차보정)">
+                  <option value="" selected>출생지역</option>
+                  <option value="seoul">서울·경기</option>
+                  <option value="busan">부산·경남</option>
+                  <option value="daegu">대구·경북</option>
+                  <option value="incheon">인천</option>
+                  <option value="gwangju">광주·전남</option>
+                  <option value="daejeon">대전·충청</option>
+                  <option value="ulsan">울산</option>
+                  <option value="gangwon">강원</option>
+                  <option value="jeju">제주</option>
+                </select>
               </div>
 
-              <select id="birth-city" class="pill-select" aria-label="출생 지역 (시차보정)">
-                <option value="" disabled selected>출생지역</option>
-                <option value="seoul">서울·경기</option>
-                <option value="busan">부산·경남</option>
-                <option value="daegu">대구·경북</option>
-                <option value="incheon">인천</option>
-                <option value="gwangju">광주·전남</option>
-                <option value="daejeon">대전·충청</option>
-                <option value="ulsan">울산</option>
-                <option value="gangwon">강원</option>
-                <option value="jeju">제주</option>
-              </select>
-
-              <input type="hidden" id="gender" value="">
-              <div class="seg-toggle" data-target="gender" role="group" aria-label="성별 선택">
-                <button type="button" class="seg-btn" id="btn-gender-male" data-value="male" aria-pressed="false">남</button>
-                <button type="button" class="seg-btn" id="btn-gender-female" data-value="female" aria-pressed="false">여</button>
+              <div class="form-group-box form-box-gender">
+                <label class="label-muted">성별</label>
+                <input type="hidden" id="gender" value="male">
+                <div class="seg-toggle" data-target="gender" role="group" aria-label="성별 선택">
+                  <button type="button" class="seg-btn active" id="btn-gender-male" data-value="male" aria-pressed="true">남</button>
+                  <button type="button" class="seg-btn" id="btn-gender-female" data-value="female" aria-pressed="false">여</button>
+                </div>
               </div>
             </div>
 
@@ -217,15 +235,15 @@
         </form>
       </section>
 
-      <!-- 대표님 지시: 사주에 더 관심 있는 사람만 누르는 별도 평생수 배너 -->
+      <!-- 오늘의 맞춤 사주 & 평생 운명수 배너 (대표님 1안 & 문구 A안 선정) -->
       <section class="banner-destiny-gateway" id="banner-destiny-gateway">
         <div class="gateway-text-wrap">
-          <span class="gateway-badge">사주 심층 분석</span>
-          <strong class="gateway-title">평생 쓰는 내 운명수도 궁금하신가요?</strong>
-          <span class="gateway-desc">선천수·후천수로 푸는 내 전화번호 뒷자리 · 통장 비밀번호 · 차량번호</span>
+          <span class="gateway-badge">✨ 오늘의 사주 &amp; 운명수</span>
+          <strong class="gateway-title">오늘 해야 할 일과 피해야 할 일</strong>
+          <span class="gateway-desc">당일 맞춤 길흉부터 평생 쓰는 전화 · 차량번호까지</span>
         </div>
         <button type="button" id="btn-open-destiny-gateway" class="btn-gateway-go">
-          확인하기 ›
+          운명수 보기 ›
         </button>
       </section>
 
@@ -237,7 +255,7 @@
       <!-- 결과 상단 네비게이션: 다시 뽑기 & 평생수 전환 버튼 -->
       <div class="result-action-bar">
         <button id="btn-back-to-input" class="btn-sub-nav" type="button">
-          ‹ 다른 사주 선택
+          ‹ 메인 화면으로 돌아가기 (다시 입력)
         </button>
         <button id="btn-switch-to-destiny" class="btn-highlight-nav" type="button">
           오늘의 사주 · 평생 운명수 보기 ›
@@ -364,6 +382,13 @@
 
             <!-- 히든 호환 엘리먼트 -->
             <button id="btn-save-numbers" type="button" style="display: none;"></button>
+
+            <!-- 결과 하단 명확한 메인 뒤로가기 버튼 -->
+            <div class="result-bottom-back-wrap" style="margin-top: 14px;">
+              <button type="button" class="btn-result-back-main" onclick="showScreen('main')">
+                ‹ 메인 화면으로 돌아가기 (다시 입력)
+              </button>
+            </div>
           </div>
         </section>
       </main>
@@ -558,9 +583,100 @@
     </div>
   </div>
 
+  <!-- 생년월일 3열 롤링 휠 피커 모달 (보관함/QR 확인창과 동일한 다크 골드 컴팩트 다이얼로그) -->
+  <div id="wheel-picker-modal" class="app-modal" style="display: none;">
+    <div class="modal-backdrop" id="wheel-picker-backdrop"></div>
+    <div class="modal-dialog wheel-modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h3 class="modal-title">생년월일 선택</h3>
+          <span class="modal-subtitle">출생 연도 · 월 · 일을 간편하게 선택해 주세요</span>
+        </div>
+        <button type="button" id="btn-close-wheel-picker" class="btn-modal-close" aria-label="닫기">✕</button>
+      </div>
+
+      <div class="modal-body wheel-modal-body">
+        <!-- 빠른 연대 바로가기 칩 (50년대~00년대 1초 점프) -->
+        <div class="quick-decade-chips">
+          <button type="button" class="decade-chip" data-year="1950">50년대</button>
+          <button type="button" class="decade-chip" data-year="1960">60년대</button>
+          <button type="button" class="decade-chip" data-year="1970">70년대</button>
+          <button type="button" class="decade-chip" data-year="1980">80년대</button>
+          <button type="button" class="decade-chip" data-year="1990">90년대</button>
+          <button type="button" class="decade-chip" data-year="2000">00년대</button>
+        </div>
+
+        <!-- 조작 가이드 안내 문구 -->
+        <div class="wheel-guide-hint">
+          <span>👆 화살표(▲▼) 터치 또는 숫자를 위아래로 밀어 굴리기</span>
+        </div>
+
+        <!-- 3열 롤링 휠 & 화살표 제어 컨테이너 -->
+        <div class="wheel-control-board">
+          <!-- 상단 헤더 & ▲ 버튼 -->
+          <div class="wheel-stepper-row header-row">
+            <div class="wheel-stepper-cell">
+              <span class="stepper-label">출생연도</span>
+              <button type="button" class="btn-stepper btn-stepper-up" data-col="year" data-dir="-1" aria-label="연도 올리기">▲</button>
+            </div>
+            <div class="wheel-stepper-cell">
+              <span class="stepper-label">월</span>
+              <button type="button" class="btn-stepper btn-stepper-up" data-col="month" data-dir="-1" aria-label="월 올리기">▲</button>
+            </div>
+            <div class="wheel-stepper-cell">
+              <span class="stepper-label">일</span>
+              <button type="button" class="btn-stepper btn-stepper-up" data-col="day" data-dir="-1" aria-label="일 올리기">▲</button>
+            </div>
+          </div>
+
+          <!-- 3열 롤링 휠 컨테이너 (컴팩트 3행 132px, 여백 거품 완벽 제거!) -->
+          <div class="wheel-columns-wrap">
+            <div class="wheel-selection-lens"></div>
+
+            <!-- 1열: 연도 휠 -->
+            <div class="wheel-col" id="wheel-col-year">
+              <div class="wheel-scroll" id="wheel-scroll-year"></div>
+            </div>
+
+            <!-- 2열: 월 휠 -->
+            <div class="wheel-col" id="wheel-col-month">
+              <div class="wheel-scroll" id="wheel-scroll-month"></div>
+            </div>
+
+            <!-- 3열: 일 휠 -->
+            <div class="wheel-col" id="wheel-col-day">
+              <div class="wheel-scroll" id="wheel-scroll-day"></div>
+            </div>
+          </div>
+
+          <!-- 하단 ▼ 버튼 -->
+          <div class="wheel-stepper-row footer-row">
+            <div class="wheel-stepper-cell">
+              <button type="button" class="btn-stepper btn-stepper-down" data-col="year" data-dir="1" aria-label="연도 내리기">▼</button>
+            </div>
+            <div class="wheel-stepper-cell">
+              <button type="button" class="btn-stepper btn-stepper-down" data-col="month" data-dir="1" aria-label="월 내리기">▼</button>
+            </div>
+            <div class="wheel-stepper-cell">
+              <button type="button" class="btn-stepper btn-stepper-down" data-col="day" data-dir="1" aria-label="일 내리기">▼</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 선택 완료 버튼 -->
+      <div class="modal-footer wheel-modal-footer">
+        <button type="button" id="btn-confirm-wheel-picker" class="btn-modal-primary" style="width: 100%;">
+          <span id="wheel-preview-date">1971년 10월 15일</span> 선택 완료
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="v5_saju_engine.js?v=5.0"></script>
+  <script src="v5_lotto_engine.js?v=5.1"></script>
   <script src="v5_daily_content.js?v=5.0"></script>
-  <script src="v5_destiny_hub.js?v=5.0"></script>
-  <script src="v5_app.js?v=5.0"></script>
+  <script src="v5_destiny_hub.js?v=5.3"></script>
+  <script src="v5_app.js?v=7.0"></script>
 </body>
 </html>

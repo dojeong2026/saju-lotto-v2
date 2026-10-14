@@ -119,13 +119,39 @@
     // B수: 내 사주의 결핍 오행 보강수
     const minEl = chart.minElement || 'metal';
     const hadoListB = HADO_NUMS[minEl] || [4, 9];
-    const numB = (todayP.idx % 2 === 0) ? hadoListB[0] : hadoListB[1];
+    let numB = (todayP.idx % 2 === 0) ? hadoListB[0] : hadoListB[1];
+
+    // 명리학 하도 음양 조화(天一生水 地六成之): 일진 오행과 결핍 오행이 일치할 때는 
+    // 생수(1)와 성수(6)가 음양 한 쌍을 이루도록 짝 배속 (1+1 중복 방지 및 음양 합 완성)
+    if (numA === numB) {
+      numB = (numA === hadoListB[0]) ? hadoListB[1] : hadoListB[0];
+    }
 
     // 오늘이 내 결핍 오행을 직접 채워주는 날인지 체크
     const isDirectRecharge = (todayP.ganEl === minEl || todayP.jiEl === minEl);
 
     // 가족 운세 프로필 수집
-    const profiles = (window.state && Array.isArray(window.state.profiles)) ? window.state.profiles : [];
+    const profiles = (window.state && Array.isArray(window.state.profiles) && window.state.profiles.length) 
+      ? window.state.profiles 
+      : [{ id: 'me', name: '나', relation: '본인', birthDate: chart.birthDate || '1988-05-12', gender: chart.gender || 'male' }];
+
+    const activeProfId = (window.state && window.state.activeProfileId) ? window.state.activeProfileId : 'me';
+
+    // 상단 가족 프로필 선택 칩 바
+    let profileChipsHtml = '';
+    profiles.forEach(p => {
+      const isAct = (p.id === activeProfId);
+      const icon = (p.relation === '배우자') ? '💍' : ((p.relation === '자녀' || p.relation === '아들' || p.relation === '딸') ? '👶' : ((p.relation === '부모') ? '👵' : (p.id === 'me' ? '👤' : '✨')));
+      const dName = p.name || (p.id === 'me' ? '나' : p.relation);
+      const delBtn = (p.id !== 'me') ? `<span class="dh-chip-del" onclick="event.stopPropagation(); deleteDestinyProfile('${esc(p.id)}')" title="삭제">×</span>` : '';
+      profileChipsHtml += `
+        <button type="button" class="dh-profile-chip ${isAct ? 'is-active' : ''}" onclick="switchDestinyProfile('${esc(p.id)}')">
+          <span class="dh-chip-icon">${icon}</span>
+          <span class="dh-chip-name">${esc(dName)}</span>
+          ${delBtn}
+        </button>
+      `;
+    });
 
     let familyRowsHtml = '';
     let bestProfile = null;
@@ -135,7 +161,7 @@
       let fChart = null;
       try {
         const solDate = window.resolveSolarDate ? window.resolveSolarDate(p) : p.birthDate;
-        fChart = global.SajuEngine ? global.SajuEngine.computeChart(solDate, p.birthHour, p.gender) : null;
+        fChart = global.SajuEngine ? global.SajuEngine.computeChart(solDate, p.birthHour || '12', p.gender || 'male') : null;
       } catch (e) {}
 
       if (fChart) {
@@ -144,18 +170,23 @@
         const weight = (fBrief.level === 'good') ? 3 : (fBrief.level === 'calm' ? 2 : 1);
         if (weight > bestWeight) {
           bestWeight = weight;
-          bestProfile = p.name;
+          bestProfile = p.name || p.relation;
         }
 
+        const isCur = (p.id === activeProfId);
         const levelClass = fBrief.level === 'good' ? 'level-good' : (fBrief.level === 'calm' ? 'level-calm' : 'level-careful');
         familyRowsHtml += `
-          <div class="dh-family-row">
-            <div class="dh-family-left">
-              <span class="dh-family-name">${esc(p.name)}</span>
+          <div class="dh-family-row ${isCur ? 'is-active-row' : ''}">
+            <div class="dh-family-left" onclick="switchDestinyProfile('${esc(p.id)}')">
+              <span class="dh-family-name">${esc(p.name || p.relation)}</span>
+              ${isCur ? '<span class="dh-active-pill">현재 사주</span>' : ''}
               <span class="dh-family-chip ${levelClass}">${esc(fBrief.label)}</span>
             </div>
             <div class="dh-family-right">
-              <span class="dh-family-desc">${esc(fBrief.headline)}</span>
+              <span class="dh-family-desc" onclick="switchDestinyProfile('${esc(p.id)}')">${esc(fBrief.headline)}</span>
+              <button type="button" class="dh-btn-fam-share" title="이 가족의 폰으로 기운 전송" onclick="event.stopPropagation(); shareFamilyFortune('${esc(p.id)}')">💌 전송</button>
+              ${(p.id !== 'me') ? `<button type="button" class="dh-btn-fam-del" title="삭제" onclick="event.stopPropagation(); deleteDestinyProfile('${esc(p.id)}')">삭제</button>` : ''}
+              <span class="dh-row-arrow" onclick="switchDestinyProfile('${esc(p.id)}')">›</span>
             </div>
           </div>
         `;
@@ -266,11 +297,22 @@
     container.innerHTML = `
       <div class="destiny-hub-wrapper">
         
+        <!-- [상단 가족 프로필 선택 바: 사주 전용 스위처] -->
+        <div class="dh-profile-bar-wrap">
+          <div class="dh-profile-bar">
+            ${profileChipsHtml}
+            <button type="button" class="dh-chip-add-fam" onclick="openDhFamilyModal()">+ 가족 추가</button>
+          </div>
+        </div>
+
         <!-- [상단 Hero: 화이트 감성 카드] -->
         <header class="dh-hero-card">
           <div class="dh-hero-top">
             <span class="dh-date-badge">${todayP.m}월 ${todayP.d}일 (${todayP.weekday}) · ${todayP.kor}일(${todayP.han}日)</span>
-            <span class="dh-streak-badge">연속 ${streakDays}일째 출석</span>
+            <div class="dh-hero-top-right">
+              <span class="dh-streak-badge">연속 ${streakDays}일째 출석</span>
+              <button type="button" class="dh-btn-hero-share" onclick="shareFamilyFortune('${esc(activeProfId)}')">💌 기운 보내기</button>
+            </div>
           </div>
 
           <div class="dh-hero-main">
@@ -362,13 +404,13 @@
                 </div>
                 <div class="dh-guardian-desc">
                   ${isDirectRecharge 
-                    ? `<p class="dh-notice-direct"><strong>기운 일치일:</strong> 오늘 일진(${todayP.kor})은 내 부족한 오행(${global.SajuEngine ? global.SajuEngine.EL_KOR[minEl] : minEl})을 직접 채워주는 뜻깊은 날입니다.</p>`
+                    ? `<p class="dh-notice-direct"><strong>기운 일치일:</strong> 오늘 일진(${todayP.kor})은 내 부족한 오행(${global.SajuEngine ? global.SajuEngine.EL_KOR[minEl] : minEl})을 직접 채워주는 뜻깊은 날입니다. 하늘의 기운(<strong>${numA}</strong>)과 땅의 보강수(<strong>${numB}</strong>)가 음양의 합을 이룹니다.</p>`
                     : `<p class="dh-notice-norm">오늘의 하늘 기운인 <strong>${todayP.kor}</strong>의 천간수(<strong>${numA}</strong>)와 내게 가장 필요한 <strong>${global.SajuEngine ? global.SajuEngine.EL_KOR[minEl] : minEl}</strong>의 보강수(<strong>${numB}</strong>)가 조화를 이룹니다.</p>`
                   }
                 </div>
                 <div class="dh-guardian-action">
-                  <button type="button" class="dh-btn-to-lotto" onclick="showScreen(window.state && window.state.sheets && window.state.sheets.length ? 'results' : 'main')">
-                    이번 주 로또 번호 뽑기로 이동 ›
+                  <button type="button" class="dh-btn-to-lotto" onclick="extractLottoForProfile('${esc(activeProfId)}')">
+                    ${esc(profileName)} 님의 수호수로 이번 주 5게임 추출하기 ›
                   </button>
                 </div>
               </div>
@@ -388,14 +430,23 @@
               <span class="dh-acc-arrow">›</span>
             </button>
             <div class="dh-acc-body">
-              <div class="dh-family-list">
-                ${familyRowsHtml}
-              </div>
-              <div class="dh-family-bottom">
-                <button type="button" class="dh-btn-add-fam" onclick="showScreen('main'); setTimeout(function(){ const b = document.getElementById('btn-add-family'); if(b) b.click(); }, 200);">
-                  + 가족 추가하고 기운 함께 보기
-                </button>
-              </div>
+              ${profiles.length <= 1 ? `
+                <div class="dh-family-empty-box">
+                  <div class="dh-fam-empty-icon">👨‍👩‍👧‍👦</div>
+                  <p class="dh-fam-empty-title">우리 가족의 사주를 등록해 보세요</p>
+                  <p class="dh-fam-empty-sub">배우자·자녀·부모님의 생년월일을 등록하면 매일 아침 온 가족의 일진과 상생 조화를 한눈에 살필 수 있습니다.</p>
+                  <button type="button" class="dh-btn-add-fam-direct" onclick="openDhFamilyModal()">+ 첫 가족 사주 등록하기</button>
+                </div>
+              ` : `
+                <div class="dh-family-list">
+                  ${familyRowsHtml}
+                </div>
+                <div class="dh-family-bottom">
+                  <button type="button" class="dh-btn-add-fam" onclick="openDhFamilyModal()">
+                    + 가족 추가하기
+                  </button>
+                </div>
+              `}
             </div>
           </article>
 
@@ -518,6 +569,74 @@
           </button>
         </div>
 
+        <!-- [가족 사주 등록 전용 모달] -->
+        <div id="dh-family-modal" class="dh-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeDhFamilyModal()">
+          <div class="dh-modal-box">
+            <div class="dh-modal-header">
+              <h3 class="dh-modal-title">가족 사주 등록</h3>
+              <button type="button" class="dh-modal-close" onclick="closeDhFamilyModal()">✕</button>
+            </div>
+            <div class="dh-modal-body">
+              <div class="dh-form-group">
+                <label class="dh-form-label">관계</label>
+                <div class="dh-rel-chips" id="dh-modal-rel-group">
+                  <button type="button" class="dh-rel-btn active" data-rel="배우자" onclick="selectDhRel(this)">배우자</button>
+                  <button type="button" class="dh-rel-btn" data-rel="자녀" onclick="selectDhRel(this)">자녀</button>
+                  <button type="button" class="dh-rel-btn" data-rel="부모" onclick="selectDhRel(this)">부모</button>
+                  <button type="button" class="dh-rel-btn" data-rel="지인" onclick="selectDhRel(this)">지인</button>
+                </div>
+              </div>
+              <div class="dh-form-group">
+                <label class="dh-form-label">호칭 / 이름</label>
+                <input type="text" id="dh-modal-name" class="dh-input-text" placeholder="예: 아내, 남편, 아들, 민우" value="배우자">
+              </div>
+              <div class="dh-form-group">
+                <label class="dh-form-label">생년월일</label>
+                <div class="dh-date-row">
+                  <select id="dh-modal-cal" class="dh-select-mini">
+                    <option value="solar">양력</option>
+                    <option value="lunar">음력</option>
+                  </select>
+                  <input type="date" id="dh-modal-date" class="dh-input-date" value="1990-01-01">
+                </div>
+              </div>
+              <div class="dh-form-group">
+                <div class="dh-two-cols">
+                  <div>
+                    <label class="dh-form-label">태어난 시간</label>
+                    <select id="dh-modal-hour" class="dh-select-mini" style="width:100%">
+                      <option value="none">모름 / 미입력</option>
+                      <option value="0">자시 (23:30 ~ 01:29)</option>
+                      <option value="2">축시 (01:30 ~ 03:29)</option>
+                      <option value="4">인시 (03:30 ~ 05:29)</option>
+                      <option value="6">묘시 (05:30 ~ 07:29)</option>
+                      <option value="8">진시 (07:30 ~ 09:29)</option>
+                      <option value="10">사시 (09:30 ~ 11:29)</option>
+                      <option value="12" selected>오시 (11:30 ~ 13:29)</option>
+                      <option value="14">미시 (13:30 ~ 15:29)</option>
+                      <option value="16">신시 (15:30 ~ 17:29)</option>
+                      <option value="18">유시 (17:30 ~ 19:29)</option>
+                      <option value="20">술시 (19:30 ~ 21:29)</option>
+                      <option value="22">해시 (21:30 ~ 23:29)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="dh-form-label">성별</label>
+                    <select id="dh-modal-gender" class="dh-select-mini" style="width:100%">
+                      <option value="female">여성</option>
+                      <option value="male">남성</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="dh-modal-footer">
+              <button type="button" class="dh-btn-modal-cancel" onclick="closeDhFamilyModal()">취소</button>
+              <button type="button" class="dh-btn-modal-save" onclick="saveDhFamilyModal()">가족 사주 등록 완료</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     `;
 
@@ -546,6 +665,211 @@
       }
     });
   };
+
+  /**
+   * 사주 화면 내 프로필 즉시 전환
+   */
+  global.switchDestinyProfile = function (profId) {
+    if (!window.state || !Array.isArray(window.state.profiles)) return;
+    const target = window.state.profiles.find(p => p.id === profId);
+    if (!target) return;
+    window.state.activeProfileId = profId;
+    window.state.profile = target;
+    if (typeof window.saveProfiles === 'function') window.saveProfiles(window.state.profiles);
+
+    const solDate = window.resolveSolarDate ? window.resolveSolarDate(target) : target.birthDate;
+    if (typeof window.calculateSaju === 'function') {
+      const saju = window.calculateSaju(solDate, target.birthHour || '12', target.birthCity || 'seoul', target.gender || 'male', 0);
+      window.state.sajuResult = saju;
+      renderDestinyHub(saju);
+    }
+  };
+
+  /**
+   * 가족 프로필 삭제 기능
+   */
+  global.deleteDestinyProfile = function (profId) {
+    if (!window.state || !Array.isArray(window.state.profiles)) return;
+    if (profId === 'me') return; // 본인은 삭제 불가
+    const target = window.state.profiles.find(p => p.id === profId);
+    const targetName = target ? (target.name || target.relation) : '가족';
+    if (!confirm(`'${targetName}' 사주를 삭제하시겠습니까?`)) return;
+
+    window.state.profiles = window.state.profiles.filter(p => p.id !== profId);
+    if (window.state.activeProfileId === profId) {
+      window.state.activeProfileId = 'me';
+      const meProf = window.state.profiles.find(p => p.id === 'me') || window.state.profiles[0];
+      window.state.profile = meProf;
+      window.state.savedProfile = meProf;
+    }
+
+    if (typeof window.saveProfiles === 'function') {
+      window.saveProfiles(window.state.profiles);
+    }
+    if (typeof window.renderProfileSystem === 'function') {
+      window.renderProfileSystem();
+    }
+
+    const curTarget = window.state.profiles.find(p => p.id === window.state.activeProfileId) || window.state.profiles[0];
+    if (curTarget) {
+      const solDate = window.resolveSolarDate ? window.resolveSolarDate(curTarget) : curTarget.birthDate;
+      if (typeof window.calculateSaju === 'function') {
+        const saju = window.calculateSaju(solDate, curTarget.birthHour || '12', curTarget.birthCity || 'seoul', curTarget.gender || 'male', 0);
+        window.state.sajuResult = saju;
+        renderDestinyHub(saju);
+      }
+    }
+  };
+
+  /**
+   * 해당 가족의 수호수로 5게임 즉시 추출하고 로또 결과 화면으로 전환
+   */
+  global.extractLottoForProfile = function (profId) {
+    const st = window.state;
+    let target = null;
+    if (st && Array.isArray(st.profiles) && st.profiles.length) {
+      target = st.profiles.find(p => p.id === profId) || st.profiles.find(p => p.id === 'me') || st.profiles[0];
+    }
+    if (!target && typeof window.loadProfiles === 'function') {
+      try {
+        const list = window.loadProfiles();
+        if (Array.isArray(list) && list.length) {
+          target = list.find(p => p.id === profId) || list.find(p => p.id === 'me') || list[0];
+        }
+      } catch (e) {}
+    }
+    if (!target && st && st.savedProfile) {
+      target = st.savedProfile;
+    }
+    if (!target) {
+      if (typeof window.showScreen === 'function') window.showScreen('main');
+      return;
+    }
+
+    if (st) {
+      st.activeProfileId = target.id;
+      st.profile = target;
+      st.savedProfile = target;
+    }
+
+    if (typeof window.runAnalysis === 'function') {
+      window.runAnalysis(target, 'results');
+    } else if (typeof window.showScreen === 'function') {
+      window.showScreen('results');
+    }
+  };
+
+  /**
+   * 가족 추가 모달 컨트롤
+   */
+  global.openDhFamilyModal = function () {
+    const modal = document.getElementById('dh-family-modal');
+    if (modal) modal.style.display = 'flex';
+  };
+
+  global.closeDhFamilyModal = function () {
+    const modal = document.getElementById('dh-family-modal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  global.selectDhRel = function (btn) {
+    const group = document.getElementById('dh-modal-rel-group');
+    if (!group) return;
+    group.querySelectorAll('.dh-rel-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const rel = btn.dataset.rel;
+    const nameInput = document.getElementById('dh-modal-name');
+    if (nameInput) nameInput.value = rel;
+  };
+
+  global.saveDhFamilyModal = function () {
+    const activeRelBtn = document.querySelector('#dh-modal-rel-group .dh-rel-btn.active');
+    const rel = activeRelBtn ? activeRelBtn.dataset.rel : '가족';
+    const nameInput = document.getElementById('dh-modal-name');
+    const name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : rel;
+    const dateInput = document.getElementById('dh-modal-date');
+    const birthDate = dateInput ? dateInput.value : '';
+    const calType = document.getElementById('dh-modal-cal') ? document.getElementById('dh-modal-cal').value : 'solar';
+    const hour = document.getElementById('dh-modal-hour') ? document.getElementById('dh-modal-hour').value : '12';
+    const gender = document.getElementById('dh-modal-gender') ? document.getElementById('dh-modal-gender').value : 'female';
+
+    if (!birthDate) {
+      alert('생년월일을 입력해 주세요.');
+      return;
+    }
+
+    const newId = 'fam_' + Date.now();
+    const newProf = {
+      id: newId,
+      name,
+      relation: rel,
+      birthDate,
+      calendarType: calType,
+      isLeap: false,
+      birthHour: hour,
+      gender,
+      birthCity: 'seoul'
+    };
+
+    if (!window.state) window.state = {};
+    if (!Array.isArray(window.state.profiles)) window.state.profiles = [];
+    window.state.profiles.push(newProf);
+    if (typeof window.saveProfiles === 'function') window.saveProfiles(window.state.profiles);
+
+    closeDhFamilyModal();
+    // 방금 등록한 가족 사주로 즉시 전환!
+    switchDestinyProfile(newId);
+  };
+
+  /**
+   * 가족 사주 1초 딥링크 카카오톡 전송
+   */
+  global.shareFamilyFortune = function (profId) {
+    if (!window.state || !Array.isArray(window.state.profiles)) return;
+    const target = window.state.profiles.find(p => p.id === profId) || window.state.profiles[0];
+    if (!target) return;
+
+    const myProfile = window.state.profiles.find(p => p.id === 'me');
+    const senderName = (myProfile && myProfile.name && myProfile.name !== '나') ? myProfile.name : '가족';
+
+    const payload = {
+      name: target.name || target.relation || '소중한 분',
+      relation: target.relation || '가족',
+      birthDate: target.birthDate,
+      calendarType: target.calendarType || 'solar',
+      isLeap: !!target.isLeap,
+      birthHour: target.birthHour || '12',
+      gender: target.gender || 'female',
+      birthCity: target.birthCity || 'seoul',
+      sender: senderName
+    };
+
+    const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+    const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
+    const shareTitle = `[사주로또] ${payload.name} 님을 위한 오늘의 기운과 수호수가 도착했습니다! 💌`;
+    const shareText = `${senderName} 님이 보내신 ${payload.name} 님의 오늘의 사주와 행운 번호를 확인해 보세요!`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl
+      }).catch(err => {
+        if (err.name !== 'AbortError') copyFallbackLink(shareUrl, payload.name);
+      });
+    } else {
+      copyFallbackLink(shareUrl, payload.name);
+    }
+  };
+
+  function copyFallbackLink(url, name) {
+    if (typeof window.copyToClipboard === 'function') {
+      window.copyToClipboard(url);
+      alert(`💌 [${name}] 님에게 전달할 전용 사주 링크가 복사되었습니다!\n\n카카오톡 대화방에 [붙여넣기]하여 보내주세요.`);
+    } else {
+      prompt(`아래 링크를 복사하여 카카오톡으로 전달하세요:`, url);
+    }
+  }
 
   // 전역 노출
   global.renderDestinyHub = renderDestinyHub;

@@ -5,30 +5,60 @@
  *  - QR 스캔 즉시 가동 및 결과 도출 시 카메라 프레임 자동 숨김
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+function bootApp() {
   initApp();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootApp);
+} else {
+  bootApp();
+}
+
+function normalizeBirthDate(str) {
+  if (!str) return '1988-05-12';
+  const clean = String(str).replace(/[^\d]/g, '');
+  if (clean.length >= 8) {
+    const y = clean.substring(0, 4);
+    const m = clean.substring(4, 6);
+    const d = clean.substring(6, 8);
+    return `${y}-${m}-${d}`;
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  return '1988-05-12';
+}
 
 function loadProfiles() {
   try {
-    const multi = JSON.parse(localStorage.getItem('saju_lotto_v2_profiles') || 'null');
-    if (Array.isArray(multi) && multi.length > 0) return multi;
+    let multi = JSON.parse(localStorage.getItem('saju_lotto_v2_profiles') || 'null');
+    if (Array.isArray(multi) && multi.length > 0) {
+      multi = multi.map(p => ({
+        ...p,
+        birthDate: normalizeBirthDate(p.birthDate)
+      }));
+      let me = multi.find(p => p.id === 'me');
+      if (!me) {
+        me = { id: 'me', name: '나', relation: '본인', birthDate: multi[0].birthDate, calendarType: multi[0].calendarType || 'solar', birthHour: multi[0].birthHour || '12', gender: multi[0].gender || 'male', birthCity: multi[0].birthCity || 'seoul' };
+        multi.unshift(me);
+      }
+      return multi;
+    }
     const single = JSON.parse(localStorage.getItem('saju_lotto_v2_profile') || 'null');
     if (single && single.birthDate) {
-      return [{ id: 'me', name: '나', ...single }];
+      return [{ id: 'me', name: '나', relation: '본인', ...single, birthDate: normalizeBirthDate(single.birthDate) }];
     }
   } catch (e) {
     console.warn('프로필 로드 에러:', e);
   }
-  return [];
+  return []; // 최초 실행자는 저장된 프로필이 없는 빈 배열이어야 사주입력창이 펼쳐짐!
 }
 
 function saveProfiles(profiles) {
   try {
     localStorage.setItem('saju_lotto_v2_profiles', JSON.stringify(profiles));
-    const active = profiles.find(p => p.id === state.activeProfileId) || profiles[0] || null;
-    if (active) {
-      localStorage.setItem('saju_lotto_v2_profile', JSON.stringify(active));
+    const me = profiles.find(p => p.id === 'me') || profiles[0] || null;
+    if (me) {
+      localStorage.setItem('saju_lotto_v2_profile', JSON.stringify(me));
     }
   } catch (e) {
     console.warn('프로필 저장 에러:', e);
@@ -36,6 +66,7 @@ function saveProfiles(profiles) {
 }
 
 const initialProfiles = loadProfiles();
+const hasSavedProfiles = (initialProfiles.length > 0);
 const state = {
   currentTrack: 'lotto',
   sajuResult: null,
@@ -45,10 +76,16 @@ const state = {
   isAllSheetsView: false,
   savedNumbers: JSON.parse(localStorage.getItem('saju_lotto_v2_saved') || '[]'),
   profiles: initialProfiles,
-  activeProfileId: initialProfiles.length > 0 ? initialProfiles[0].id : 'me',
-  savedProfile: initialProfiles.length > 0 ? initialProfiles[0] : null,
-  inputMode: 'none' // 'none' (접힘), 'edit' (수정), 'add-family' (가족 추가)
+  activeProfileId: hasSavedProfiles ? 'me' : null,
+  savedProfile: hasSavedProfiles ? (initialProfiles.find(p => p.id === 'me') || initialProfiles[0]) : null,
+  inputMode: hasSavedProfiles ? 'none' : 'edit' // 최초 실행자는 'edit'(입력창 펼침), 재방문자는 'none'(원클릭 슈퍼패스 접힘)
 };
+window.state = state;
+window.loadProfiles = loadProfiles;
+window.saveProfiles = saveProfiles;
+window.renderProfileSystem = renderProfileSystem;
+window.calculateSaju = calculateSaju;
+window.resolveSolarDate = resolveSolarDate;
 
 const CITY_TIME_OFFSETS = {
   'seoul': -32, 'busan': -24, 'daegu': -26, 'incheon': -33,
@@ -222,7 +259,7 @@ function updateSalesStatus() {
   const diffWeeks = currentTargetRound - LATEST_DRAW.round - 1;
 
   if (roundTagElem) {
-    roundTagElem.textContent = `다음 회차(${currentTargetRound}회) 판매 현황`;
+    roundTagElem.textContent = `다음 ${currentTargetRound}회 판매 현황`;
   }
 
   // 이번 회차 판매 시작 시각 (직전 토요일 21:00)
@@ -305,25 +342,55 @@ function showScreen(screenName) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+window.showScreen = showScreen;
 
 // 폼 인풋에 프로필 값 반영
 function fillProfileToForm(profile) {
   const dateInput = document.getElementById('birth-date');
+  const ySel = document.getElementById('birth-year');
+  const mSel = document.getElementById('birth-month');
+  const dSel = document.getElementById('birth-day');
   const hourInput = document.getElementById('birth-hour');
   const cityInput = document.getElementById('birth-city');
   const genderInput = document.getElementById('gender');
   const calTypeInput = document.getElementById('calendar-type');
   const leapInput = document.getElementById('is-leap-month');
 
-  if (dateInput) dateInput.value = (profile && profile.birthDate) ? profile.birthDate : '';
-  if (hourInput) hourInput.value = (profile && !isNaN(profile.birthHour)) ? profile.birthHour : '';
+  const displayText = document.getElementById('birth-date-display-text');
+
+  if (profile && profile.birthDate) {
+    const validDate = normalizeBirthDate(profile.birthDate);
+    if (dateInput) dateInput.value = validDate;
+    const parts = validDate.split('-');
+    if (parts.length === 3) {
+      if (ySel) ySel.value = parts[0];
+      if (mSel) mSel.value = parts[1].padStart(2, '0');
+      if (dSel) dSel.value = parts[2].padStart(2, '0');
+      if (displayText) {
+        displayText.textContent = `${parts[0]}년 ${parseInt(parts[1], 10)}월 ${parseInt(parts[2], 10)}일`;
+        displayText.classList.remove('placeholder');
+      }
+    }
+  } else {
+    if (dateInput) dateInput.value = '';
+    if (ySel) ySel.value = '';
+    if (mSel) mSel.value = '';
+    if (dSel) dSel.value = '';
+    if (displayText) {
+      displayText.textContent = '생년월일';
+      displayText.classList.add('placeholder');
+    }
+  }
+
+  const validHour = (profile && profile.birthHour !== undefined && profile.birthHour !== null && profile.birthHour !== '' && !isNaN(profile.birthHour));
+  if (hourInput) hourInput.value = validHour ? String(profile.birthHour) : '';
   if (cityInput) cityInput.value = (profile && profile.birthCity) ? profile.birthCity : '';
-  if (genderInput) genderInput.value = (profile && profile.gender) ? profile.gender : '';
+  if (genderInput) genderInput.value = (profile && profile.gender) ? profile.gender : 'male';
   if (calTypeInput) calTypeInput.value = (profile && profile.calendarType) ? profile.calendarType : 'solar';
   if (leapInput) leapInput.checked = !!(profile && profile.isLeapMonth);
 
   const calVal = (profile && profile.calendarType) ? profile.calendarType : 'solar';
-  const genVal = (profile && profile.gender) ? profile.gender : '';
+  const genVal = (profile && profile.gender) ? profile.gender : 'male';
 
   document.querySelectorAll('.seg-toggle').forEach(group => {
     const isCal = (group.dataset.target === 'calendar-type');
@@ -353,11 +420,12 @@ function renderProfileSystem() {
   const submitText = document.getElementById('btn-submit-text');
   const targetRound = getTargetRound();
 
-  const activeProfile = state.profiles.find(p => p.id === state.activeProfileId) || state.profiles[0] || null;
+  const activeProfile = state.profiles.find(p => p.id === state.activeProfileId) || state.profiles.find(p => p.id === 'me') || state.profiles[0] || null;
+  state.activeProfileId = activeProfile ? activeProfile.id : 'me';
   state.savedProfile = activeProfile;
 
-  // 1. 프로필이 있는 경우
-  if (activeProfile && activeProfile.birthDate) {
+  // 1. 프로필이 있는 경우 (가족 추가 모드가 아닐 때만 폼에 채움!)
+  if (state.inputMode !== 'add-family' && activeProfile && activeProfile.birthDate) {
     // 폼 인풋은 백그라운드에서 채워둠
     fillProfileToForm(activeProfile);
 
@@ -367,8 +435,9 @@ function renderProfileSystem() {
         tabsBar.style.display = 'flex';
         tabsBar.innerHTML = state.profiles.map(p => {
           const isActive = (p.id === state.activeProfileId);
+          const validDate = normalizeBirthDate(p.birthDate);
           // 연도 2자리 추출 (의심 해소용 컴팩트 표기: 예: 아들(95년))
-          const yearShort = p.birthDate ? `${p.birthDate.substring(2, 4)}년` : '';
+          const yearShort = validDate ? `${validDate.substring(2, 4)}년` : '';
           const label = (p.id === 'me') ? '나' : `${p.name}(${yearShort})`;
           const delBtn = (p.id !== 'me') ? `<span class="tab-del" data-del-id="${p.id}" title="삭제">×</span>` : '';
           return `
@@ -411,10 +480,11 @@ function renderProfileSystem() {
         const isMe = (activeProfile.id === 'me');
         const calName = (activeProfile.calendarType === 'lunar') ? '음력' : '양력';
         const genName = (activeProfile.gender === 'male') ? '남' : (activeProfile.gender === 'female' ? '여' : '');
+        const validDate = normalizeBirthDate(activeProfile.birthDate);
         if (isMe) {
-          bannerText.innerHTML = `저장된 내 사주가 자동 적용되었습니다 (<strong>${activeProfile.birthDate} ${calName} · ${genName}</strong>)`;
+          bannerText.innerHTML = `저장된 내 사주가 자동 적용되었습니다 (<strong>${validDate} ${calName} · ${genName}</strong>)`;
         } else {
-          bannerText.innerHTML = `선택된 사주: <strong>${activeProfile.name}</strong> (${activeProfile.birthDate} ${calName} · ${genName})`;
+          bannerText.innerHTML = `선택된 사주: <strong>${activeProfile.name}</strong> (${validDate} ${calName} · ${genName})`;
         }
       }
     }
@@ -597,8 +667,18 @@ function bindProfileActions() {
   }
 }
 
-// 하위 호환 별칭
+// 최초 실행자(신규) vs 재방문자 분기 렌더링
 function restoreSavedProfileToForm() {
+  if (state.profiles && state.profiles.length > 0) {
+    state.activeProfileId = 'me';
+    state.inputMode = 'none';
+    const me = state.profiles.find(p => p.id === 'me') || state.profiles[0];
+    state.savedProfile = me;
+  } else {
+    state.activeProfileId = null;
+    state.savedProfile = null;
+    state.inputMode = 'edit'; // 최초 실행자는 사주입력창 활짝 펼침!
+  }
   renderProfileSystem();
 }
 
@@ -660,20 +740,29 @@ function updateDiagnosisCard(saju) {
 }
 
 function initApp() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('clear') === '1') {
+    localStorage.clear();
+    window.location.href = window.location.pathname;
+    return;
+  }
   renderDrawBoard();
   updateSalesStatus();
   renderSavedCount();
   setupNavigation();
   setupForm();
+  initWheelDatePicker();
   restoreSavedProfileToForm(); // 재방문자 사주 자동 채우기
   initModalSystem();
 
   // 첫 화면은 무조건 로또 추출 메인 화면으로 시작!
   showScreen('main');
 
-  // URL 파라미터 기반 검증 데모 지원 (?demo=ticket 또는 ?demo=destiny)
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('demo') === 'ticket') {
+  // URL 파라미터 기반 검증 데모 지원 (?demo=ticket 또는 ?demo=destiny 또는 ?share=...)
+  if (urlParams.get('share')) {
+    handleIncomingSharedProfile(urlParams.get('share'));
+    return;
+  } else if (urlParams.get('demo') === 'ticket') {
     runAnalysis({ birthDate: '1985-05-15', birthHour: 12, birthCity: 'seoul', gender: 'male' }, 'results');
   } else if (urlParams.get('demo') === 'destiny') {
     runAnalysis({ birthDate: '1985-05-15', birthHour: 12, birthCity: 'seoul', gender: 'male' }, 'destiny');
@@ -681,6 +770,55 @@ function initApp() {
 
   // 1분 주기 판매현황 자동 갱신
   setInterval(updateSalesStatus, 60000);
+}
+
+/**
+ * 가족 사주 공유 딥링크 처리:
+ * 링크를 타고 들어온 가족의 스마트폰에 본인 사주로 자동 안착
+ */
+function handleIncomingSharedProfile(shareDataStr) {
+  try {
+    const jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(shareDataStr))));
+    const shared = JSON.parse(jsonStr);
+    if (!shared || !shared.birthDate) {
+      showScreen('main');
+      return;
+    }
+
+    const myProfile = {
+      id: 'me',
+      name: shared.name || '나',
+      relation: '본인',
+      birthDate: shared.birthDate,
+      calendarType: shared.calendarType || 'solar',
+      isLeap: !!shared.isLeap,
+      birthHour: shared.birthHour || '12',
+      gender: shared.gender || 'female',
+      birthCity: shared.birthCity || 'seoul'
+    };
+
+    let profiles = loadProfiles();
+    profiles = profiles.filter(p => p.id !== 'me');
+    profiles.unshift(myProfile);
+    saveProfiles(profiles);
+    state.profiles = profiles;
+    state.activeProfileId = 'me';
+
+    const senderName = shared.sender || '가족';
+    runAnalysis(myProfile, 'destiny');
+
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    setTimeout(() => {
+      alert(`💌 ${senderName} 님이 보내신 ${myProfile.name} 님의 사주와 오늘의 기운이 내 스마트폰에 안전하게 등록되었습니다!`);
+    }, 400);
+
+  } catch (err) {
+    console.error('공유 프로필 파싱 오류:', err);
+    showScreen('main');
+  }
 }
 
 function setupNavigation() {
@@ -749,12 +887,332 @@ function setupNavigation() {
   }
 }
 
+// =====================================================================
+// [토스 · 카카오뱅크 스타일 3열 롤링 휠 피커 시스템]
+// =====================================================================
+function initWheelDatePicker() {
+  const triggerBtn = document.getElementById('birth-date-trigger');
+  const modal = document.getElementById('wheel-picker-modal');
+  const closeBtn = document.getElementById('btn-close-wheel-picker');
+  const confirmBtn = document.getElementById('btn-confirm-wheel-picker');
+  const previewText = document.getElementById('wheel-preview-date');
+  const displayText = document.getElementById('birth-date-display-text');
+  const dateInput = document.getElementById('birth-date');
+  const yInput = document.getElementById('birth-year');
+  const mInput = document.getElementById('birth-month');
+  const dInput = document.getElementById('birth-day');
+
+  const scrollY = document.getElementById('wheel-scroll-year');
+  const scrollM = document.getElementById('wheel-scroll-month');
+  const scrollD = document.getElementById('wheel-scroll-day');
+  if (!triggerBtn || !modal || !scrollY || !scrollM || !scrollD) return;
+
+  const ITEM_HEIGHT = 44;
+  let curYear = 1971;
+  let curMonth = 10;
+  let curDay = 15;
+
+  // 1. 연도 생성 (2026 ~ 1920)
+  scrollY.innerHTML = '';
+  for (let y = 2026; y >= 1920; y--) {
+    const item = document.createElement('div');
+    item.className = 'wheel-item';
+    item.dataset.value = String(y);
+    item.textContent = `${y}년`;
+    item.onclick = () => {
+      curYear = y;
+      scrollToValue(scrollY, y, true);
+      updateDaysForSelection();
+      onDateWheelChange();
+    };
+    scrollY.appendChild(item);
+  }
+
+  // 2. 월 생성 (1 ~ 12)
+  scrollM.innerHTML = '';
+  for (let m = 1; m <= 12; m++) {
+    const item = document.createElement('div');
+    item.className = 'wheel-item';
+    item.dataset.value = String(m);
+    item.textContent = `${m}월`;
+    item.onclick = () => {
+      curMonth = m;
+      scrollToValue(scrollM, m, true);
+      updateDaysForSelection();
+      onDateWheelChange();
+    };
+    scrollM.appendChild(item);
+  }
+
+  // 3. 일 생성 (연/월에 따라 28~31일 동적 갱신)
+  function renderDays(maxDays) {
+    scrollD.innerHTML = '';
+    for (let d = 1; d <= maxDays; d++) {
+      const item = document.createElement('div');
+      item.className = 'wheel-item';
+      item.dataset.value = String(d);
+      item.textContent = `${d}일`;
+      item.onclick = () => {
+        curDay = d;
+        scrollToValue(scrollD, d, true);
+        onDateWheelChange();
+      };
+      scrollD.appendChild(item);
+    }
+  }
+
+  function getDaysInMonth(year, month) {
+    return new Date(year, month, 0).getDate();
+  }
+
+  function updateDaysForSelection() {
+    const maxDays = getDaysInMonth(curYear, curMonth);
+    if (curDay > maxDays) curDay = maxDays;
+    renderDays(maxDays);
+  }
+
+  let isProgrammaticScroll = false;
+
+  function getTargetScroll(container, val) {
+    if (container === scrollY) {
+      return Math.max(0, (2026 - val) * ITEM_HEIGHT);
+    } else if (container === scrollM) {
+      return Math.max(0, (val - 1) * ITEM_HEIGHT);
+    } else if (container === scrollD) {
+      return Math.max(0, (val - 1) * ITEM_HEIGHT);
+    }
+    return 0;
+  }
+
+  function scrollToValue(container, val, smooth = true) {
+    if (!container) return;
+    const targetScroll = getTargetScroll(container, val);
+    isProgrammaticScroll = true;
+    if (smooth) {
+      container.scrollTo({ top: targetScroll, behavior: 'smooth' });
+    } else {
+      container.scrollTop = targetScroll;
+    }
+    setTimeout(() => {
+      container.scrollTop = targetScroll;
+      updateHighlight();
+    }, smooth ? 180 : 20);
+
+    setTimeout(() => {
+      isProgrammaticScroll = false;
+      updateHighlight();
+    }, 320);
+  }
+
+  function onDateWheelChange() {
+    updateHighlight();
+    if (previewText) {
+      previewText.textContent = `${curYear}년 ${curMonth}월 ${curDay}일`;
+    }
+  }
+
+  function updateHighlight() {
+    [scrollY, scrollM, scrollD].forEach(c => {
+      c.querySelectorAll('.wheel-item').forEach(it => it.classList.remove('selected'));
+    });
+    const yItem = scrollY.querySelector(`[data-value="${curYear}"]`);
+    const mItem = scrollM.querySelector(`[data-value="${curMonth}"]`);
+    const dItem = scrollD.querySelector(`[data-value="${curDay}"]`);
+    if (yItem) yItem.classList.add('selected');
+    if (mItem) mItem.classList.add('selected');
+    if (dItem) dItem.classList.add('selected');
+  }
+
+  function setupScrollDetect(container, onSelect) {
+    let timer = null;
+    container.addEventListener('scroll', () => {
+      if (isProgrammaticScroll) return;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (isProgrammaticScroll) return;
+        const scrollTop = container.scrollTop;
+        const index = Math.round(scrollTop / ITEM_HEIGHT);
+        const items = container.querySelectorAll('.wheel-item');
+        if (items[index]) {
+          const val = parseInt(items[index].dataset.value, 10);
+          onSelect(val);
+        }
+      }, 50);
+    }, { passive: true });
+  }
+
+  setupScrollDetect(scrollY, (y) => {
+    curYear = y;
+    syncActiveDecadeChip(y);
+    updateDaysForSelection();
+    scrollToValue(scrollD, curDay, false);
+    onDateWheelChange();
+  });
+
+  setupScrollDetect(scrollM, (m) => {
+    curMonth = m;
+    updateDaysForSelection();
+    scrollToValue(scrollD, curDay, false);
+    onDateWheelChange();
+  });
+
+  setupScrollDetect(scrollD, (d) => {
+    curDay = d;
+    onDateWheelChange();
+  });
+
+  function syncActiveDecadeChip(year) {
+    const decadeStart = Math.floor(year / 10) * 10;
+    decadeChips.forEach(c => {
+      const cy = parseInt(c.dataset.year, 10);
+      c.classList.toggle('active', cy === decadeStart);
+    });
+  }
+
+  // 퀵 연대 칩 클릭 (50년대~00년대 1초 점프)
+  const decadeChips = modal.querySelectorAll('.decade-chip');
+  decadeChips.forEach(chip => {
+    chip.onclick = (e) => {
+      e.stopPropagation();
+      const targetYear = parseInt(chip.dataset.year, 10);
+      curYear = targetYear;
+      decadeChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      scrollToValue(scrollY, targetYear, true);
+      onDateWheelChange();
+    };
+  });
+
+  // 상하 화살표 (▲ / ▼) 버튼 클릭 이벤트
+  modal.querySelectorAll('.btn-stepper').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const col = btn.dataset.col;
+      const dir = parseInt(btn.dataset.dir, 10); // -1 (상단 ▲), 1 (하단 ▼)
+      stepWheel(col, dir);
+    };
+  });
+
+  function stepWheel(col, dir) {
+    if (col === 'year') {
+      const nextY = dir === -1 ? curYear + 1 : curYear - 1;
+      if (nextY >= 1920 && nextY <= 2026) {
+        curYear = nextY;
+        syncActiveDecadeChip(curYear);
+        scrollToValue(scrollY, curYear, true);
+        updateDaysForSelection();
+        onDateWheelChange();
+      }
+    } else if (col === 'month') {
+      let nextM = dir === -1 ? curMonth - 1 : curMonth + 1;
+      if (nextM < 1) nextM = 12;
+      if (nextM > 12) nextM = 1;
+      curMonth = nextM;
+      scrollToValue(scrollM, curMonth, true);
+      updateDaysForSelection();
+      onDateWheelChange();
+    } else if (col === 'day') {
+      const maxD = getDaysInMonth(curYear, curMonth);
+      let nextD = dir === -1 ? curDay - 1 : curDay + 1;
+      if (nextD < 1) nextD = maxD;
+      if (nextD > maxD) nextD = 1;
+      curDay = nextD;
+      scrollToValue(scrollD, curDay, true);
+      onDateWheelChange();
+    }
+  }
+
+  // 모달 열기
+  function openPicker() {
+    let initDate = dateInput ? dateInput.value : '';
+    if (initDate && initDate.includes('-')) {
+      const parts = initDate.split('-');
+      curYear = parseInt(parts[0], 10) || 1971;
+      curMonth = parseInt(parts[1], 10) || 10;
+      curDay = parseInt(parts[2], 10) || 15;
+    } else {
+      curYear = 1971;
+      curMonth = 10;
+      curDay = 15;
+    }
+
+    updateDaysForSelection();
+    modal.style.display = 'flex';
+    syncActiveDecadeChip(curYear);
+
+    scrollToValue(scrollY, curYear, false);
+    scrollToValue(scrollM, curMonth, false);
+    scrollToValue(scrollD, curDay, false);
+    onDateWheelChange();
+
+    setTimeout(() => {
+      scrollToValue(scrollY, curYear, false);
+      scrollToValue(scrollM, curMonth, false);
+      scrollToValue(scrollD, curDay, false);
+      onDateWheelChange();
+    }, 40);
+  }
+
+  function closePicker() {
+    modal.style.display = 'none';
+  }
+
+  window.openWheelPicker = openPicker;
+  window.closeWheelPicker = closePicker;
+
+  triggerBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    openPicker();
+  });
+  triggerBtn.onclick = (e) => {
+    e.preventDefault();
+    openPicker();
+  };
+
+  if (closeBtn) closeBtn.onclick = closePicker;
+  const backdrop = document.getElementById('wheel-picker-backdrop');
+  if (backdrop) backdrop.onclick = closePicker;
+  modal.onclick = (e) => {
+    if (e.target === modal || e.target === backdrop) closePicker();
+  };
+
+  confirmBtn.onclick = () => {
+    const sYear = String(curYear);
+    const sMonth = String(curMonth).padStart(2, '0');
+    const sDay = String(curDay).padStart(2, '0');
+    const fullDate = `${sYear}-${sMonth}-${sDay}`;
+
+    if (dateInput) dateInput.value = fullDate;
+    if (yInput) yInput.value = sYear;
+    if (mInput) mInput.value = sMonth;
+    if (dInput) dInput.value = sDay;
+
+    if (displayText) {
+      displayText.textContent = `${sYear}년 ${curMonth}월 ${curDay}일`;
+      displayText.classList.remove('placeholder');
+    }
+
+    closePicker();
+  };
+}
+
 // 폼에서 사주 정보 읽기 (양력/음력·윤달 포함)
 function readFormProfile() {
   const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
   const leapEl = document.getElementById('is-leap-month');
+  let bDate = val('birth-date');
+  if (!bDate) {
+    const y = val('birth-year');
+    const m = val('birth-month');
+    const d = val('birth-day');
+    if (y && m && d) {
+      bDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+      const dateEl = document.getElementById('birth-date');
+      if (dateEl) dateEl.value = bDate;
+    }
+  }
   return {
-    birthDate: val('birth-date'),
+    birthDate: bDate,
     birthHour: parseInt(val('birth-hour'), 10),
     birthCity: val('birth-city'),
     gender: val('gender'),
@@ -800,8 +1258,12 @@ function setupForm() {
       const activeProfile = state.profiles.find(p => p.id === state.activeProfileId) || state.profiles[0] || null;
 
       // 1. 접힌 상태(원클릭 슈퍼패스 모드)이고 저장된 프로필이 있는 경우 -> 0.1초 즉시 추출!
-      if (state.inputMode === 'none' && activeProfile && activeProfile.birthDate) {
-        runAnalysis(activeProfile, 'results');
+      if (state.inputMode === 'none' && activeProfile) {
+        const cleanProf = {
+          ...activeProfile,
+          birthDate: normalizeBirthDate(activeProfile.birthDate)
+        };
+        runAnalysis(cleanProf, 'results');
         return;
       }
 
@@ -908,6 +1370,7 @@ function runAnalysis(profile, targetScreen = 'results') {
     console.error('사주 로또 분석 및 렌더링 오류:', err);
   }
 }
+window.runAnalysis = runAnalysis;
 
 function calculateSaju(dateStr, hour, city, gender, sheetVariant = 0) {
   const [year, month, day] = dateStr.split('-').map(Number);
@@ -954,89 +1417,64 @@ function calculateSaju(dateStr, hour, city, gender, sheetVariant = 0) {
   const seoncheon = SEONCHEON_MAP[minElement];
   const hucheon = HUCHEON_MAP[minElement];
 
-  // 5게임 구조: A~E 명확한 분류 및 친숙하고 쉬운 설명
+  // 5게임 구조: A~E 역할 분류 + 오늘의 십신(일진)에 따른 배합 (v5_lotto_engine.js)
   const games = [];
   const minObj = OHAENG_INFO[minElement];
   const parentMap = { wood: 'water', fire: 'wood', earth: 'fire', metal: 'earth', water: 'metal' };
   const parentElem = parentMap[minElement];
-  const minBalls = minObj.balls;
   const parentBalls = OHAENG_INFO[parentElem].balls;
   const RECENT_WINNING = LATEST_DRAW.numbers; // 직전 회차 당첨번호 (자동 연동)
 
-  const gameMeta = [
-    { tag: 'A', title: `부족한 ${minObj.name} 기운 보강 조합`, desc: `사주 맞춤수 + 1등 최다 당첨 번호` },
-    { tag: 'B', title: `선천수·후천수 길수 조합`, desc: `태어난 날 행운수 + 역대 인기 번호` },
-    { tag: 'C', title: `${OHAENG_INFO[parentElem].name}·${minObj.name} 상생 순환 조합`, desc: `기운을 돕는 상생수 + 자주 나온 번호` },
-    { tag: 'D', title: `최신 회차 흐름 연계 조합`, desc: `지난주 당첨 흐름수 + 내 사주 보완수` },
-    { tag: 'E', title: `5대 오행 황금 밸런스 조합`, desc: `5가지 기운 골고루 + 고른 번호대 조합` }
-  ];
-
-  // 1~45번 전체 대역(10번대, 20번대, 30번대, 40번대) 고른 번호 분배
-  const rawGames = [
-    // Game A: 부족한 기운 보강 (저번대, 중번대, 고번대에서 고르게 골라 담기)
-    [
-      minBalls[seed % 3], // 1~15 저번대
-      minBalls[3 + (seed % 3)], // 16~30 중번대
-      minBalls[6 + (seed % 3)], // 31~45 고번대
-      HOT_NUMBERS[(seed + 1) % HOT_NUMBERS.length],
-      HOT_NUMBERS[(seed + 4) % HOT_NUMBERS.length],
-      HOT_NUMBERS[(seed + 7) % HOT_NUMBERS.length]
-    ],
-    // Game B: 선천수·후천수 길수
-    [
-      minBalls[(seed + 2) % minBalls.length],
-      minBalls[(seed + 5) % minBalls.length],
-      HOT_NUMBERS[(seed + 2) % HOT_NUMBERS.length],
-      HOT_NUMBERS[(seed + 8) % HOT_NUMBERS.length],
-      HOT_NUMBERS[(seed + 12) % HOT_NUMBERS.length],
-      30 + ((seed * 7) % 15) + 1
-    ],
-    // Game C: 상생 순환 조합
-    [
-      parentBalls[seed % 4],
-      parentBalls[4 + (seed % 5)],
-      minBalls[(seed + 1) % 4],
-      minBalls[4 + ((seed + 2) % 5)],
-      HOT_NUMBERS[(seed + 3) % HOT_NUMBERS.length],
-      HOT_NUMBERS[(seed + 9) % HOT_NUMBERS.length]
-    ],
-    // Game D: 최신 회차 흐름 연계
-    [
-      RECENT_WINNING[seed % RECENT_WINNING.length],
-      RECENT_WINNING[(seed + 2) % RECENT_WINNING.length],
-      minBalls[(seed + 3) % minBalls.length],
-      minBalls[(seed + 7) % minBalls.length],
-      HOT_NUMBERS[(seed + 5) % HOT_NUMBERS.length],
-      HOT_NUMBERS[(seed + 10) % HOT_NUMBERS.length]
-    ],
-    // Game E: 5대 오행 황금 밸런스 (오행별 1개씩 고른 분포)
-    [
-      OHAENG_INFO.wood.balls[(seed + 1) % OHAENG_INFO.wood.balls.length],
-      OHAENG_INFO.fire.balls[(seed + 2) % OHAENG_INFO.fire.balls.length],
-      OHAENG_INFO.earth.balls[(seed + 3) % OHAENG_INFO.earth.balls.length],
-      OHAENG_INFO.metal.balls[(seed + 4) % OHAENG_INFO.metal.balls.length],
-      OHAENG_INFO.water.balls[(seed + 5) % OHAENG_INFO.water.balls.length],
-      HOT_NUMBERS[(seed + 6) % HOT_NUMBERS.length]
-    ]
-  ];
-
-  for (let g = 0; g < 5; g++) {
-    let u6 = Array.from(new Set(rawGames[g])).map(n => ((n - 1) % 45) + 1).slice(0, 6);
-    let fillIdx = 0;
-    while (u6.length < 6) {
-      let cand = HOT_NUMBERS[fillIdx % HOT_NUMBERS.length];
-      if (!u6.includes(cand)) u6.push(cand);
-      fillIdx++;
+  // 오늘의 일진 및 수호수 (v5_destiny_hub.js와 100% 일치 연동)
+  const HADO_NUMS = { wood: [3, 8], fire: [2, 7], earth: [5, 10], metal: [4, 9], water: [1, 6] };
+  let todayReading = null;
+  let guardianA = 9; // 기본값
+  let guardianB = 8; // 기본값
+  if (typeof SajuEngine !== 'undefined') {
+    if (chart && SajuEngine.dailyReading) {
+      try { todayReading = SajuEngine.dailyReading(chart.dayGan, new Date()); } catch (e) { todayReading = null; }
     }
-    u6.sort((a, b) => a - b);
-    games.push({
-      numbers: u6,
-      label: gameMeta[g].tag,
-      tag: gameMeta[g].tag,
-      title: gameMeta[g].title,
-      desc: gameMeta[g].desc
-    });
+    if (SajuEngine.todayPillar) {
+      const todayP = SajuEngine.todayPillar(new Date());
+      const todayGanIsYang = (todayP.idx % 2 === 0);
+      const hadoA = HADO_NUMS[todayP.ganEl] || [1, 6];
+      guardianA = todayGanIsYang ? hadoA[0] : hadoA[1];
+      const hadoB = HADO_NUMS[minElement] || [4, 9];
+      guardianB = (todayP.idx % 2 === 0) ? hadoB[0] : hadoB[1];
+      if (guardianA === guardianB) {
+        guardianB = (guardianA === hadoB[0]) ? hadoB[1] : hadoB[0];
+      }
+    }
   }
+  const todayGod = todayReading ? todayReading.god : null;
+  const todayKey = todayReading ? todayReading.key : new Date().toISOString().slice(0, 10);
+  const dayEl = chart ? chart.dayGanEl : maxElement;
+
+  const lotto = LottoEngine.generateGames({
+    key: `${dateStr}|${hour}|${city}|${gender}|${todayKey}|r${getTargetRound()}|v${sheetVariant}`,
+    minElement, dayEl, god: todayGod,
+    hucheon, recent: RECENT_WINNING, hot: HOT_NUMBERS, cold: COLD_NUMBERS,
+    guardianA, guardianB
+  });
+  const godTag = todayGod ? `오늘 ${todayGod}운` : '오늘의 기운';
+
+  const gameMeta = {
+    A: { title: `부족한 ${minObj.name} 기운 보강 조합`, desc: `오늘의 수호수(${guardianB}·${guardianA}) + 결핍 보강` },
+    B: { title: `선천수·후천수 길수 조합`, desc: `후천수(끝자리) + ${godTag}` },
+    C: { title: `${OHAENG_INFO[parentElem].name}·${minObj.name} 상생 순환 조합`, desc: `기운을 돕는 상생수 + ${godTag}` },
+    D: { title: `사주 본원 귀인 조력 조합`, desc: `나를 돕는 귀인수 + ${godTag}` },
+    E: { title: `5대 오행 황금 밸런스 조합`, desc: `5가지 기운 골고루 + ${godTag}` }
+  };
+
+  lotto.games.forEach((g) => {
+    games.push({
+      numbers: g.numbers,
+      label: g.role,
+      tag: g.role,
+      title: gameMeta[g.role].title,
+      desc: gameMeta[g.role].desc
+    });
+  });
 
   const DIRECTIONS = {
     wood: {

@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>사주로또 v4 - 이번 주 로또번호부터 평생 쓰는 내 운명수까지</title>
+  <title>사주로또 v5 - 이번 주 로또 5게임부터 나와 가족의 평생 운명수까지</title>
   <meta name="description" content="출생지 시차보정 사주 분석으로 이번 주 로또번호와 평생 쓰는 전화번호·비밀번호·차량번호 운명수를 추천합니다. 번호를 고른 이유까지 공개합니다.">
-  <link rel="stylesheet" href="v4_style.css?v=4.0">
+  <link rel="stylesheet" href="v5_style.css?v=7.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
@@ -35,7 +35,7 @@
           <span class="brand-kor">사주로또</span>
           <span class="brand-badge-ai">AI 명리 분석</span>
         </h1>
-        <span class="brand-sub">이번 주 로또번호부터 <strong class="brand-sub-hl">평생 쓰는 내 전화번호까지</strong></span>
+        <span class="brand-sub">이번 주 로또 5게임부터 <strong class="brand-sub-hl">나와 가족의 평생 운명수까지</strong></span>
       </div>
     </div>
     <div class="header-actions">
@@ -79,7 +79,7 @@
         <!-- 우측: 다음 회차 판매 현황 (1분마다 자동 갱신) -->
         <div class="board-pane pane-next">
           <div class="pane-head">
-            <h2 class="pane-title" id="next-round-tag">다음 회차(1246회) 판매 현황</h2>
+            <h2 class="pane-title" id="next-round-tag">다음 1246회 판매 현황</h2>
           </div>
           <span class="pane-live-time" id="sales-update-time">[10월 12일, 11시 현재]</span>
           <div class="pane-stat-grid">
@@ -102,101 +102,148 @@
       <!-- 로또 메인 카드: 내 사주 기운 맞춤 로또 5게임 추출 -->
       <section class="card-lotto-extract" id="lotto-extract-card">
         <div class="extract-card-header">
-          <h2 class="extract-title">🎯 동행복권 나만의 맞춤 추출</h2>
+          <h2 class="extract-title">동행복권 나만의 맞춤 추출</h2>
           <p class="extract-sub">내 생년월일의 타고난 오행과 당일 기운을 조화시킨 황금 5게임</p>
         </div>
+
+        <!-- 다중 프로필 탭 바 (가족 등록 시 자동 노출) -->
+        <div id="profile-tabs-bar" class="profile-tabs-bar" style="display: none;"></div>
 
         <!-- 재방문 유저용 스마트 프로필 알림 바 (기존 입력 이력 있을 때 자동 노출) -->
         <div id="saved-profile-banner" class="saved-profile-banner" style="display: none;">
           <div class="saved-profile-info">
-            <span class="saved-profile-icon">👤</span>
-            <span class="saved-profile-text" id="saved-profile-text">내 사주 정보가 기억되어 자동 적용되었습니다</span>
+            <span class="saved-profile-text" id="saved-profile-text">저장된 내 사주가 자동 적용되었습니다</span>
           </div>
-          <button type="button" id="btn-reset-profile" class="btn-reset-profile" title="다른 사람 사주 입력">새로 입력 🔄</button>
+          <div class="saved-profile-actions">
+            <button type="button" id="btn-edit-profile" class="btn-profile-action" title="사주 정보 수정">수정</button>
+            <button type="button" id="btn-add-family" class="btn-profile-action highlight" title="가족 사주 추가">가족 추가</button>
+          </div>
         </div>
 
         <form id="saju-form">
-          <!-- 1줄: 생년월일 + 출생 시간 -->
-          <div class="form-grid-2x2">
-            <div class="form-group-box">
-              <label for="birth-date" class="label-with-chip">
-                <span id="birth-date-label">생년월일 (양력)</span>
-                <span class="leap-chip" id="leap-month-wrap" style="display: none;">
-                  <input type="checkbox" id="is-leap-month"> 윤달
-                </span>
-              </label>
-              <input type="date" id="birth-date" value="" min="1900-01-01" max="2029-12-31" required>
+          <!-- 접기/펼치기 아코디언 컨테이너 (저장된 사주가 있으면 기본 접힘) -->
+          <div id="saju-inputs-collapse" class="saju-inputs-collapse">
+            
+            <!-- 가족/지인 추가 시에만 열리는 관계/호칭 선택 바 -->
+            <div id="family-relation-field" class="family-relation-field" style="display: none;">
+              <span class="relation-label">관계 선택:</span>
+              <div class="relation-chips" id="relation-chips-group">
+                <button type="button" class="rel-chip active" data-rel="배우자">배우자</button>
+                <button type="button" class="rel-chip" data-rel="아들">아들</button>
+                <button type="button" class="rel-chip" data-rel="딸">딸</button>
+                <button type="button" class="rel-chip" data-rel="부모님">부모님</button>
+                <button type="button" class="rel-chip" data-rel="친구">친구·연인</button>
+                <button type="button" class="rel-chip" data-rel="기타">기타(직접입력)</button>
+              </div>
+              <input type="text" id="custom-rel-name" class="custom-rel-input" placeholder="호칭 직접 입력" maxlength="6" style="display: none;">
             </div>
-            <div class="form-group-box">
-              <label for="birth-hour">출생 시간</label>
-              <select id="birth-hour" required>
-                <option value="" disabled selected>출생 시간 선택</option>
-                <option value="12">오시 (11:30~13:29)</option>
-                <option value="0">자시 (23:30~01:29)</option>
-                <option value="2">축시 (01:30~03:29)</option>
-                <option value="4">인시 (03:30~05:29)</option>
-                <option value="6">묘시 (05:30~07:29)</option>
-                <option value="8">진시 (07:30~09:29)</option>
-                <option value="10">사시 (09:30~11:29)</option>
-                <option value="14">미시 (13:30~15:29)</option>
-                <option value="16">신시 (15:30~17:29)</option>
-                <option value="18">유시 (17:30~19:29)</option>
-                <option value="20">술시 (19:30~21:29)</option>
-                <option value="22">해시 (21:30~23:29)</option>
-                <option value="-1">시간 모름</option>
-              </select>
+
+            <!-- 1줄: 생년월일(년·월·일 넉넉한 공간) + 양력/음력 토글 -->
+            <div class="form-row-ymd-cal">
+              <div class="form-group-box form-box-ymd">
+                <label for="birth-date" class="label-with-chip">
+                  <span id="birth-date-label">생년월일</span>
+                  <span class="leap-chip" id="leap-month-wrap" style="display: none;">
+                    <input type="checkbox" id="is-leap-month"> 윤달
+                  </span>
+                </label>
+                <button type="button" id="birth-date-trigger" class="birth-date-trigger-btn" onclick="if(window.openWheelPicker) window.openWheelPicker();" aria-label="생년월일 선택">
+                  <span class="trigger-icon">📅</span>
+                  <span id="birth-date-display-text" class="trigger-text placeholder">생년월일</span>
+                  <span class="trigger-arrow">▼</span>
+                </button>
+                <input type="hidden" id="birth-date" value="">
+                <input type="hidden" id="birth-year" value="">
+                <input type="hidden" id="birth-month" value="">
+                <input type="hidden" id="birth-day" value="">
+              </div>
+
+              <div class="form-group-box form-box-cal">
+                <label class="label-muted">구분</label>
+                <input type="hidden" id="calendar-type" value="solar">
+                <div class="seg-toggle" data-target="calendar-type" role="group" aria-label="양력 음력 선택">
+                  <button type="button" class="seg-btn active" id="btn-cal-solar" data-value="solar" aria-pressed="true">양력</button>
+                  <button type="button" class="seg-btn" id="btn-cal-lunar" data-value="lunar" aria-pressed="false">음력</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2줄: 출생시간 · 출생지역 · 성별 3박스 황금비율 배치 -->
+            <div class="form-row-time-city-gender">
+              <div class="form-group-box form-box-time">
+                <label for="birth-hour">출생 시간</label>
+                <select id="birth-hour" class="pill-select" aria-label="출생 시간">
+                  <option value="" selected>출생시간</option>
+                  <option value="12">오시 (11:30~13:29)</option>
+                  <option value="0">자시 (23:30~01:29)</option>
+                  <option value="2">축시 (01:30~03:29)</option>
+                  <option value="4">인시 (03:30~05:29)</option>
+                  <option value="6">묘시 (05:30~07:29)</option>
+                  <option value="8">진시 (07:30~09:29)</option>
+                  <option value="10">사시 (09:30~11:29)</option>
+                  <option value="14">미시 (13:30~15:29)</option>
+                  <option value="16">신시 (15:30~17:29)</option>
+                  <option value="18">유시 (17:30~19:29)</option>
+                  <option value="20">술시 (19:30~21:29)</option>
+                  <option value="22">해시 (21:30~23:29)</option>
+                  <option value="-1">시간 모름</option>
+                </select>
+              </div>
+
+              <div class="form-group-box form-box-city">
+                <label for="birth-city">출생지역</label>
+                <select id="birth-city" class="pill-select" aria-label="출생 지역 (시차보정)">
+                  <option value="" selected>출생지역</option>
+                  <option value="seoul">서울·경기</option>
+                  <option value="busan">부산·경남</option>
+                  <option value="daegu">대구·경북</option>
+                  <option value="incheon">인천</option>
+                  <option value="gwangju">광주·전남</option>
+                  <option value="daejeon">대전·충청</option>
+                  <option value="ulsan">울산</option>
+                  <option value="gangwon">강원</option>
+                  <option value="jeju">제주</option>
+                </select>
+              </div>
+
+              <div class="form-group-box form-box-gender">
+                <label class="label-muted">성별</label>
+                <input type="hidden" id="gender" value="male">
+                <div class="seg-toggle" data-target="gender" role="group" aria-label="성별 선택">
+                  <button type="button" class="seg-btn active" id="btn-gender-male" data-value="male" aria-pressed="true">남</button>
+                  <button type="button" class="seg-btn" id="btn-gender-female" data-value="female" aria-pressed="false">여</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 입력/수정 완료 액션 바 -->
+            <div id="collapse-action-bar" class="collapse-action-bar" style="display: none;">
+              <button type="button" id="btn-save-profile-input" class="btn-save-profile">입력 정보 저장</button>
+              <button type="button" id="btn-cancel-profile-input" class="btn-cancel-profile">접기 / 취소</button>
             </div>
           </div>
 
-          <!-- 2줄: 양력/음력 · 출생지역 · 성별 3버튼 -->
-          <div class="form-row-3">
-            <input type="hidden" id="calendar-type" value="solar">
-            <div class="seg-toggle" data-target="calendar-type" role="group" aria-label="양력 음력 선택">
-              <button type="button" class="seg-btn active" id="btn-cal-solar" data-value="solar" aria-pressed="true">양력</button>
-              <button type="button" class="seg-btn" id="btn-cal-lunar" data-value="lunar" aria-pressed="false">음력</button>
-            </div>
-
-            <select id="birth-city" class="pill-select" aria-label="출생 지역 (시차보정)" required>
-              <option value="" disabled selected>📍 출생지역</option>
-              <option value="seoul">서울·경기</option>
-              <option value="busan">부산·경남</option>
-              <option value="daegu">대구·경북</option>
-              <option value="incheon">인천</option>
-              <option value="gwangju">광주·전남</option>
-              <option value="daejeon">대전·충청</option>
-              <option value="ulsan">울산</option>
-              <option value="gangwon">강원</option>
-              <option value="jeju">제주</option>
-            </select>
-
-            <input type="hidden" id="gender" value="">
-            <div class="seg-toggle" data-target="gender" role="group" aria-label="성별 선택">
-              <button type="button" class="seg-btn" id="btn-gender-male" data-value="male" aria-pressed="false">남</button>
-              <button type="button" class="seg-btn" id="btn-gender-female" data-value="female" aria-pressed="false">여</button>
-            </div>
-          </div>
-
-          <!-- 1순위 메인: 로또 5게임 추출 버튼 -->
+          <!-- 1순위 메인: 로또 5게임 추출 버튼 (원클릭 슈퍼패스) -->
           <button type="submit" id="btn-submit-form" class="btn-lotto-extract-main">
-            <span id="btn-submit-text">🎰 이번 주 1246회 행운 5게임 추출하기</span>
+            <span id="btn-submit-text">이번 주 1246회 행운 5게임 추출하기</span>
           </button>
 
           <div class="extract-trust-foot">
-            <span>🛡️ 100% 기기 내 연산 · 개인정보 외부 전송 0%</span>
-            <span>🔑 왜 이 번호인지 추출 근거 공개</span>
+            <span>100% 기기 내 연산 · 개인정보 외부 전송 0%</span>
+            <span>왜 이 번호인지 추출 근거 공개</span>
           </div>
         </form>
       </section>
 
-      <!-- 대표님 지시: 사주에 더 관심 있는 사람만 누르는 별도 평생수 배너 -->
+      <!-- 오늘의 맞춤 사주 & 평생 운명수 배너 (대표님 1안 & 문구 A안 선정) -->
       <section class="banner-destiny-gateway" id="banner-destiny-gateway">
         <div class="gateway-text-wrap">
-          <span class="gateway-badge">사주 심층 분석</span>
-          <strong class="gateway-title">📱 평생 쓰는 내 운명수도 궁금하신가요?</strong>
-          <span class="gateway-desc">선천수·후천수로 푸는 내 전화번호 뒷자리 · 통장 비밀번호 · 차량번호</span>
+          <span class="gateway-badge">✨ 오늘의 사주 &amp; 운명수</span>
+          <strong class="gateway-title">오늘 해야 할 일과 피해야 할 일</strong>
+          <span class="gateway-desc">당일 맞춤 길흉부터 평생 쓰는 전화 · 차량번호까지</span>
         </div>
         <button type="button" id="btn-open-destiny-gateway" class="btn-gateway-go">
-          확인하기 ›
+          운명수 보기 ›
         </button>
       </section>
 
@@ -208,10 +255,10 @@
       <!-- 결과 상단 네비게이션: 다시 뽑기 & 평생수 전환 버튼 -->
       <div class="result-action-bar">
         <button id="btn-back-to-input" class="btn-sub-nav" type="button">
-          ‹ 다시 입력
+          ‹ 메인 화면으로 돌아가기 (다시 입력)
         </button>
         <button id="btn-switch-to-destiny" class="btn-highlight-nav" type="button">
-          📱 내 평생 운명수(전화·비번·차량) 보기 ›
+          오늘의 사주 · 평생 운명수 보기 ›
         </button>
       </div>
 
@@ -219,24 +266,15 @@
       <main id="view-lotto">
         <section id="lotto-result-section">
 
-          <!-- 다중 장수(1만원, 2만원) 전환 탭 -->
-          <div id="ticket-sheet-nav" class="ticket-sheet-nav" style="display: none;">
-            <div class="sheet-tabs-wrap" id="sheet-tabs-wrap">
-              <!-- JS 동적 탭 -->
-            </div>
-            <button id="btn-toggle-all-sheets" class="btn-toggle-sheets" type="button">전체 펼쳐보기 ▾</button>
-          </div>
-
-          <!-- 사주 명리 정밀 진단 & 오행 숫자 처방 카드 (대표님 지시: 티켓 바로 위 장착) -->
+          <!-- 사주 명리 정밀 진단 & 오행 숫자 처방 카드 (대표님 지시: 최상단 배치) -->
           <section id="saju-summary-bar" class="saju-diagnosis-card">
             <!-- 상단 헤더: 생년월일 + 발행 장수 + 사주 변경 버튼 -->
             <div class="diagnosis-top-row">
               <div class="diagnosis-meta">
-                <span class="diagnosis-icon">🔮</span>
                 <span class="diagnosis-subject" id="diagnosis-title">사주 명리 정밀 진단</span>
                 <span class="diagnosis-amount-badge" id="diagnosis-amount-badge">1장 (5게임)</span>
               </div>
-              <button id="btn-toggle-saju" class="btn-toggle-saju" type="button">사주 변경 ✏️</button>
+              <button id="btn-toggle-saju" class="btn-toggle-saju" type="button">사주 변경</button>
             </div>
 
             <!-- 1행: 오행 기운 진단 (왕성한 기운 vs 부족한 결핍 기운) -->
@@ -247,14 +285,14 @@
               </div>
               <div class="element-diag-chip chip-weak">
                 <span class="diag-label">결핍 기운</span>
-                <strong id="diag-weak-elem">금(金) 부족 ⚠️ 보강</strong>
+                <strong id="diag-weak-elem">금(金) 부족 · 보강</strong>
               </div>
             </div>
 
             <!-- 2행: 숫자 처방 근거 (선천수 · 상생수 · 보완수) -->
             <div class="diagnosis-prescription-row">
               <div class="prescription-line">
-                <span class="prescript-badge">🔑 숫자 처방</span>
+                <span class="prescript-badge">숫자 처방</span>
                 <span class="prescript-detail" id="diag-prescript-numbers">
                   선천수 <strong>4, 9</strong> · 후천수 <strong>6, 7</strong> · 상생 보완수 <strong>5, 10</strong>
                 </span>
@@ -264,6 +302,14 @@
               </p>
             </div>
           </section>
+
+          <!-- 다중 장수(1만원, 2만원) 전환 탭 (대표님 지시: 사주 진단 카드와 티켓 사이로 위치 재배치) -->
+          <div id="ticket-sheet-nav" class="ticket-sheet-nav" style="display: none;">
+            <div class="sheet-tabs-wrap" id="sheet-tabs-wrap">
+              <!-- JS 동적 탭 -->
+            </div>
+            <button id="btn-toggle-all-sheets" class="btn-toggle-sheets" type="button">전체 펼쳐보기 ▾</button>
+          </div>
 
           <!-- 동행복권 실전 영수증 스타일 티켓 -->
           <div class="compact-ticket" id="compact-ticket">
@@ -278,12 +324,6 @@
               </div>
             </div>
 
-            <!-- 이번 주 조화 배합 1줄 요약 뱃지 -->
-            <div class="ticket-harmony-summary" id="ticket-harmony-summary">
-              <span class="harmony-tag">명리 배합:</span>
-              <span class="harmony-text" id="ticket-harmony-text">선천수 4, 9 · 후천수 6, 7 · 용신 보완수 5, 10 중심 5게임 큐레이션</span>
-            </div>
-
             <!-- 게임 목록 (A~E) -->
             <div id="ticket-games">
               <!-- JS 동적 렌더링 -->
@@ -292,12 +332,12 @@
             <!-- 추천 방위 & 최적 구매 시간 안내 카드 -->
             <div class="ticket-lucky-guide">
               <div class="guide-header">
-                <span class="guide-badge">🌟 복권 구매 명리 비책</span>
-                <span class="guide-origin-note">📍 기준: <strong>자택 또는 직장(현재 위치)</strong></span>
+                <span class="guide-badge">복권 구매 명리 비책</span>
+                <span class="guide-origin-note">기준: <strong>자택 또는 직장(현재 위치)</strong></span>
               </div>
               <div class="guide-cards-grid">
                 <div class="guide-card guide-direction">
-                  <div class="guide-icon-wrap">🧭</div>
+                  <div class="guide-icon-wrap">방위</div>
                   <div class="guide-info">
                     <div class="guide-label">추천 구매 방위</div>
                     <div class="guide-main-val" id="ticket-direction">-</div>
@@ -305,7 +345,7 @@
                   </div>
                 </div>
                 <div class="guide-card guide-time">
-                  <div class="guide-icon-wrap">⏰</div>
+                  <div class="guide-icon-wrap">길시</div>
                   <div class="guide-info">
                     <div class="guide-label">최적 구매 길시(吉時)</div>
                     <div class="guide-main-val" id="ticket-time">-</div>
@@ -316,36 +356,37 @@
             </div>
           </div>
 
-          <!-- 복권방 현장 즉시 구매 퀵 툴 (OMR 마킹 뷰 & 모바일 슬립지 QR) -->
-          <div class="purchase-tools-group">
-            <button id="btn-open-omr" class="btn-tool-omr" type="button">
-              <span class="tool-icon">🔴</span>
-              <div class="tool-text">
-                <span class="tool-title">실제 로또 OMR 종이 마킹 뷰</span>
-                <span class="tool-sub">복권방 빨간 슬립지 1:1 싱크 마킹</span>
-              </div>
-            </button>
-            <button id="btn-open-qr" class="btn-tool-qr" type="button">
-              <span class="tool-icon">📱</span>
-              <div class="tool-text">
-                <span class="tool-title">로또 바로 구매 QR</span>
-                <span class="tool-sub">복권방에서 대면 마킹 없이 출력</span>
-              </div>
-            </button>
-          </div>
-
-          <!-- 티켓 액션 버튼군 -->
+          <!-- 대표님 지시 1 & 2: 3개 퀵 액션 박스 1열 병렬 나열 & (+5천원) 삭제 -->
           <div class="ticket-action-group">
-            <button id="btn-add-sheet" class="btn-add-sheet" type="button">
-              <span class="reward-tag">🎬 5초 무료</span>
-              <span class="reward-text">추가 5게임 더 뽑기 (+5천원 다른 조화 조합)</span>
-            </button>
-            <div class="save-vault-row">
-              <button id="btn-save-numbers" class="btn-save-compact" type="button">
-                💾 이번 번호 내 폰에 보관하기
+            <!-- 1행: 3열 병렬 퀵 툴 (OMR 마킹 / 구매 QR / 보관함 보기) -->
+            <div class="purchase-tools-trio">
+              <button id="btn-open-omr" class="btn-tool-trio tool-omr" type="button">
+                <strong class="trio-title">실제 로또 OMR 종이 마킹 뷰</strong>
+                <span class="trio-sub">복권방 빨간 슬립지 1:1 마킹</span>
               </button>
-              <button id="btn-open-vault" class="btn-vault-open" type="button">
-                📂 보관함 보기 (<span id="saved-count-badge">0</span>)
+              <button id="btn-open-qr" class="btn-tool-trio tool-qr" type="button">
+                <strong class="trio-title">로또 바로 구매 QR</strong>
+                <span class="trio-sub">복권방에서 대면 마킹 없이 출력</span>
+              </button>
+              <button id="btn-open-vault" class="btn-tool-trio tool-vault" type="button">
+                <strong class="trio-title">보관함 보기 (<span id="saved-count-badge">0</span>)</strong>
+                <span class="trio-sub">내 폰에 자동보관 완료</span>
+              </button>
+            </div>
+
+            <!-- 2행: 추가 5게임 정밀 추출 대형 버튼 -->
+            <button id="btn-add-sheet" class="btn-add-sheet" type="button">
+              <span class="reward-tag">1,000원</span>
+              <span class="reward-text">추가 5게임 정밀 추출 (다른 오행 배합)</span>
+            </button>
+
+            <!-- 히든 호환 엘리먼트 -->
+            <button id="btn-save-numbers" type="button" style="display: none;"></button>
+
+            <!-- 결과 하단 명확한 메인 뒤로가기 버튼 -->
+            <div class="result-bottom-back-wrap" style="margin-top: 14px;">
+              <button type="button" class="btn-result-back-main" onclick="showScreen('main')">
+                ‹ 메인 화면으로 돌아가기 (다시 입력)
               </button>
             </div>
           </div>
@@ -360,7 +401,7 @@
         <button id="btn-back-to-lotto-ticket" class="btn-sub-nav" type="button">
           ‹ 로또 번호 티켓으로 돌아가기
         </button>
-        <span class="destiny-nav-tag">📜 사주 평생수 심층 리포트</span>
+        <span class="destiny-nav-tag">오늘의 사주 &amp; 평생 운명수</span>
       </div>
       <section id="destiny-content">
         <!-- JS에서 사주 & 평생 운명수(전화·비번·차량번호) 렌더링 -->
@@ -374,12 +415,12 @@
 
   </div>
 
-  <!-- ================= [최하단 고정: 💰 수익화 배너 슬롯 (Ad Slot)] ================= -->
+  <!-- ================= [최하단 고정: 수익화 배너 슬롯 (Ad Slot)] ================= -->
   <aside class="fixed-bottom-ad-bar" id="fixed-bottom-ad-bar" aria-label="스폰서 광고 영역">
     <div class="ad-inner-wrap">
       <div class="ad-badge-tag">AD</div>
       <div class="ad-content-text">
-        <strong class="ad-title-hl">✨ [프리미엄 멤버십] 월 1,900원</strong>
+        <strong class="ad-title-hl">[프리미엄 멤버십] 월 1,900원</strong>
         <span class="ad-desc-sub">광고 100% 제거 &amp; 평생 운명수(전화+비번+차량) 완결판 리포트</span>
       </div>
       <button type="button" class="btn-ad-cta" id="btn-ad-upgrade">혜택보기 ›</button>
@@ -392,16 +433,13 @@
     <div class="modal-dialog">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <h3 class="modal-title">📂 내 행운 번호 보관함</h3>
+          <h3 class="modal-title">내 행운 번호 보관함</h3>
           <span class="modal-subtitle">내 폰에 안전하게 보관된 사주 번호 목록입니다.</span>
         </div>
         <button type="button" class="btn-modal-close" id="btn-close-vault" aria-label="닫기">✕</button>
       </div>
       <div class="modal-body" id="vault-list-container">
         <!-- JS 동적 렌더링 -->
-      </div>
-      <div class="vault-disclaimer-notice">
-        ※ 본 당첨 결과 대조는 참고용이며, 실제 당첨 여부는 동행복권 실물 영수증 QR로 반드시 재확인하시기 바랍니다.
       </div>
       <div class="modal-footer">
         <button type="button" id="btn-clear-vault" class="btn-modal-sub">전체 비우기</button>
@@ -416,7 +454,7 @@
     <div class="modal-dialog modal-omr-dialog">
       <div class="modal-header omr-modal-header-slim">
         <div class="modal-title-wrap">
-          <h3 class="modal-title">🔴 실제 로또 6/45 OMR 마킹 종이</h3>
+          <h3 class="modal-title">실제 로또 6/45 OMR 마킹 종이</h3>
         </div>
         <button type="button" class="btn-modal-close" id="btn-close-omr" aria-label="닫기">✕</button>
       </div>
@@ -429,7 +467,7 @@
         </div>
       </div>
       <div class="modal-footer omr-modal-footer-slim">
-        <span class="omr-guide-tip">💡 빨간 OMR 종이에 검정 컴퓨터용 싸인펜으로 칠하듯 1:1 마킹하세요!</span>
+        <span class="omr-guide-tip">빨간 OMR 종이에 검정 컴퓨터용 싸인펜으로 칠하듯 1:1 마킹하세요!</span>
         <button type="button" id="btn-confirm-omr" class="btn-modal-primary btn-slim-confirm">확인 완료</button>
       </div>
     </div>
@@ -545,6 +583,100 @@
     </div>
   </div>
 
-  <script src="v4_app.js?v=4.0"></script>
+  <!-- 생년월일 3열 롤링 휠 피커 모달 (보관함/QR 확인창과 동일한 다크 골드 컴팩트 다이얼로그) -->
+  <div id="wheel-picker-modal" class="app-modal" style="display: none;">
+    <div class="modal-backdrop" id="wheel-picker-backdrop"></div>
+    <div class="modal-dialog wheel-modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h3 class="modal-title">생년월일 선택</h3>
+          <span class="modal-subtitle">출생 연도 · 월 · 일을 간편하게 선택해 주세요</span>
+        </div>
+        <button type="button" id="btn-close-wheel-picker" class="btn-modal-close" aria-label="닫기">✕</button>
+      </div>
+
+      <div class="modal-body wheel-modal-body">
+        <!-- 빠른 연대 바로가기 칩 (50년대~00년대 1초 점프) -->
+        <div class="quick-decade-chips">
+          <button type="button" class="decade-chip" data-year="1950">50년대</button>
+          <button type="button" class="decade-chip" data-year="1960">60년대</button>
+          <button type="button" class="decade-chip" data-year="1970">70년대</button>
+          <button type="button" class="decade-chip" data-year="1980">80년대</button>
+          <button type="button" class="decade-chip" data-year="1990">90년대</button>
+          <button type="button" class="decade-chip" data-year="2000">00년대</button>
+        </div>
+
+        <!-- 조작 가이드 안내 문구 -->
+        <div class="wheel-guide-hint">
+          <span>👆 화살표(▲▼) 터치 또는 숫자를 위아래로 밀어 굴리기</span>
+        </div>
+
+        <!-- 3열 롤링 휠 & 화살표 제어 컨테이너 -->
+        <div class="wheel-control-board">
+          <!-- 상단 헤더 & ▲ 버튼 -->
+          <div class="wheel-stepper-row header-row">
+            <div class="wheel-stepper-cell">
+              <span class="stepper-label">출생연도</span>
+              <button type="button" class="btn-stepper btn-stepper-up" data-col="year" data-dir="-1" aria-label="연도 올리기">▲</button>
+            </div>
+            <div class="wheel-stepper-cell">
+              <span class="stepper-label">월</span>
+              <button type="button" class="btn-stepper btn-stepper-up" data-col="month" data-dir="-1" aria-label="월 올리기">▲</button>
+            </div>
+            <div class="wheel-stepper-cell">
+              <span class="stepper-label">일</span>
+              <button type="button" class="btn-stepper btn-stepper-up" data-col="day" data-dir="-1" aria-label="일 올리기">▲</button>
+            </div>
+          </div>
+
+          <!-- 3열 롤링 휠 컨테이너 (컴팩트 3행 132px, 여백 거품 완벽 제거!) -->
+          <div class="wheel-columns-wrap">
+            <div class="wheel-selection-lens"></div>
+
+            <!-- 1열: 연도 휠 -->
+            <div class="wheel-col" id="wheel-col-year">
+              <div class="wheel-scroll" id="wheel-scroll-year"></div>
+            </div>
+
+            <!-- 2열: 월 휠 -->
+            <div class="wheel-col" id="wheel-col-month">
+              <div class="wheel-scroll" id="wheel-scroll-month"></div>
+            </div>
+
+            <!-- 3열: 일 휠 -->
+            <div class="wheel-col" id="wheel-col-day">
+              <div class="wheel-scroll" id="wheel-scroll-day"></div>
+            </div>
+          </div>
+
+          <!-- 하단 ▼ 버튼 -->
+          <div class="wheel-stepper-row footer-row">
+            <div class="wheel-stepper-cell">
+              <button type="button" class="btn-stepper btn-stepper-down" data-col="year" data-dir="1" aria-label="연도 내리기">▼</button>
+            </div>
+            <div class="wheel-stepper-cell">
+              <button type="button" class="btn-stepper btn-stepper-down" data-col="month" data-dir="1" aria-label="월 내리기">▼</button>
+            </div>
+            <div class="wheel-stepper-cell">
+              <button type="button" class="btn-stepper btn-stepper-down" data-col="day" data-dir="1" aria-label="일 내리기">▼</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 선택 완료 버튼 -->
+      <div class="modal-footer wheel-modal-footer">
+        <button type="button" id="btn-confirm-wheel-picker" class="btn-modal-primary" style="width: 100%;">
+          <span id="wheel-preview-date">1971년 10월 15일</span> 선택 완료
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="v5_saju_engine.js?v=5.0"></script>
+  <script src="v5_lotto_engine.js?v=5.1"></script>
+  <script src="v5_daily_content.js?v=5.0"></script>
+  <script src="v5_destiny_hub.js?v=5.3"></script>
+  <script src="v5_app.js?v=7.0"></script>
 </body>
 </html>
