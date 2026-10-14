@@ -709,12 +709,34 @@ function updateDiagnosisCard(saju) {
   }
 
   const weakElemEl = document.getElementById('diag-weak-elem');
-  if (weakElemEl && saju.lackingElement) {
-    const minPct = saju.ohaengPercent[saju.minElement] || 0;
-    weakElemEl.innerText = `${saju.lackingElement.name} 결핍 (${minPct}%) ⚠️ 보강`;
+  const prescriptNumbersEl = document.getElementById('diag-prescript-numbers');
+  const prescriptCommentEl = document.getElementById('diag-prescript-comment');
+
+  const EL_KOR_MAP = { wood: '목(木)', fire: '화(火)', earth: '토(土)', metal: '금(金)', water: '수(水)' };
+  const EL_SHORT_MAP = { wood: '목', fire: '화', earth: '토', metal: '금', water: '수' };
+
+  // 0%인 결핍 오행 모두 추출 (우선순위 minElement 먼저)
+  const zeroElems = [];
+  if (saju.minElement && ((saju.ohaengPercent && saju.ohaengPercent[saju.minElement] === 0) || (saju.chart && saju.chart.counts && saju.chart.counts[saju.minElement] === 0))) {
+    zeroElems.push(saju.minElement);
+  }
+  const elOrder = ['wood', 'fire', 'earth', 'metal', 'water'];
+  elOrder.forEach(el => {
+    const isZero = (saju.ohaengPercent && saju.ohaengPercent[el] === 0) || (saju.chart && saju.chart.counts && saju.chart.counts[el] === 0);
+    if (isZero && !zeroElems.includes(el)) {
+      zeroElems.push(el);
+    }
+  });
+
+  if (weakElemEl) {
+    if (zeroElems.length > 0) {
+      weakElemEl.innerText = zeroElems.map(el => EL_KOR_MAP[el] || el).join(' · ') + ' (0%)';
+    } else if (saju.lackingElement) {
+      const minPct = saju.ohaengPercent[saju.minElement] || 0;
+      weakElemEl.innerText = `${saju.lackingElement.name} (${minPct}%)`;
+    }
   }
 
-  const prescriptNumbersEl = document.getElementById('diag-prescript-numbers');
   if (prescriptNumbersEl) {
     const sc = saju.seoncheon ? saju.seoncheon.join(', ') : '';
     const hc = saju.hucheon ? saju.hucheon.join(', ') : '';
@@ -723,11 +745,18 @@ function updateDiagnosisCard(saju) {
     prescriptNumbersEl.innerHTML = `선천수 <strong>${sc}</strong> · 후천수 <strong>${hc}</strong> · 상생 보완수 <strong>${parentName} (${parentBalls})</strong>`;
   }
 
-  const prescriptCommentEl = document.getElementById('diag-prescript-comment');
   if (prescriptCommentEl && saju.lackingElement) {
     const lackName = saju.lackingElement.name;
     const parentName = saju.parentElemObj ? saju.parentElemObj.name : '상생';
-    prescriptCommentEl.innerHTML = `"부족한 <strong>${lackName}</strong> 기운을 보완해야 ${saju.lackingElement.symbol}의 결실이 맺히므로, <strong>${parentName}·${lackName}</strong> 번호를 중심으로 황금 배합했습니다."`;
+    let lackIntro = '';
+    if (zeroElems.length > 1) {
+      const shortList = zeroElems.map(el => EL_SHORT_MAP[el] || el).join(', ');
+      lackIntro = `부족한 ${shortList} 기운을 보완해야`;
+    } else {
+      const shortSingle = EL_SHORT_MAP[saju.minElement] || '부족한';
+      lackIntro = `부족한 ${shortSingle} 기운을 보완해야`;
+    }
+    prescriptCommentEl.innerHTML = `"${lackIntro} ${saju.lackingElement.symbol}의 결실이 맺히므로, <strong>${parentName}·${lackName}</strong> 번호를 중심으로 황금 배합했습니다."`;
   }
 
   // "사주 변경 ✏️" 버튼 클릭 시 입력 폼 화면으로 이동
