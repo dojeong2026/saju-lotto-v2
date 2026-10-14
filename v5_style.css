@@ -6032,6 +6032,7 @@ body {
 .tag-def { background: #fee2e2; color: #b91c1c; }
 .tag-excess { background: #fef3c7; color: #b45309; }
 .tag-norm { background: #f1f5f9; color: #475569; }
+.tag-weak { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
 
 .dh-oh-track {
   width: 100%;
@@ -6047,38 +6048,125 @@ body {
   transition: width 0.4s ease;
 }
 
+.dh-daeun-title-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dh-daeun-hint {
+  font-size: 0.68rem;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
 .dh-daeun-now-desc {
-  font-size: 0.78rem;
-  color: #334155;
-  background: #f8fafc;
-  padding: 8px 10px;
-  border-radius: 6px;
   margin-bottom: 8px;
-  line-height: 1.4;
+}
+
+.dh-daeun-card-pop {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #2563eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dh-daeun-card-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #0f172a;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.dh-badge-cur {
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.dh-badge-future {
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.dh-badge-past {
+  background: #64748b;
+  color: #ffffff;
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.dh-daeun-card-body {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #334155;
+  margin: 0;
 }
 
 .dh-daeun-timeline {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  padding: 4px 2px 8px;
   margin-bottom: 12px;
 }
 
 .dh-daeun-chip {
   flex-shrink: 0;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   padding: 6px 8px;
   text-align: center;
-  min-width: 48px;
+  min-width: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  color: #1e293b;
+}
+
+.dh-daeun-chip:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
 }
 
 .dh-daeun-chip.is-current {
   background: #0f172a;
   border-color: #0f172a;
   color: #ffffff;
+}
+
+.dh-daeun-chip.is-active {
+  border: 2px solid #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25), 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.dh-daeun-chip.is-current.is-active {
+  background: #1e293b;
+  border-color: #60a5fa !important;
 }
 
 .dh-daeun-age {

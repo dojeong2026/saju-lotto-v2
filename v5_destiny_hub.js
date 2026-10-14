@@ -241,10 +241,25 @@
     elOrder.forEach(el => {
       const pct = chart.ohaengPercent[el] || 0;
       const cnt = chart.counts[el] || 0;
-      const isDef = (el === chart.minElement);
+      const isDefTarget = (el === chart.minElement);
+      const isZero = (cnt === 0);
       const isExcess = (el === chart.maxElement && pct >= 35);
-      const tagText = isDef ? '결핍 보강' : (isExcess ? '과다 조절' : '균형');
-      const tagClass = isDef ? 'tag-def' : (isExcess ? 'tag-excess' : 'tag-norm');
+      
+      let tagText = '균형';
+      let tagClass = 'tag-norm';
+      if (isDefTarget) {
+        tagText = '결핍 보강';
+        tagClass = 'tag-def';
+      } else if (isZero) {
+        tagText = '결핍';
+        tagClass = 'tag-def';
+      } else if (isExcess) {
+        tagText = '과다 조절';
+        tagClass = 'tag-excess';
+      } else if (cnt === 1) {
+        tagText = '약함';
+        tagClass = 'tag-weak';
+      }
 
       ohaengBarsHtml += `
         <div class="dh-oh-row">
@@ -267,17 +282,20 @@
     let currentDaeunObj = null;
 
     if (chart.daeun && Array.isArray(chart.daeun.list)) {
-      chart.daeun.list.forEach(d => {
+      chart.daeun.list.forEach((d, dIdx) => {
         const isCurrent = (koreanAge >= d.startAge && koreanAge <= d.endAge);
         if (isCurrent) currentDaeunObj = d;
+        const isFuture = (koreanAge < d.startAge);
         const dPillar = d.kor || ((d.ganKor || '') + (d.jiKor || '')) || (d.gan + '' + d.ji);
         const dGod = d.god || (global.SajuEngine ? global.SajuEngine.tenGod(chart.dayGan, d.gan) : '');
         daeunTimelineHtml += `
-          <div class="dh-daeun-chip ${isCurrent ? 'is-current' : ''}">
+          <button type="button" class="dh-daeun-chip ${isCurrent ? 'is-current is-active' : ''}" 
+                  id="dh-daeun-chip-${dIdx}"
+                  onclick="selectDaeunChip(${dIdx}, ${d.startAge}, ${d.endAge}, '${esc(dPillar)}', '${esc(dGod)}', ${isCurrent}, ${isFuture})">
             <span class="dh-daeun-age">${d.startAge}세</span>
             <span class="dh-daeun-pillar">${dPillar}</span>
             <span class="dh-daeun-god">${dGod}</span>
-          </div>
+          </button>
         `;
       });
     }
@@ -484,8 +502,16 @@
 
               <!-- 10년 대운 타임라인 -->
               <div class="dh-daeun-section">
-                <span class="dh-sec-title">10년 대운(大運) 흐름 타임라인</span>
-                <p class="dh-daeun-now-desc">${daeunDesc}</p>
+                <div class="dh-daeun-title-wrap">
+                  <span class="dh-sec-title">10년 대운(大運) 흐름 타임라인</span>
+                  <span class="dh-daeun-hint">👆 나이를 누르면 미래·과거 운세를 볼 수 있어요</span>
+                </div>
+                <div class="dh-daeun-now-desc" id="dh-daeun-desc">
+                  <div class="dh-daeun-card-pop">
+                    <div class="dh-daeun-card-head"><span class="dh-badge-cur">📍 현재 대운</span> <strong>${currentDaeunObj ? currentDaeunObj.startAge + '세~' + currentDaeunObj.endAge + '세 [' + curPillar + (curGod ? ' · ' + curGod : '') + ']' : ''}</strong></div>
+                    <p class="dh-daeun-card-body">${daeunDesc}</p>
+                  </div>
+                </div>
                 <div class="dh-daeun-timeline">
                   ${daeunTimelineHtml}
                 </div>
@@ -870,6 +896,39 @@
       prompt(`아래 링크를 복사하여 카카오톡으로 전달하세요:`, url);
     }
   }
+
+  // 대운 칩 선택 인터랙션
+  global.selectDaeunChip = function(idx, startAge, endAge, pillar, god, isCurrent, isFuture) {
+    const chips = document.querySelectorAll('.dh-daeun-chip');
+    chips.forEach(c => c.classList.remove('is-active'));
+    const target = document.getElementById(`dh-daeun-chip-${idx}`);
+    if (target) target.classList.add('is-active');
+
+    const descEl = document.getElementById('dh-daeun-desc');
+    if (!descEl) return;
+
+    const baseLine = global.DailyContent ? global.DailyContent.daeunLine(god) : '인생의 흐름이 새로운 국면을 맞이하는 시기입니다.';
+
+    let badge = '';
+    let intro = '';
+    if (isCurrent) {
+      badge = '<span class="dh-badge-cur">📍 현재 대운</span>';
+      intro = `현재는 <strong>${startAge}세~${endAge}세 ${pillar}${god ? '(' + god + ')' : ''}</strong> 대운의 흐름에 들어서 있습니다.`;
+    } else if (isFuture) {
+      badge = '<span class="dh-badge-future">🔮 미래 대운 (예상)</span>';
+      intro = `앞으로 맞이할 <strong>${startAge}세~${endAge}세 ${pillar}${god ? '(' + god + ')' : ''}</strong> 대운의 흐름입니다.`;
+    } else {
+      badge = '<span class="dh-badge-past">📜 지나온 대운</span>';
+      intro = `지나온 <strong>${startAge}세~${endAge}세 ${pillar}${god ? '(' + god + ')' : ''}</strong> 대운의 흐름이었습니다.`;
+    }
+
+    descEl.innerHTML = `
+      <div class="dh-daeun-card-pop">
+        <div class="dh-daeun-card-head">${badge} <strong>${startAge}세 ~ ${endAge}세 [${pillar} · ${god || '대운'}]</strong></div>
+        <p class="dh-daeun-card-body">${intro} ${baseLine}</p>
+      </div>
+    `;
+  };
 
   // 전역 노출
   global.renderDestinyHub = renderDestinyHub;
