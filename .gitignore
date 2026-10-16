@@ -1,3 +1,18 @@
 # Temporary screenshot files
 *.png
 read_recent_steps.py
+
+# Confidential business & strategy documents
+사주로또_원리.md
+사주로또_v2_긴급개선계획서.md
+사주로또_v2_마스터전략보고서.md
+사주로또_경쟁앱_분석보고서.md
+*.hwpx
+*.hwp
+
+# Source code backups before obfuscation
+*.src.js
+
+# Internal testing & agent rules
+tests/
+.agents/
